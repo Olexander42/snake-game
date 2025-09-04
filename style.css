@@ -1,0 +1,13 @@
+body {
+  display: flex;
+  justify-content: center;
+}
+
+.playground {
+  position: absolute;
+}
+
+.score {
+  position: absolute;
+  left: 500px;
+}

@@ -1,10 +1,10 @@
 const body = document.querySelector("body");
-const canvas = document.querySelector("canvas");
-const ctx = canvas.getContext("2d");
-const scoreCanvas = document.getElementById("score");
-const scrCtx = scoreCanvas.getContext("2d");
+const playground = document.querySelector(".playground");
+const ctx = playground.getContext("2d");
+const score = document.querySelector(".score");
+const scrCtx = score.getContext("2d");
 
-const block = canvas.width / 50;
+const block = playground.width / 50;
 const border = 2 * block;
 
 function drawBlock(x, y, type="square") {
@@ -22,9 +22,9 @@ function drawBorder() {
   ctx.strokeStyle = "#8B4513";
   ctx.lineWidth = 2 * border;
   ctx.moveTo(0, 0);
-  ctx.lineTo(canvas.width, 0);
-  ctx.lineTo(canvas.width, canvas.height);
-  ctx.lineTo(0, canvas.height);
+  ctx.lineTo(playground.width, 0);
+  ctx.lineTo(playground.width, playground.height);
+  ctx.lineTo(0, playground.height);
   ctx.lineTo(0, 0);
   ctx.stroke();
 }
@@ -80,9 +80,9 @@ class SnakeGame {
   _checkCollision() {
     if (
     this._coordInsideBody(this.xHead, this.yHead, this.body) ||
-    this.xHead > canvas.width / block - 3 ||
+    this.xHead > playground.width / block - 3 ||
     this.xHead < 2 ||
-    this.yHead > canvas.height / block - 3 ||  
+    this.yHead > playground.height / block - 3 ||  
     this.yHead < 2
     ) {
       this._init();
@@ -104,7 +104,7 @@ class SnakeGame {
 
   _getRandomFoodCoord() { 
     while (true) {
-      let [x, y] = [getRandomInt(3, canvas.width / block - 3), getRandomInt(3, canvas.height / block - 3)];
+      let [x, y] = [getRandomInt(3, playground.width / block - 3), getRandomInt(3, playground.height / block - 3)];
       if (!this._coordInsideBody(x, y, this.body)) { 
           return [x, y];
         }
@@ -124,9 +124,9 @@ class SnakeGame {
   // general   
 
   _init() {
-    this._clearCanvas();
-    this.xHead = Math.floor(canvas.width / block / 2);
-    this.yHead = Math.floor(canvas.height / block / 2);
+    this._clearplayground();
+    this.xHead = Math.floor(playground.width / block / 2);
+    this.yHead = Math.floor(playground.height / block / 2);
     this.xDirection = 1;
     this.yDirection = 0;
     this.speed = 1;
@@ -161,8 +161,8 @@ class SnakeGame {
     return false;
   }
 
-  _clearCanvas() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  _clearplayground() {
+  ctx.clearRect(0, 0, playground.width, playground.height);
   }
 }
 
