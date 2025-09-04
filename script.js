@@ -4,7 +4,7 @@ const ctx = playground.getContext("2d");
 const score = document.querySelector(".score");
 const scrCtx = score.getContext("2d");
 
-const block = playground.width / 50;
+const block = Math.floor(playground.width / 50);
 const border = 2 * block;
 
 function drawBlock(x, y, type="square") {
@@ -60,12 +60,12 @@ class SnakeGame {
   _updateBody() {
     let xBody = this.xHead;
     let yBody = this.yHead;
-    this.body.push([xBody, yBody]);
+    this.body.push([xBody, yBody]); /* grows the body by "remembering" the head coords */
   }
 
 
   _deleteTail() {
-    let [xTail, yTail] = this.body.shift();
+    let [xTail, yTail] = this.body.shift(); /* gets the last coords of body */
     ctx.clearRect(xTail * block, yTail * block, block, block);
   }
 

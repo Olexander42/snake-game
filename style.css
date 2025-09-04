@@ -1,13 +1,11 @@
-body {
-  display: flex;
-  justify-content: center;
-}
-
 .playground {
-  position: absolute;
+  display: block;
+  margin: auto;
 }
 
 .score {
   position: absolute;
-  left: 500px;
+  top: 0px;
+  inset-inline: 0px;
+  margin-inline: auto;
 }
