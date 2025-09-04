@@ -1,3 +1,17 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  height: 100vh;
+  align-content: center;
+}
+
+.container {
+  position: relative;
+  width: 75vw;
+  height: 75vh;
+  margin: auto;
+}
+
 .playground {
   display: block;
   margin: auto;
@@ -5,7 +19,7 @@
 
 .score {
   position: absolute;
-  top: 0px;
-  inset-inline: 0px;
-  margin-inline: auto;
+  inset: 0;
+  justify-self: center;
+  transform: translateX(25%);
 }
