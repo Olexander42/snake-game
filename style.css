@@ -10,14 +10,22 @@ body {
   width: 75vw;
   height: 75vh;
   margin: auto;
+  border: 1px solid;
 }
 
+.border,
 .playground {
+  position: absolute;
+  inset: 0;
   display: block;
   margin: auto;
 }
 
-.score {
+.playground {
+  border: 1px dashed;
+}
+
+.score { 
   position: absolute;
   inset: 0;
   justify-self: center;
