@@ -6,18 +6,37 @@ const score = document.querySelector(".score");
 const plgrndCtx = playground.getContext("2d");
 const scrCtx = score.getContext("2d");
 let points;
+
+/* 
+- make the shrinking less aggressive
+- show level (aka speed)
+- show best result (stats)
+- test collisions
+- test food coords (sometimes food doesn't appear)
+- background image
+- menu (start / stats / settings (snake color / pixel size))
+- add in-ward spikes to border
+*/
+// VISUALS
 const pixel = 20;
-const border = pixel * 2;
 
-// visuals
-playground.width = container.clientWidth;
-playground.height = container.clientHeight;
+// size dictated by CSS
+containerWidth = parseInt(getComputedStyle(container).width); 
+containerHeight = parseInt(getComputedStyle(container).height);
 
-playgroundWidthPx = Math.floor(playground.width / pixel);
-playgroundHeightPx = Math.floor(playground.width / pixel);
+// round the size to the round number of in-game pixels
+containerWidth = Math.round(containerWidth / 20) * 20 ;
+containerHeight = Math.round(containerHeight / 20) * 20;
 
-score.width = pixel * 10;
-score.height = pixel * 2;
+// apply the sizing 
+container.style.width = containerWidth + "px";
+container.style.height = containerHeight + "px";
+playground.width = containerWidth;
+playground.height = containerHeight;
+
+// size in in-game pixels
+playgroundWidthPx = playground.width / pixel;
+playgroundHeightPx = playground.width / pixel;
 
 function drawPixel(x, y, type="square") {
   plgrndCtx.beginPath();
@@ -32,22 +51,23 @@ function drawPixel(x, y, type="square") {
 function drawBorder() {
   plgrndCtx.beginPath();
   plgrndCtx.strokeStyle = "#8B4513";
-  plgrndCtx.lineWidth = 2 * border;
-  plgrndCtx.moveTo(0, 0);
-  plgrndCtx.lineTo(playground.width, 0);
-  plgrndCtx.lineTo(playground.width, playground.height);
-  plgrndCtx.lineTo(0, playground.height);
-  plgrndCtx.lineTo(0, 0);
+  plgrndCtx.lineWidth = pixel;
+  plgrndCtx.moveTo(0, pixel/2);
+  plgrndCtx.lineTo(playground.width - pixel/2, pixel/2);
+  plgrndCtx.lineTo(playground.width - pixel/2, playground.height - pixel/2);
+  plgrndCtx.lineTo(pixel/2, playground.height - pixel/2);
+  plgrndCtx.lineTo(pixel/2, 0);
   plgrndCtx.stroke();
 }
 
-
+score.width = pixel * 10;
+score.height = pixel;
 function displayScore() {
-  scrCtx.clearRect(4 * pixel , pixel / 2, 2 * pixel, pixel);
+  scrCtx.clearRect(4 * pixel , 0, 5 * pixel, pixel);
   scrCtx.font = `${pixel}px Courier`;
   scrCtx.fillStyle = "white";
-  scrCtx.textAlign = "left";
-  scrCtx.textBaseline = "top";
+  scrCtx.textAlign = "top";
+  scrCtx.textBaseline = "middle";
   scrCtx.fillText("Score: " + points, pixel / 2, pixel / 2);
 }
 
@@ -62,7 +82,7 @@ function shrink() {
   drawBorder();
 }
 
-// logic 
+// LOGIC 
 class SnakeGame {
   constructor() {
     this._init();
@@ -105,9 +125,9 @@ class SnakeGame {
   }
 
   _grow() {
+    points += this.speed; // later points are move valuable
     this.length += 1;
     this.speed += 1;
-    points++;
     shrink();
     displayScore();
     this._drawSnake();
