@@ -1,29 +1,20 @@
 const html = document.querySelector("html");
 const container = document.querySelector(".container")
-const border = document.querySelector(".border");
 const playground = document.querySelector(".playground");
 const score = document.querySelector(".score");
 
-const brdrCtx = border.getContext("2d");
 const plgrndCtx = playground.getContext("2d");
 const scrCtx = score.getContext("2d");
-const pixel = 20;
-const borderThick = pixel * 2;
-const k = 0.9;
 let points;
+const pixel = 20;
+const border = pixel * 2;
 
 // visuals
 playground.width = container.clientWidth;
 playground.height = container.clientHeight;
 
-border.width = container.clientWidth;
-border.height = container.clientHeight;
-
 playgroundWidthPx = Math.floor(playground.width / pixel);
 playgroundHeightPx = Math.floor(playground.width / pixel);
-
-borderWidthPx = Math.floor(border.width / pixel);
-borderHeightPx = Math.floor(border.height / pixel);
 
 score.width = pixel * 10;
 score.height = pixel * 2;
@@ -39,43 +30,39 @@ function drawPixel(x, y, type="square") {
 }
 
 function drawBorder() {
-  brdrCtx.beginPath();
-  brdrCtx.strokeStyle = "#8B4513";
-  brdrCtx.lineWidth = borderThick * 2;
-  brdrCtx.moveTo(0, 0);
-  brdrCtx.lineTo(border.width, 0);
-  brdrCtx.lineTo(border.width, border.height);
-  brdrCtx.lineTo(0, border.height);
-  brdrCtx.lineTo(0, 0);
-  brdrCtx.stroke();
+  plgrndCtx.beginPath();
+  plgrndCtx.strokeStyle = "#8B4513";
+  plgrndCtx.lineWidth = 2 * border;
+  plgrndCtx.moveTo(0, 0);
+  plgrndCtx.lineTo(playground.width, 0);
+  plgrndCtx.lineTo(playground.width, playground.height);
+  plgrndCtx.lineTo(0, playground.height);
+  plgrndCtx.lineTo(0, 0);
+  plgrndCtx.stroke();
 }
+
 
 function displayScore() {
   scrCtx.clearRect(4 * pixel , pixel / 2, 2 * pixel, pixel);
   scrCtx.font = `${pixel}px Courier`;
-  scrCtx.fillStyle = "black";
+  scrCtx.fillStyle = "white";
   scrCtx.textAlign = "left";
   scrCtx.textBaseline = "top";
   scrCtx.fillText("Score: " + points, pixel / 2, pixel / 2);
 }
 
 function shrink() {
-  border.width *= 0.9;
-  border.height *= 0.9;
-
-  playground.width *= 0.9;
-  playground.height *= 0.9;
-
+  container.style.width = parseInt(getComputedStyle(container).width) - pixel + "px";
+  container.style.height = parseInt(getComputedStyle(container).height) - pixel + "px";
+  playground.width = container.clientWidth;
+  playground.height = container.clientHeight;
   playgroundWidthPx = Math.floor(playground.width / pixel);
   playgroundHeightPx = Math.floor(playground.width / pixel);
-
-  borderWidthPx = Math.floor(border.width / pixel);
-  borderHeightPx = Math.floor(border.height / pixel);
+  console.log("shrink()");
+  drawBorder();
 }
 
-
 // logic 
-
 class SnakeGame {
   constructor() {
     this._init();
@@ -89,7 +76,7 @@ class SnakeGame {
     //this._checkCollision();
     this._drawSnake();
     this._checkSnakeFood();
-    console.log(this.yHead, borderHeightPx);
+    console.log(this.xHead, playgroundWidthPx );
     if (this.length < this.body.length) this._deleteTail();
   }
 
@@ -122,20 +109,21 @@ class SnakeGame {
     this.speed += 1;
     points++;
     shrink();
-    drawBorder();
     displayScore();
+    this._drawSnake();
     this._initWindup(); 
+    
   }
 
   _checkCollision() {
     if (
     this._coordInsideBody(this.xHead, this.yHead, this.body) ||
-    this.xHead > borderWidthPx - 2 ||
+    this.xHead > playgroundWidthPx - 3 ||
     this.xHead < 2 ||
-    this.yHead > borderHeightPx - 3 ||  
+    this.yHead > playground.height / pixel - 3 ||  
     this.yHead < 2
     ) {
-      /* reset the game */
+      // reset the game 
       this._init(); 
       this._initWindup() 
     }
@@ -156,8 +144,8 @@ class SnakeGame {
   _getRandomFoodCoord() { 
     while (true) {
       let [x, y] = [
-        getRandomInt(3, borderWidthPx - 3),
-        getRandomInt(3, borderHeightPx - 3)
+        getRandomInt(3, playgroundWidthPx - 3),
+        getRandomInt(3, playground.height / pixel - 3)
         ]; 
       if (!this._coordInsideBody(x, y, this.body)) { 
           return [x, y];
@@ -169,7 +157,7 @@ class SnakeGame {
   _init() {
     this._clearplayground();
     this.xHead = Math.floor(playgroundWidthPx / 2);
-    this.yHead = Math.floor(playgroundHeightPx / 2);
+    this.yHead = Math.floor(playground.height / pixel / 2);
     this.xDirection = 1;
     this.yDirection = 0;
     this.speed = 1;
@@ -258,8 +246,7 @@ let intervalId;
 function windup(speed) {
   intervalId = setInterval( () => {
     snake.move();
-    console.log(snake.xHead, borderWidthPx);
-  }, 50000 / 1); 
+  }, 100000 / speed); 
 }
 
 windup(snake.speed);
