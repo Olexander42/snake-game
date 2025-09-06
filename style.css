@@ -10,7 +10,6 @@ body {
   width: 75vw;
   height: 75vh;
   margin: auto;
-  border: 1px solid;
 }
 
 .border,
@@ -29,5 +28,4 @@ body {
   position: absolute;
   inset: 0;
   justify-self: center;
-  transform: translateX(25%);
 }
