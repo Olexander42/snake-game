@@ -12,11 +12,11 @@ let playgroundHeight;
 /* 
 - show best result (stats)
 - test collisions
-- test food coords (sometimes food doesn't appear - probably it appears in the same position or inside body)
 - background image
 - menu (start / stats / settings (snake color / block size))
 - add in-ward spikes to border
 - sound effects
+- snake gradient color
 */
 // VISUALS
 const block = 20;
@@ -34,7 +34,7 @@ function drawblock(x, y, type="square") {
   plgrndCtx.fill()
 }
 
-function drawOutline(mode="init") {
+function draw(mode="init") {
   // fetch sizes
   let containerWidth = parseInt(getComputedStyle(container).width); 
   let containerHeight = parseInt(getComputedStyle(container).height);
@@ -59,7 +59,7 @@ function drawOutline(mode="init") {
 
   drawScore();
 
-  drawSpike();
+  drawSpikes();
 }
 
 function drawBorder() {
@@ -83,17 +83,45 @@ function drawScore(){
   scrCtx.fillText("Score: " + points, block/2, block/2);
 }
 
-function drawSpike() {
-  plgrndCtx.beginPath();
-  plgrndCtx.strokeStyle = "black";
-  plgrndCtx.lineWidth = 2;
-  plgrndCtx.moveTo(block, block);
-  plgrndCtx.lineTo(block * 1.5, block * 2);
-  plgrndCtx.lineTo(block * 2, block);
-  plgrndCtx.stroke();
+function drawSpike(i=1, j=1, base, direction) {
+  let x = block * i;
+  let y = block * j;
+  if (base === "horizontal") {
+    plgrndCtx.beginPath();
+    plgrndCtx.moveTo(x, y);
+    direction === "down" 
+      ? plgrndCtx.lineTo(x + block/2, y + block) 
+      : plgrndCtx.lineTo(x + block/2, y - block);
+    plgrndCtx.lineTo(x + block, y);
+    plgrndCtx.fill();
+  } else if (base === "vertical") {
+      plgrndCtx.beginPath();
+      plgrndCtx.moveTo(x, y);
+      direction === "left" 
+        ? plgrndCtx.lineTo(x - block, y + block/2) 
+        : plgrndCtx.lineTo(x + block, y + block/2)
+      plgrndCtx.lineTo(x, y + block);
+      plgrndCtx.fill();
+    }
 }
 
-drawOutline(); // to fetch and initialize the sizing
+function drawSpikes() {
+  // width and height of inner border in blocks
+  const hLength = playgroundWidth - 1; 
+  const vLength = playgroundHeight - 1;
+  // horizontal base
+  for (let i = 1; i < hLength; i++) {
+    drawSpike(i, 1, "horizontal", "down");
+    drawSpike(i, vLength, "horizontal", "up");
+  }
+  // vertical base 
+  for (let j = 2; j < vLength - 1; j++) {
+    drawSpike(hLength, j, "vertical", "left");
+    drawSpike(1, j, "vertical", "right");
+  }
+}
+
+draw(); // to fetch and initialize the sizing
 
 // LOGIC 
 class SnakeGame {
@@ -103,37 +131,36 @@ class SnakeGame {
 
   // snake
   move() {
-    this._updateBody();
+    this._updateTail();
     this.xHead += this.xDirection ;
     this.yHead += this.yDirection;
     this._checkCollision();
-    this._drawSnake();
     this._checkSnakeFood();
-    console.log(this.xHead, this.yHead);
-    if (this.length < this.body.length) this._deleteTail();
+    //console.log(this.xHead, this.yHead)
+    if (this.length < this.tail.length) this._deleteTail();
+    this._drawSnake();
   }
 
   _drawSnake() {
     // head
     plgrndCtx.fillStyle = "darkgreen";
     drawblock(this.xHead, this.yHead);
-
-    // body
-    for (let i = 0; i < this.body.length; i++) {
+    // tail
+    for (let i = 0; i < this.tail.length; i++) {
       plgrndCtx.fillStyle = "green";
-      drawblock(this.body[i][0], this.body[i][1]); // redraw head but in another color 
+      drawblock(this.tail[i][0], this.tail[i][1]);
     }
   }
 
-  _updateBody() {
-    let xBody = this.xHead;
-    let yBody = this.yHead;
-    this.body.push([xBody, yBody]); // grow body by "remembering" head coords
+  _updateTail() {
+    let xTail = this.xHead;
+    let yTail = this.yHead;
+    this.tail.push([xTail, yTail]); // grow tail by "remembering" head coords
   }
 
 
   _deleteTail() {
-    let [xTail, yTail] = this.body.shift(); // get the last coords of body
+    let [xTail, yTail] = this.tail.shift(); // get the last coords of tail
     plgrndCtx.clearRect(xTail * block, yTail * block, block, block);
   }
 
@@ -141,19 +168,19 @@ class SnakeGame {
     points++;
     this.length++;
     this.speed++;
-    drawScore();
+    draw();
     this._shrinkCount();
-    this._drawSnake();
-    this._initWindup(); 
+    this._initWindup();
+    this._drawSnake(); 
   }
 
   _checkCollision() {
     if (
-    this._coordInsideBody(this.xHead, this.yHead, this.body) ||
-    this.xHead >= playgroundWidth - 1 ||
-    this.xHead < 1 ||
-    this.yHead >= playgroundHeight - 1 ||  
-    this.yHead < 1
+    this._coordInsideTail(this.xHead, this.yHead) ||
+    this.xHead >= playgroundWidth - 2 ||
+    this.xHead < 2 ||
+    this.yHead >= playgroundHeight - 2 ||  
+    this.yHead < 2
     ) {
       // reset the game 
       this._init(); 
@@ -176,10 +203,12 @@ class SnakeGame {
   _getRandomFoodCoord() { 
     while (true) {
       let [x, y] = [
-        getRandomInt(3, playgroundWidth - 3),
-        getRandomInt(3, playground.height / block - 3)
+        getRandomInt(2, playgroundWidth - 2), 
+        getRandomInt(2, playgroundHeight - 2)
         ]; 
-      if (!this._coordInsideBody(x, y, this.body)) { 
+      if (this._coordInsideTail(x, y) || x === this.xFood || y === this.yFood) {
+          continue;
+        } else {
           return [x, y];
         }
       }
@@ -193,7 +222,7 @@ class SnakeGame {
     this.xDirection = 1;
     this.yDirection = 0;
     this.speed = 1;
-    this.body = [];
+    this.tail = [];
     this.length = 1;
     this.counterOuter = 1;
     this.counterInner = 0;
@@ -201,10 +230,11 @@ class SnakeGame {
     // reset the sizing 
     container.style.width = "";
     container.style.height = "";
-    drawOutline();
-    this._drawSnake();
+
+    draw();
     this._randomFoodCreation();
-    this.move();
+    this.move(); // to create tail upon creation
+    this._drawSnake();
   }
    
   _checkSnakeFood() {
@@ -219,9 +249,9 @@ class SnakeGame {
     windup(this.speed);
   }
 
-  _coordInsideBody(x, y, array) {
-    for (let i = 0; i < this.body.length; i++) {
-      if (this.body[i][0] === x && this.body[i][1] === y) {
+  _coordInsideTail(x, y) {
+    for (let i = 0; i < this.tail.length; i++) {
+      if (this.tail[i][0] === x && this.tail[i][1] === y) {
         return true;
       }
     }
@@ -236,12 +266,23 @@ class SnakeGame {
     if (this.counterInner < this.counterOuter) {
       this.counterInner++;
       if (this.counterInner >= this.counterOuter) {
-        drawOutline("shrink");
+        draw("shrink");
         this.counterInner = 0;
         this.counterOuter++;
       }
     }
   }
+  
+  /*
+  _snakeCoordsCorrection() {
+    for (let i = 0; i < this.tail.length; i++) {
+      if (this.tail[i][0] === (playgroundWidth - 2) { // if snake inside right border spikes
+
+      }
+
+       this.tail[i][1] === (playgroundHeight - 2)) 
+  }
+  */
 }
 
 function getRandomInt(min, max) {
@@ -293,7 +334,7 @@ let intervalId;
 function windup(speed) {
   intervalId = setInterval( () => {
     snake.move();
-  }, 100000 / speed); 
+  }, 100000000 / 1); 
 }
 
 windup(snake.speed);
