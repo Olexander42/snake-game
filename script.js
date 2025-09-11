@@ -1,16 +1,18 @@
 const html = document.querySelector("html");
 const menu = document.querySelector(".menu");
 const start = document.querySelector(".start-btn");
+const startAgain = document.querySelector(".start-again-btn");
 const background = document.querySelector(".background");
 const container = document.querySelector(".container");
 const playground = document.querySelector(".playground");
 const score = document.querySelector(".score");
 const record = document.querySelector(".record");
 
+let snake;
 const plgrndCtx = playground.getContext("2d");
 const scrCtx = score.getContext("2d");
 const rcrdCtx = record.getContext("2d");
-let points;
+let points = 0;
 let best = 0;
 let playgroundWidth;
 let playgroundHeight;
@@ -48,15 +50,17 @@ function draw(mode) {
   let containerHeight = parseInt(getComputedStyle(container).height);
 
   if (mode === "init") {
-    // round the size in pixels to the round number of blocks
+    // "normalization"
     containerWidth = Math.round(containerWidth / 20) * 20 ;
     containerHeight = Math.round(containerHeight / 20) * 20;
     // apply the sizing 
-    document.documentElement.style.setProperty("--container-width", containerWidth + "px");
-    document.documentElement.style.setProperty("--container-height", containerHeight + "px");
+    container.style.width = containerWidth + "px";
+    container.style.height = containerHeight + "px";
+    background.style.width = containerWidth + "px";
+    background.style.height = containerHeight + "px";
 
-    displayInfo(scrCtx, " Score:", points);
-    displayInfo(rcrdCtx, " Record:", best);
+    displayInfo(scrCtx);
+    displayInfo(rcrdCtx);
   } else if (mode === "shrink") {
       // shrink container
       container.style.width = containerWidth - block + "px";
@@ -73,7 +77,6 @@ function draw(mode) {
   playgroundHeight = playground.height / block;
 
   drawBorder();
-
   drawSpikes();
 }
 
@@ -89,13 +92,14 @@ function drawBorder() {
   plgrndCtx.stroke();
 }
 
-function displayInfo(ctx, text, data) {
+function displayInfo(ctx) {
   ctx.clearRect(4 * block , 0, 5 * block, block);
   ctx.font = `${block}px Courier`;
   ctx.fillStyle = "white";
   ctx.textAlign = "left";
   ctx.textBaseline = "middle"; 
-  ctx.fillText(text + data, block/2, block/2);
+  if (ctx === scrCtx) ctx.fillText(" Score:" + points, block/2, block/2);
+  else if (ctx === rcrdCtx) ctx.fillText(" Record:" + best, block/2, block/2);
 }
 
 function drawSpike(i=1, j=1, base, direction) {
@@ -139,15 +143,18 @@ function drawSpikes() {
 function resetSize() {
     container.style.width = "";
     container.style.height = "";
-    background.style.width = "";
-    background.style.height = "";
-    background.style.clipPath = `none`;
+    background.style.clipPath = "none";
     clip = block/2;
+    points = 0;
 }
+
+ function clearplayground() {
+    plgrndCtx.clearRect(0, 0, playground.width, playground.height);
+  }
 
 
 // LOGIC 
-class SnakeGame {
+class Snake {
   constructor() {
     this._init();
   }
@@ -193,15 +200,15 @@ class SnakeGame {
     points++;
     if (points > best) {
       best = points;
-      displayInfo(rcrdCtx, " Record:", best)
+      displayInfo(rcrdCtx)
     }
-    displayInfo(scrCtx, " Score:", points);
+    displayInfo(scrCtx);
     this.length++;
     this.speed++;
     this._checkShrink(); // playground size remains or shrinks
     if (!this._checkCollision()) { // if the game doesn't get reset because of collision
       this._randomFoodCreation();
-      this._initWindup();
+      this._changeSpeed();
     }
   }
 
@@ -245,9 +252,7 @@ class SnakeGame {
 
   // general   
   _init() {
-    this._clearplayground();
     points = 0;
-    draw("init");
     this.xHead = Math.floor(playgroundWidth / 2);
     this.yHead = Math.floor(playgroundHeight / 2);
     this.xDirection = 1;
@@ -267,22 +272,13 @@ class SnakeGame {
     }
   }
 
-  async _initWindup(mode="grow") { // speed change
-    clearInterval(intervalId); // stop animation
-    if (mode === "reset") {
-      await freeze(5000);  // pause on the moment of collision before starting movement again
-      this.speed = 1;
-    } else {
+  _changeSpeed() { // speed change
+    clearInterval(intervalId); 
     windup(this.speed);
-    }
   }
 
   _coordInsideTail(x, y) {
     return this.tail.some((tailCoord) => tailCoord[0] === x && tailCoord[1] === y);
-  }
-
-  _clearplayground() {
-    plgrndCtx.clearRect(0, 0, playground.width, playground.height);
   }
 
   _checkShrink() {
@@ -312,13 +308,10 @@ class SnakeGame {
     }
   }
 
-  async _gameOver() {
+  _gameOver() {
     this._drawSnake("crimson", "coral");
-    // reset the game 
-    this._initWindup("reset"); 
-    await freeze(5000); // don't redraw untill freeze() inside this._initWindup() done waiting
-    resetSize();
-    this._init(); 
+    clearInterval(intervalId); // stop any movement
+    startAgain.style.display = "block";
   }
 }
 
@@ -330,7 +323,6 @@ function getRandomInt(min, max) {
 function freeze(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
-
 
 // controls 
 const handleKeydown = (event) => {
@@ -368,14 +360,11 @@ const handleKeydown = (event) => {
       break;
   }
 }
- 
+
 const control = () => {
   html.addEventListener("keydown", handleKeydown);
 }
-
-// start the game 
-const snake = new SnakeGame();
-
+ 
 function windup(speed) {
   intervalId = setInterval(() => {
     control();
@@ -383,8 +372,21 @@ function windup(speed) {
   }, 1000 / speed); 
 }
 
-start.addEventListener("click", () => {
-  windup(1);
-  menu.style.display = "none";
-})
+const gameStarter = (btn) => {
+  btn.addEventListener("click", (event) => {
+    resetSize();
+    draw("init");
+    snake = new Snake();
+    windup(snake.speed);
+    btn.style.display = "none";
+    menu.style.display = "none";
+  })
+}
+
+draw("init");
+
+gameStarter(start);
+
+gameStarter(startAgain);
+
 
