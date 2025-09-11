@@ -1,6 +1,6 @@
 const html = document.querySelector("html");
-const wrapper = document.querySelector(".wrapper");
-const backgroundImg = document.querySelector(".background-image");
+//const background = document.querySelector(".background");
+const background = document.querySelector(".background");
 const container = document.querySelector(".container");
 const playground = document.querySelector(".playground");
 const score = document.querySelector(".score");
@@ -24,7 +24,7 @@ let intervalId;
 
 // VISUALS
 const block = 20;
-let clip = block/2; // clip-path value to use on backgroundImg
+let clip = block/2; // clip-path value to use on background
 
 score.width = block * 7;
 score.height = block;
@@ -51,8 +51,8 @@ function draw(mode) {
     // apply the sizing 
     container.style.width = containerWidth + "px";
     container.style.height = containerHeight + "px";
-    wrapper.style.width = containerWidth + "px";
-    wrapper.style.height = containerHeight + "px";
+    background.style.width = containerWidth + "px";
+    background.style.height = containerHeight + "px";
 
     drawScore();
   } else if (mode === "shrink") {
@@ -61,9 +61,10 @@ function draw(mode) {
       container.style.height = containerHeight - block + "px";
 
       // clip background image
-      backgroundImg.style.clipPath = `inset(${clip}px)`;
+      background.style.clipPath = `inset(${clip + 1}px)`;
       clip += block/2;
     }
+  // equal the size of <canvas> to the size of its parent
   playground.width = container.clientWidth;
   playground.height = container.clientHeight;
   // convert pixels to blocks
@@ -137,9 +138,9 @@ function drawSpikes() {
 function resetSize() {
     container.style.width = "";
     container.style.height = "";
-    wrapper.style.width = "";
-    wrapper.style.height = "";
-    backgroundImg.style.clipPath = `none`;
+    background.style.width = "";
+    background.style.height = "";
+    background.style.clipPath = `none`;
     clip = block/2;
 }
 
