@@ -214,19 +214,16 @@ class SnakeGame {
 
   // food
   _randomFoodCreation() {
-    console.log("I'm inside _randomFoodCreation");
     [this.xFood, this.yFood] = this._getRandomFoodCoord();
     this._drawFood();
   }
 
   _drawFood() {
-    console.log("I'm inside _drawFood");
     plgrndCtx.fillStyle = "red";
     drawblock(this.xFood, this.yFood, "circle");
   } 
 
   _getRandomFoodCoord() { 
-    console.log("I'm inside _getRandomFoodCoord");
     while (true) {
       let [x, y] = [
         getRandomInt(2, playgroundWidth - 2), 
@@ -321,9 +318,7 @@ class SnakeGame {
 }
 
 function getRandomInt(min, max) {
-    //if (min >= max) throw new RangeError("min can't be equal to max");
     const result = Math.floor(Math.random() * ((max - min)) + min);
-    console.log(result);
     return result;
   }
 
