@@ -1,21 +1,22 @@
 const html = document.querySelector("html");
-//const background = document.querySelector(".background");
+const menu = document.querySelector(".menu");
+const start = document.querySelector(".start-btn");
 const background = document.querySelector(".background");
 const container = document.querySelector(".container");
 const playground = document.querySelector(".playground");
 const score = document.querySelector(".score");
+const record = document.querySelector(".record");
 
 const plgrndCtx = playground.getContext("2d");
 const scrCtx = score.getContext("2d");
-let points = 0;
+const rcrdCtx = record.getContext("2d");
+let points;
+let best = 0;
 let playgroundWidth;
 let playgroundHeight;
 let intervalId;
 
 /* 
-- control 360 turn bug
-- pause the game on death (something goes wrong if snake dies between framed)
-- show best result (from current sessions as well all time)
 - menu (start / stats / settings (snake color / block size))
 - snake gradient color
 - restraing control
@@ -26,8 +27,10 @@ let intervalId;
 const block = 20;
 let clip = block/2; // clip-path value to use on background
 
-score.width = block * 7;
-score.height = block;
+[score, record].forEach((el) => {
+  el.width = block * 7;
+  el.height = block;
+})
 
 function drawblock(x, y, type="square") {
   plgrndCtx.beginPath();
@@ -49,17 +52,15 @@ function draw(mode) {
     containerWidth = Math.round(containerWidth / 20) * 20 ;
     containerHeight = Math.round(containerHeight / 20) * 20;
     // apply the sizing 
-    container.style.width = containerWidth + "px";
-    container.style.height = containerHeight + "px";
-    background.style.width = containerWidth + "px";
-    background.style.height = containerHeight + "px";
+    document.documentElement.style.setProperty("--container-width", containerWidth + "px");
+    document.documentElement.style.setProperty("--container-height", containerHeight + "px");
 
-    drawScore();
+    displayInfo(scrCtx, " Score:", points);
+    displayInfo(rcrdCtx, " Record:", best);
   } else if (mode === "shrink") {
       // shrink container
       container.style.width = containerWidth - block + "px";
       container.style.height = containerHeight - block + "px";
-
       // clip background image
       background.style.clipPath = `inset(${clip + 1}px)`;
       clip += block/2;
@@ -88,13 +89,13 @@ function drawBorder() {
   plgrndCtx.stroke();
 }
 
-function drawScore() {
-  scrCtx.clearRect(4 * block , 0, 5 * block, block);
-  scrCtx.font = `${block}px Courier`;
-  scrCtx.fillStyle = "white";
-  scrCtx.textAlign = "left";
-  scrCtx.textBaseline = "middle"; 
-  scrCtx.fillText("Score: " + points, block/2, block/2);
+function displayInfo(ctx, text, data) {
+  ctx.clearRect(4 * block , 0, 5 * block, block);
+  ctx.font = `${block}px Courier`;
+  ctx.fillStyle = "white";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle"; 
+  ctx.fillText(text + data, block/2, block/2);
 }
 
 function drawSpike(i=1, j=1, base, direction) {
@@ -190,13 +191,17 @@ class SnakeGame {
 
   _grow() {
     points++;
+    if (points > best) {
+      best = points;
+      displayInfo(rcrdCtx, " Record:", best)
+    }
+    displayInfo(scrCtx, " Score:", points);
     this.length++;
     this.speed++;
     this._checkShrink(); // playground size remains or shrinks
     if (!this._checkCollision()) { // if the game doesn't get reset because of collision
       this._randomFoodCreation();
       this._initWindup();
-      drawScore();
     }
   }
 
@@ -267,8 +272,9 @@ class SnakeGame {
     if (mode === "reset") {
       await freeze(5000);  // pause on the moment of collision before starting movement again
       this.speed = 1;
-    }
+    } else {
     windup(this.speed);
+    }
   }
 
   _coordInsideTail(x, y) {
@@ -314,7 +320,6 @@ class SnakeGame {
     resetSize();
     this._init(); 
   }
-
 }
 
 function getRandomInt(min, max) {
@@ -328,12 +333,13 @@ function freeze(ms) {
 
 
 // controls 
-html.addEventListener("keydown", (event) => {
+const handleKeydown = (event) => {
   switch (event.key) {
     case "ArrowUp":
       if (snake.yDirection !== 1) {
         snake.xDirection = 0;
         snake.yDirection = -1;
+        html.removeEventListener("keydown", handleKeydown); // only one change per frame is allowed
       }
       break;
 
@@ -341,6 +347,7 @@ html.addEventListener("keydown", (event) => {
       if (snake.xDirection !== -1) {
         snake.xDirection = 1;
         snake.yDirection = 0;
+        html.removeEventListener("keydown", handleKeydown);
       }
       break;
 
@@ -348,6 +355,7 @@ html.addEventListener("keydown", (event) => {
       if (snake.yDirection !== -1) {
         snake.xDirection = 0;
         snake.yDirection = 1;
+        html.removeEventListener("keydown", handleKeydown);
       }
       break;
 
@@ -355,18 +363,28 @@ html.addEventListener("keydown", (event) => {
       if (snake.xDirection !== 1) {
         snake.xDirection = -1;
         snake.yDirection = 0;
+        html.removeEventListener("keydown", handleKeydown);
       }
       break;
   }
-})
+}
+ 
+const control = () => {
+  html.addEventListener("keydown", handleKeydown);
+}
 
 // start the game 
 const snake = new SnakeGame();
 
 function windup(speed) {
   intervalId = setInterval(() => {
+    control();
     snake.move();
   }, 1000 / speed); 
 }
 
-windup(1);
+start.addEventListener("click", () => {
+  windup(1);
+  menu.style.display = "none";
+})
+

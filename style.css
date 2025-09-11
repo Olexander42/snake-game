@@ -1,3 +1,8 @@
+:root {
+  --container-width: 75vw;
+  --container-height: 75vh;
+}
+
 body {
   margin: 0;
   overflow: hidden;
@@ -15,16 +20,30 @@ body {
   /* make them stack on top of each other */
   position: absolute; 
   inset: 0;
-  width: 75vw;
-  height: 75vh;
+  width: var(--container-width);
+  height: var(--container-height);
   margin: auto; 
   /* margin is the only viable way of centering here
    because center has to stay in the center during shrink() */
 }
 
-.score { 
-  /* sticks to the center of the top border of its parent */
+.score,
+.record { 
   position: absolute;
   inset: 0;
-  justify-self: center;
+}
+
+.record {
+  align-self: end;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: min-content;
+  height: min-content;
+  position: absolute;
+  inset: 50%;
+  transform: translate(-50%, -50%);
 }
