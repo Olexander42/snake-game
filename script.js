@@ -8,6 +8,7 @@ const playground = document.querySelector(".playground");
 const score = document.querySelector(".score");
 const record = document.querySelector(".record");
 
+
 const plgrndCtx = playground.getContext("2d");
 const scrCtx = score.getContext("2d");
 const rcrdCtx = record.getContext("2d");
@@ -16,9 +17,10 @@ let best = 0;
 let playgroundWidth;
 let playgroundHeight;
 let intervalId;
+let snake;
 
 /* 
-- menu (start / stats / settings (snake color / block size))
+- menu (start / stats / settings (snake color / block size / spikes / shrink))
 - snake gradient color
 - restraing control
 - border image (bricks)
@@ -75,26 +77,13 @@ function draw(mode) {
   playgroundWidth = playground.width / block;
   playgroundHeight = playground.height / block;
 
-  drawBorder();
   drawSpikes();
-}
-
-function drawBorder() {
-  plgrndCtx.beginPath();
-  plgrndCtx.strokeStyle = "#8B4513";
-  plgrndCtx.lineWidth = block;
-  plgrndCtx.moveTo(0, block/2);
-  plgrndCtx.lineTo(playground.width - block/2, block/2);
-  plgrndCtx.lineTo(playground.width - block/2, playground.height - block/2);
-  plgrndCtx.lineTo(block/2, playground.height - block/2);
-  plgrndCtx.lineTo(block/2, 0);
-  plgrndCtx.stroke();
 }
 
 function displayInfo(ctx) {
   ctx.clearRect(4 * block , 0, 5 * block, block);
   ctx.font = `${block}px Courier`;
-  ctx.fillStyle = "white";
+  ctx.fillStyle = "black";
   ctx.textAlign = "left";
   ctx.textBaseline = "middle"; 
   if (ctx === scrCtx) ctx.fillText(" Score:" + points, block/2, block/2);
@@ -102,40 +91,41 @@ function displayInfo(ctx) {
 }
 
 function drawSpike(i=1, j=1, base, direction) {
-  let x = block * i;
-  let y = block * j;
+  let step = block / 2;
+  let x = step  * i;
+  let y = step  * j;
   if (base === "horizontal") {
     plgrndCtx.beginPath();
     plgrndCtx.moveTo(x, y);
     direction === "down" 
-      ? plgrndCtx.lineTo(x + block/2, y + block) 
-      : plgrndCtx.lineTo(x + block/2, y - block);
-    plgrndCtx.lineTo(x + block, y);
+      ? plgrndCtx.lineTo(x + step/2, y + step) 
+      : plgrndCtx.lineTo(x + step/2, y - step);
+    plgrndCtx.lineTo(x + step, y);
     plgrndCtx.fill();
   } else if (base === "vertical") {
       plgrndCtx.beginPath();
       plgrndCtx.moveTo(x, y);
       direction === "left" 
-        ? plgrndCtx.lineTo(x - block, y + block/2) 
-        : plgrndCtx.lineTo(x + block, y + block/2)
-      plgrndCtx.lineTo(x, y + block);
+        ? plgrndCtx.lineTo(x - step, y + step/2) 
+        : plgrndCtx.lineTo(x + step, y + step/2)
+      plgrndCtx.lineTo(x, y + step);
       plgrndCtx.fill();
     }
 }
 
 function drawSpikes() {
   // width and height of inner border in blocks
-  const hLength = playgroundWidth - 1; 
-  const vLength = playgroundHeight - 1;
+  const hLength = (playgroundWidth - 1) * 2; 
+  const vLength = (playgroundHeight - 1) * 2;
   // horizontal base
-  for (let i = 1; i < hLength; i++) {
-    drawSpike(i, 1, "horizontal", "down");
+  for (let i = 2; i < hLength; i++) {
+    drawSpike(i, 2, "horizontal", "down");
     drawSpike(i, vLength, "horizontal", "up");
   }
   // vertical base 
-  for (let j = 2; j < vLength - 1; j++) {
+  for (let j = 3; j < vLength - 1; j++) {
     drawSpike(hLength, j, "vertical", "left");
-    drawSpike(1, j, "vertical", "right");
+    drawSpike(2, j, "vertical", "right");
   }
 }
 
@@ -375,8 +365,8 @@ function windup(speed) {
 const gameStarter = (btn) => {
   btn.addEventListener("click", (event) => {
     resetSize();
-    snake = new Snake()
     draw("init");
+    snake = new Snake();
     windup(snake.speed);
     btn.style.display = "none";
     menu.style.display = "none";

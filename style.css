@@ -22,6 +22,13 @@ body {
    because center has to stay in the center of the screen during shrink() */
 }
 
+.playground {
+  border-image-source: url("assets/images/brick-wall.jpg");
+  border-image-slice: 400;
+  border-image-width: 20px;
+  border-image-repeat: repeat;
+}
+
 .score,
 .record { 
   position: absolute;
