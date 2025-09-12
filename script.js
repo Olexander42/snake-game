@@ -21,9 +21,8 @@ let snake;
 
 /* 
 - menu (start / stats / settings (snake color / block size / spikes / shrink))
-- snake gradient color
-- restraing control
-- border image (bricks)
+- gradual "fading" upon death
+- outside walls image of grass pob above
 */
 
 // VISUALS
@@ -163,13 +162,15 @@ class Snake {
     }
   }
 
-  _drawSnake(headColor="darkgreen", tailColor="green") {
+  _drawSnake() {
     // head
-    plgrndCtx.fillStyle = headColor;
+    plgrndCtx.fillStyle = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l}%)`;
     drawblock(this.xHead, this.yHead);
     // tail
+    let lightness = this.hsl.l + 2;
     for (let i = 0; i < this.tail.length; i++) {
-      plgrndCtx.fillStyle = tailColor;
+      lightness += 1
+      plgrndCtx.fillStyle = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${lightness}%)`;
       drawblock(this.tail[i][0], this.tail[i][1]);
     }
   }
@@ -177,11 +178,11 @@ class Snake {
   _updateTail() {
     let xTail = this.xHead;
     let yTail = this.yHead;
-    this.tail.push([xTail, yTail]); // grow tail by "remembering" head coords
+    this.tail.unshift([xTail, yTail]); // grow tail by "remembering" head coords
   }
 
   _deleteTail() {
-    let [xTail, yTail] = this.tail.shift(); // get the last coords of tail
+    let [xTail, yTail] = this.tail.pop(); // get the last coords of tail
     plgrndCtx.clearRect(xTail * block, yTail * block, block, block);
   }
 
@@ -241,18 +242,30 @@ class Snake {
 
   // general   
   _init() {
-    points = 0;
     this.xHead = Math.floor(playgroundWidth / 2);
     this.yHead = Math.floor(playgroundHeight / 2);
+    this.length = 1;
+    this.tail = [];
+    this.speed = 1;
     this.xDirection = 1;
     this.yDirection = 0;
-    this.speed = 1;
-    this.tail = [];
-    this.length = 1;
+    this._randomFoodCreation();
+    // snake colors
+    this.color = "hsl(120, 100%, 25%)";
+    this.hsl = this._splitColor();
+    // shrink counters
     this.counterOuter = 1;
     this.counterInner = 0;
-    this._randomFoodCreation();
+
     this.move(); // to create tail upon creation
+  }
+
+
+
+  _splitColor() {
+    let hsl = this.color.match(/\d+/g);
+    hsl = hsl.map((val) => Number(val)); 
+    return {h: hsl[0], s: hsl[1], l: hsl[2]};
   }
    
   _checkSnakeFood() {
@@ -298,7 +311,8 @@ class Snake {
   }
 
   _gameOver() {
-    this._drawSnake("crimson", "coral");
+    this.hsl.s *= 0.1;
+    this._drawSnake();
     clearInterval(intervalId); // stop any movement
     startAgain.style.display = "block";
   }
@@ -347,6 +361,15 @@ const handleKeydown = (event) => {
         html.removeEventListener("keydown", handleKeydown);
       }
       break;
+
+    case "p": // pause
+      if (intervalId !== 0) {
+        clearInterval(intervalId);
+        intervalId = 0;
+      } else {
+        windup(snake.speed);
+      }
+      break;
   }
 }
 
@@ -359,7 +382,7 @@ function windup(speed) {
   intervalId = setInterval(() => {
     control();
     snake.move();
-  }, 1000 / speed); 
+  }, 500 / speed); 
 }
 
 const gameStarter = (btn) => {
