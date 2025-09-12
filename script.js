@@ -8,7 +8,6 @@ const playground = document.querySelector(".playground");
 const score = document.querySelector(".score");
 const record = document.querySelector(".record");
 
-let snake;
 const plgrndCtx = playground.getContext("2d");
 const scrCtx = score.getContext("2d");
 const rcrdCtx = record.getContext("2d");
@@ -361,6 +360,7 @@ const handleKeydown = (event) => {
   }
 }
 
+
 const control = () => {
   html.addEventListener("keydown", handleKeydown);
 }
@@ -375,8 +375,8 @@ function windup(speed) {
 const gameStarter = (btn) => {
   btn.addEventListener("click", (event) => {
     resetSize();
+    snake = new Snake()
     draw("init");
-    snake = new Snake();
     windup(snake.speed);
     btn.style.display = "none";
     menu.style.display = "none";

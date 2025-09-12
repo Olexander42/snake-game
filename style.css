@@ -19,7 +19,7 @@ body {
   height: 75vh;
   margin: auto; 
   /* margin is the only viable way of centering here
-   because center has to stay in the center during shrink() */
+   because center has to stay in the center of the screen during shrink() */
 }
 
 .score,
