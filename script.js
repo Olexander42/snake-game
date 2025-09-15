@@ -12,12 +12,14 @@ const record = document.querySelector(".record");
 const plgrndCtx = playground.getContext("2d");
 const scrCtx = score.getContext("2d");
 const rcrdCtx = record.getContext("2d");
-let points = 0;
-let best = 0;
-let playgroundWidth;
-let playgroundHeight;
-let intervalId;
+const stats = {score: 0, record: 0};
+let playgroundWidth = 0;
+let playgroundHeight = 0;
+let playgroundCenter = {};
+let intervalId = 0;
 let snake;
+
+
 
 /* 
 - menu (start / stats / settings (snake color / block size / spikes / shrink))
@@ -34,13 +36,10 @@ let clip = block/2; // clip-path value to use on background
   el.height = block;
 })
 
-function drawblock(x, y, type="square") {
+function drawBlock(x, y, color) {
+  plgrndCtx.fillStyle = color;
   plgrndCtx.beginPath();
-  if (type === "circle") {
-    plgrndCtx.arc(x * block + block / 2, y * block + block / 2, block / 2, 0, 2 * Math.PI);
-  } else {
-    plgrndCtx.fillRect(x * block, y * block, block, block);
-  }
+  plgrndCtx.fillRect(x * block, y * block, block, block);
   plgrndCtx.fill()
 }
 
@@ -76,6 +75,8 @@ function draw(mode) {
   playgroundWidth = playground.width / block;
   playgroundHeight = playground.height / block;
 
+  playgroundCenter = {x: Math.floor(playgroundWidth / 2), y: Math.floor(playgroundHeight / 2)};
+
   drawSpikes();
 }
 
@@ -85,8 +86,8 @@ function displayInfo(ctx) {
   ctx.fillStyle = "black";
   ctx.textAlign = "left";
   ctx.textBaseline = "middle"; 
-  if (ctx === scrCtx) ctx.fillText(" Score:" + points, block/2, block/2);
-  else if (ctx === rcrdCtx) ctx.fillText(" Record:" + best, block/2, block/2);
+  if (ctx === scrCtx) ctx.fillText(" Score:" + stats.score, block/2, block/2);
+  else if (ctx === rcrdCtx) ctx.fillText(" Record:" + stats.record, block/2, block/2);
 }
 
 function drawSpike(i=1, j=1, base, direction) {
@@ -133,7 +134,7 @@ function resetSize() {
     container.style.height = "";
     background.style.clipPath = "none";
     clip = block/2;
-    points = 0;
+    stats.score = 0;
 }
 
  function clearplayground() {
@@ -150,9 +151,10 @@ class Snake {
   // snake
   move() {
     this._updateTail();
-    this.body.head.x += this.xDirection ;
+    this.body.head.x += this.xDirection;
     this.body.head.y += this.yDirection;
     if (this.length < this.body.tail.length) this._deleteTail();
+
     if (this._checkCollision()) {
       this._gameOver();
     } else {
@@ -164,19 +166,22 @@ class Snake {
 
   _drawSnake() {
     // head
-    plgrndCtx.fillStyle = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l}%)`;
-    drawblock(this.body.head.x, this.body.head.y);
+    drawBlock(this.body.head.x, this.body.head.y, this.color);
+
     // tail
-    let lightness = this.hsl.l + 2; // create contrast between head and tail
     for (let i = 0; i < this.body.tail.length; i++) {
-      lightness += 1; // each tail section is lighter
-      plgrndCtx.fillStyle = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${lightness}%)`;
-      drawblock(this.body.tail[i].x, this.body.tail[i].y);
+      const lighterColor = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l + i + 1}%)`
+      drawBlock(this.body.tail[i].x, this.body.tail[i].y, lighterColor);
     }
   }
 
   _updateTail() {
-    this.body.tail.unshift({x: this.body.head.x, y: this.body.head.y}); // grow tail by "remembering" head coords
+    this.body.tail.unshift({  // grow tail by "remembering" head coords
+      x: this.body.head.x, 
+      y: this.body.head.y,
+    });
+    console.log("First Tail Section:", this.body.tail[0]);
+    console.log("Last Tail Section:", this.body.tail[this.body.tail.length - 2]);
   }
 
   _deleteTail() {
@@ -185,9 +190,9 @@ class Snake {
   }
 
   _grow() {
-    points++;
-    if (points > best) {
-      best = points;
+    stats.score++;
+    if (stats.score > stats.record) {
+      stats.record = stats.score;
       displayInfo(rcrdCtx)
     }
     displayInfo(scrCtx);
@@ -213,7 +218,6 @@ class Snake {
   }
 
   // food
-
   _getRandomFoodCoord() { 
     while (true) {
       let [x, y] = [
@@ -231,12 +235,12 @@ class Snake {
 
   _randomFoodCreation() {
     this.food = this._getRandomFoodCoord();
+    this.food.color = "red";
     this._drawFood();
   }
 
   _drawFood() {
-    plgrndCtx.fillStyle = "red";
-    drawblock(this.food.x, this.food.y, "circle");
+    drawBlock(this.food.x, this.food.y, this.food.color);
   } 
 
   _checkSnakeFood() {
@@ -248,23 +252,27 @@ class Snake {
 
   // general   
   _init() {
-    this.body = {head: {x: Math.floor(playgroundWidth / 2), y: Math.floor(playgroundHeight / 2)}, tail: []}; // create body with head coords
+    // snake
+    this.body = { //  snake sections coords
+      head: {x: playgroundCenter.x, y: playgroundCenter.y}, 
+      tail: [{x: playgroundCenter.x - 1, y: playgroundCenter.y}],
+      }; 
     this.length = 1;
     this.speed = 1;
     this.xDirection = 1;
     this.yDirection = 0;
-    this._randomFoodCreation();
-    // snake colors
+
+    // colors
     this.color = "hsl(120, 100%, 25%)";
     this.hsl = this._splitColor();
-    // shrink counters
+
+    // shrink 
     this.counterOuter = 1;
     this.counterInner = 0;
-    
-    this.move(); // to create tail upon creation
+
+    this._drawSnake();
+    this._randomFoodCreation();
   }
-
-
 
   _splitColor() {
     let hsl = this.color.match(/\d+/g);
@@ -375,8 +383,6 @@ const handleKeydown = (event) => {
 const control = () => {
   html.addEventListener("keydown", handleKeydown);
 }
-
-control();
  
 function windup(speed) {
   intervalId = setInterval(() => {
