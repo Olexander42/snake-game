@@ -150,14 +150,14 @@ class Snake {
   // snake
   move() {
     this._updateTail();
-    this.xHead += this.xDirection ;
-    this.yHead += this.yDirection;
-    if (this.length < this.tail.length) this._deleteTail();
+    this.body.head.x += this.xDirection ;
+    this.body.head.y += this.yDirection;
+    if (this.length < this.body.tail.length) this._deleteTail();
     if (this._checkCollision()) {
       this._gameOver();
     } else {
       this._checkSnakeFood();
-      //console.log(this.xHead, this.yHead)
+      //console.log(this.body.head.x, this.body.head.y)
       this._drawSnake();
     }
   }
@@ -165,25 +165,23 @@ class Snake {
   _drawSnake() {
     // head
     plgrndCtx.fillStyle = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l}%)`;
-    drawblock(this.xHead, this.yHead);
+    drawblock(this.body.head.x, this.body.head.y);
     // tail
-    let lightness = this.hsl.l + 2;
-    for (let i = 0; i < this.tail.length; i++) {
-      lightness += 1
+    let lightness = this.hsl.l + 2; // create contrast between head and tail
+    for (let i = 0; i < this.body.tail.length; i++) {
+      lightness += 1; // each tail section is lighter
       plgrndCtx.fillStyle = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${lightness}%)`;
-      drawblock(this.tail[i][0], this.tail[i][1]);
+      drawblock(this.body.tail[i].x, this.body.tail[i].y);
     }
   }
 
   _updateTail() {
-    let xTail = this.xHead;
-    let yTail = this.yHead;
-    this.tail.unshift([xTail, yTail]); // grow tail by "remembering" head coords
+    this.body.tail.unshift({x: this.body.head.x, y: this.body.head.y}); // grow tail by "remembering" head coords
   }
 
   _deleteTail() {
-    let [xTail, yTail] = this.tail.pop(); // get the last coords of tail
-    plgrndCtx.clearRect(xTail * block, yTail * block, block, block);
+    let tailPoint = this.body.tail.pop(); // get the last coords of tail
+    plgrndCtx.clearRect(tailPoint.x * block, tailPoint.y * block, block, block);
   }
 
   _grow() {
@@ -204,26 +202,17 @@ class Snake {
 
   _checkCollision() {
     if (
-    this._coordInsideTail(this.xHead, this.yHead) ||
-    this.xHead >= playgroundWidth - 2 ||
-    this.xHead < 2 || this.tail.some((tailCoord) => tailCoord[0] < 2) || // head OR tail is in the left border spikes
-    this.yHead >= playgroundHeight - 2 ||  
-    this.yHead < 2 || this.tail.some((tailCoord) => tailCoord[1] < 2) // head OR tail is in the top border spikes
+    this._coordInsideTail(this.body.head.x, this.body.head.y) ||
+    this.body.head.x >= playgroundWidth - 2 ||
+    this.body.head.x < 2 || this.body.tail.some((tailCoord) => tailCoord.x < 2) || // head OR tail is in the left border spikes
+    this.body.head.y >= playgroundHeight - 2 ||  
+    this.body.head.y < 2 || this.body.tail.some((tailCoord) => tailCoord.y < 2) // head OR tail is in the top border spikes
     ) {
       return true;
     }
   }
 
   // food
-  _randomFoodCreation() {
-    [this.xFood, this.yFood] = this._getRandomFoodCoord();
-    this._drawFood();
-  }
-
-  _drawFood() {
-    plgrndCtx.fillStyle = "red";
-    drawblock(this.xFood, this.yFood, "circle");
-  } 
 
   _getRandomFoodCoord() { 
     while (true) {
@@ -231,21 +220,36 @@ class Snake {
         getRandomInt(2, playgroundWidth - 2), 
         getRandomInt(2, playgroundHeight - 2)
         ]; 
-      if (this._coordInsideTail(x, y) || (x === this.xFood && y === this.yFood)) {
+      if (this._coordInsideTail(x, y) ||
+         (x === this.body.head.x && y === this.body.head.y)) {
           continue;
         } else {
-          return [x, y];
+          return {x, y};
         }
       }
     }
+
+  _randomFoodCreation() {
+    this.food = this._getRandomFoodCoord();
+    this._drawFood();
+  }
+
+  _drawFood() {
+    plgrndCtx.fillStyle = "red";
+    drawblock(this.food.x, this.food.y, "circle");
+  } 
+
+  _checkSnakeFood() {
+    if (this.body.head.x === this.food.x && this.body.head.y === this.food.y) {
+      this._grow();
+    }
+  }
   
 
   // general   
   _init() {
-    this.xHead = Math.floor(playgroundWidth / 2);
-    this.yHead = Math.floor(playgroundHeight / 2);
+    this.body = {head: {x: Math.floor(playgroundWidth / 2), y: Math.floor(playgroundHeight / 2)}, tail: []}; // create body with head coords
     this.length = 1;
-    this.tail = [];
     this.speed = 1;
     this.xDirection = 1;
     this.yDirection = 0;
@@ -256,7 +260,7 @@ class Snake {
     // shrink counters
     this.counterOuter = 1;
     this.counterInner = 0;
-
+    
     this.move(); // to create tail upon creation
   }
 
@@ -267,12 +271,6 @@ class Snake {
     hsl = hsl.map((val) => Number(val)); 
     return {h: hsl[0], s: hsl[1], l: hsl[2]};
   }
-   
-  _checkSnakeFood() {
-    if (this.xHead === this.xFood && this.yHead === this.yFood) {
-      this._grow();
-    }
-  }
 
   _changeSpeed() { // speed change
     clearInterval(intervalId); 
@@ -280,7 +278,7 @@ class Snake {
   }
 
   _coordInsideTail(x, y) {
-    return this.tail.some((tailCoord) => tailCoord[0] === x && tailCoord[1] === y);
+    return this.body.tail.some((tailCoord) => tailCoord.x === x && tailCoord.y === y);
   }
 
   _checkShrink() {
@@ -297,17 +295,21 @@ class Snake {
     
   _snakeShrinkCoordsCorrection() {
     // snake is inside right border spikes after shrink()
-    if (this.tail.some((tailCoord) => tailCoord[0] === playgroundWidth - 2) || this.xHead === playgroundWidth - 2) {
+    if (this.body.tail.some((tailCoord) => tailCoord.x === playgroundWidth - 2) || this.body.head.x === playgroundWidth - 2) {
        // offset snake one block to the left
-      this.tail.forEach((tailCoord) => tailCoord[0] -= 1);
-      this.xHead -= 1;
+      this.body.tail.forEach((tailCoord) => tailCoord.x -= 1);
+      this.body.head.x -= 1;
     }
     // snake is inside bottom border spikes after shrink()
-    if (this.tail.some((tailCoord) => tailCoord[1] === playgroundHeight - 2) || this.yHead === playgroundHeight - 2) {
+    if (this.body.tail.some((tailCoord) => tailCoord.y === playgroundHeight - 2) || this.body.head.y === playgroundHeight - 2) {
        // offset snake one block up
-      this.tail.forEach((tailCoord) => tailCoord[1] -= 1);
-      this.yHead -= 1;
+      this.body.tail.forEach((tailCoord) => tailCoord.y -= 1);
+      this.body.head.y -= 1;
     }
+  }
+
+  _gradualFading() {
+    const drawTailSection = true;
   }
 
   _gameOver() {
@@ -322,10 +324,6 @@ function getRandomInt(min, max) {
     const result = Math.floor(Math.random() * ((max - min)) + min);
     return result;
   }
-
-function freeze(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 // controls 
 const handleKeydown = (event) => {
@@ -377,6 +375,8 @@ const handleKeydown = (event) => {
 const control = () => {
   html.addEventListener("keydown", handleKeydown);
 }
+
+control();
  
 function windup(speed) {
   intervalId = setInterval(() => {
