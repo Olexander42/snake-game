@@ -164,24 +164,35 @@ class Snake {
     }
   }
 
-  _drawSnake() {
-    // head
-    drawBlock(this.body.head.x, this.body.head.y, this.color);
+  _drawSnake(ms=0) {
+    return new Promise((resolve) => {
+      // head
+      drawBlock(this.body.head.x, this.body.head.y, `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l}%)`);
+      
+      //tail
+      let i = 0;
+      const drawTailSection = (i) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            const lighterColor = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l + i + 1}%)`
+            drawBlock(this.body.tail[i].x, this.body.tail[i].y, lighterColor);
+            i++;
+            if (i < this.body.tail.length) resolve(drawTailSection(i)); // each iteration has to pass `resolve` back up the chain
+            else resolve(true);                                        // otherwise only the last tail section passes up `resolve`
+          }, ms)                                                      // to the second from the end section and after that nothing happens
+        })
+      }
 
-    // tail
-    for (let i = 0; i < this.body.tail.length; i++) {
-      const lighterColor = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l + i + 1}%)`
-      drawBlock(this.body.tail[i].x, this.body.tail[i].y, lighterColor);
-    }
+      drawTailSection(i).then(() => resolve(wait(ms * this.speed)));
+    })
   }
+  
 
   _updateTail() {
     this.body.tail.unshift({  // grow tail by "remembering" head coords
       x: this.body.head.x, 
       y: this.body.head.y,
     });
-    console.log("First Tail Section:", this.body.tail[0]);
-    console.log("Last Tail Section:", this.body.tail[this.body.tail.length - 2]);
   }
 
   _deleteTail() {
@@ -265,7 +276,7 @@ class Snake {
     // colors
     this.color = "hsl(120, 100%, 25%)";
     this.hsl = this._splitColor();
-
+    
     // shrink 
     this.counterOuter = 1;
     this.counterInner = 0;
@@ -316,22 +327,27 @@ class Snake {
     }
   }
 
-  _gradualFading() {
-    const drawTailSection = true;
-  }
-
   _gameOver() {
-    this.hsl.s *= 0.1;
-    this._drawSnake();
     clearInterval(intervalId); // stop any movement
-    startAgain.style.display = "block";
+    this.hsl.s *= 0.1;
+    this._drawSnake(1000 / this.speed)
+      .then(() => startAgain.style.display = "block");
   }
 }
 
 function getRandomInt(min, max) {
-    const result = Math.floor(Math.random() * ((max - min)) + min);
-    return result;
-  }
+  const result = Math.floor(Math.random() * ((max - min)) + min);
+  return result;
+}
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true)
+    }, ms);
+  })
+}
+
 
 // controls 
 const handleKeydown = (event) => {
