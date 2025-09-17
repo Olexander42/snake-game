@@ -10,8 +10,6 @@ const record = document.querySelector(".record");
 
 
 const plgrndCtx = playground.getContext("2d");
-const scrCtx = score.getContext("2d");
-const rcrdCtx = record.getContext("2d");
 const stats = {score: 0, record: 0};
 let playgroundWidth = 0;
 let playgroundHeight = 0;
@@ -22,9 +20,9 @@ let snake;
 
 
 /* 
-- menu (start / stats / settings (snake color / block size / spikes / shrink))
-- gradual "fading" upon death
-- outside walls image of grass pob above
+- settings (snake color / block size / hard ))
+- minmax size
+- rewrite canvas in css
 */
 
 // VISUALS
@@ -52,14 +50,15 @@ function draw(mode) {
     // "normalization"
     containerWidth = Math.round(containerWidth / 20) * 20 ;
     containerHeight = Math.round(containerHeight / 20) * 20;
+
     // apply the sizing 
     container.style.width = containerWidth + "px";
     container.style.height = containerHeight + "px";
     background.style.width = containerWidth + "px";
     background.style.height = containerHeight + "px";
 
-    displayInfo(scrCtx);
-    displayInfo(rcrdCtx);
+    score.innerText = `Score: ${stats.score}`;
+
   } else if (mode === "shrink") {
       // shrink container
       container.style.width = containerWidth - block + "px";
@@ -78,16 +77,6 @@ function draw(mode) {
   playgroundCenter = {x: Math.floor(playgroundWidth / 2), y: Math.floor(playgroundHeight / 2)};
 
   drawSpikes();
-}
-
-function displayInfo(ctx) {
-  ctx.clearRect(4 * block , 0, 5 * block, block);
-  ctx.font = `${block}px Courier`;
-  ctx.fillStyle = "black";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "middle"; 
-  if (ctx === scrCtx) ctx.fillText(" Score:" + stats.score, block/2, block/2);
-  else if (ctx === rcrdCtx) ctx.fillText(" Record:" + stats.record, block/2, block/2);
 }
 
 function drawSpike(i=1, j=1, base, direction) {
@@ -167,7 +156,7 @@ class Snake {
   _drawSnake(ms=0) {
     return new Promise((resolve) => {
       // head
-      drawBlock(this.body.head.x, this.body.head.y, `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l}%)`);
+      drawBlock(this.body.head.x, this.body.head.y, `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l * 0.75}%)`);
       
       //tail
       let i = 0;
@@ -204,9 +193,9 @@ class Snake {
     stats.score++;
     if (stats.score > stats.record) {
       stats.record = stats.score;
-      displayInfo(rcrdCtx)
+      record.innerText = `Record: ${stats.record}`;
     }
-    displayInfo(scrCtx);
+    score.innerText = `Score: ${stats.score}`;
     this.length++;
     this.speed++;
     this._checkShrink(); // playground size remains or shrinks
@@ -330,7 +319,7 @@ class Snake {
   _gameOver() {
     clearInterval(intervalId); // stop any movement
     this.hsl.s *= 0.1;
-    this._drawSnake(500 / this.speed)
+    this._drawSnake(250 / this.speed)
       .then(() => startAgain.style.display = "block");
   }
 }

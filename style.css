@@ -1,3 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rock+Salt&display=swap');
+
+@font-face {
+  font-family: "Brick Edgie";
+  src: url("assets/fonts/BrickEdgie-Zp9wz.otf") format('opentype');
+}
+
+
+
+html {
+  font-size: 20px;
+}
+
 body {
   margin: 0;
   overflow: hidden;
@@ -34,10 +47,23 @@ body {
 .record { 
   position: absolute;
   inset: 0;
+  height: 20px;
+  margin: 0 20px;
+  font-size: 1rem;
+  line-height: 20px;
+}
+
+.score {
+  font-family: "Rock Salt";
+  font-size: 0.6rem;
+  letter-spacing: 2px;
 }
 
 .record {
   align-self: end;
+  font-family: "Permanent Marker";
+  padding-bottom: 1px;
+  font-size: 1rem;
 }
 
 .menu {
@@ -51,10 +77,22 @@ body {
   transform: translate(-50%, -50%);
 }
 
+button {
+  font-family: "Brick Edgie";
+  font-size: 2rem;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid;
+  border-style: outset;
+  backdrop-filter: blur(2px);
+  letter-spacing: 4px;
+  background: none;
+}
+
 .start-again-btn {
   position: absolute;
   inset: 50%;
-  width: min-content;
+  width: max-content;
   height: min-content;
+  transform: translate(-50%, -50%);
   display: none;
 }
