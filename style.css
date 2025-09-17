@@ -2,11 +2,12 @@ body {
   margin: 0;
   overflow: hidden;
   height: 100vh;
-  background-color: darkslategray;
+  background-image: url("assets/images/grass.jpg");
+  background-repeat: repeat;
 }
 
 .background {
-  background-image: url("assets/images/background.jpg");
+  background-image: url("assets/images/sand.jpg");
   background-repeat: repeat;
 }
 

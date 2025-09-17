@@ -177,9 +177,9 @@ class Snake {
             const lighterColor = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l + i + 1}%)`
             drawBlock(this.body.tail[i].x, this.body.tail[i].y, lighterColor);
             i++;
-            if (i < this.body.tail.length) resolve(drawTailSection(i)); // each iteration has to pass `resolve` back up the chain
+            if (i < this.body.tail.length) resolve(drawTailSection(i)); // each iteration has to pass `resolve` up the chain
             else resolve(true);                                        // otherwise only the last tail section passes up `resolve`
-          }, ms)                                                      // to the second from the end section and after that nothing happens
+          }, ms)                                                      // to the second to last section and after that nothing happens
         })
       }
 
@@ -330,7 +330,7 @@ class Snake {
   _gameOver() {
     clearInterval(intervalId); // stop any movement
     this.hsl.s *= 0.1;
-    this._drawSnake(1000 / this.speed)
+    this._drawSnake(500 / this.speed)
       .then(() => startAgain.style.display = "block");
   }
 }
