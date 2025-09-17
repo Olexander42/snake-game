@@ -1,45 +1,48 @@
+const root = document.documentElement;
 const html = document.querySelector("html");
 const menu = document.querySelector(".menu");
 const start = document.querySelector(".start-btn");
 const startAgain = document.querySelector(".start-again-btn");
 const background = document.querySelector(".background");
 const container = document.querySelector(".container");
-const playground = document.querySelector(".playground");
 const score = document.querySelector(".score");
 const record = document.querySelector(".record");
 
-
-const plgrndCtx = playground.getContext("2d");
 const stats = {score: 0, record: 0};
-let playgroundWidth = 0;
-let playgroundHeight = 0;
-let playgroundCenter = {};
+let containerCenter = {};
 let intervalId = 0;
 let snake;
 
 
 
 /* 
-- settings (snake color / block size / hard ))
+- settings (snake color / step size / hard ))
 - minmax size
 - rewrite canvas in css
 */
 
 // VISUALS
-const block = 20;
-let clip = block/2; // clip-path value to use on background
+const step = 20;
+root.style.setProperty("--step", `${step}px`);
 
-[score, record].forEach((el) => {
-  el.width = block * 7;
-  el.height = block;
-})
+const snakeColor = "hsl(120, 100%, 25%)";
 
-function drawBlock(x, y, color) {
-  plgrndCtx.fillStyle = color;
-  plgrndCtx.beginPath();
-  plgrndCtx.fillRect(x * block, y * block, block, block);
-  plgrndCtx.fill()
+let clip = step / 2; // clip-path value to use on background inside the walls
+
+function createBlock(x, y, color, i) {
+  const block  = document.createElement('div');
+
+  block.classList.add("block");
+  block.id = i;
+  block.style.left = `${x * step}px`;
+  block.style.top = `${y * step}px`;
+  block.style.backgroundColor = color;
+  
+  container.appendChild(block);
 }
+
+
+
 
 function draw(mode) {
   // fetch sizes
@@ -61,76 +64,28 @@ function draw(mode) {
 
   } else if (mode === "shrink") {
       // shrink container
-      container.style.width = containerWidth - block + "px";
-      container.style.height = containerHeight - block + "px";
+      container.style.width = containerWidth - step + "px";
+      container.style.height = containerHeight - step + "px";
       // clip background image
       background.style.clipPath = `inset(${clip + 1}px)`;
-      clip += block/2;
+      clip += step/2;
     }
-  // equal the size of <canvas> to the size of its parent
-  playground.width = container.clientWidth;
-  playground.height = container.clientHeight;
-  // convert pixels to blocks
-  playgroundWidth = playground.width / block;
-  playgroundHeight = playground.height / block;
-
-  playgroundCenter = {x: Math.floor(playgroundWidth / 2), y: Math.floor(playgroundHeight / 2)};
-
-  drawSpikes();
-}
-
-function drawSpike(i=1, j=1, base, direction) {
-  let step = block / 2;
-  let x = step  * i;
-  let y = step  * j;
-  if (base === "horizontal") {
-    plgrndCtx.beginPath();
-    plgrndCtx.moveTo(x, y);
-    direction === "down" 
-      ? plgrndCtx.lineTo(x + step/2, y + step) 
-      : plgrndCtx.lineTo(x + step/2, y - step);
-    plgrndCtx.lineTo(x + step, y);
-    plgrndCtx.fill();
-  } else if (base === "vertical") {
-      plgrndCtx.beginPath();
-      plgrndCtx.moveTo(x, y);
-      direction === "left" 
-        ? plgrndCtx.lineTo(x - step, y + step/2) 
-        : plgrndCtx.lineTo(x + step, y + step/2)
-      plgrndCtx.lineTo(x, y + step);
-      plgrndCtx.fill();
-    }
-}
-
-function drawSpikes() {
-  // width and height of inner border in blocks
-  const hLength = (playgroundWidth - 1) * 2; 
-  const vLength = (playgroundHeight - 1) * 2;
-  // horizontal base
-  for (let i = 2; i < hLength; i++) {
-    drawSpike(i, 2, "horizontal", "down");
-    drawSpike(i, vLength, "horizontal", "up");
-  }
-  // vertical base 
-  for (let j = 3; j < vLength - 1; j++) {
-    drawSpike(hLength, j, "vertical", "left");
-    drawSpike(2, j, "vertical", "right");
-  }
+  containerCenter = {x: Math.floor(containerCenter / 2), y: Math.floor(containerCenter / 2)};
 }
 
 function resetSize() {
     container.style.width = "";
     container.style.height = "";
     background.style.clipPath = "none";
-    clip = block/2;
+    clip = step / 2;
     stats.score = 0;
 }
 
- function clearplayground() {
-    plgrndCtx.clearRect(0, 0, playground.width, playground.height);
-  }
+draw("init");
 
+createBlock(1, 1, 'green', 1);
 
+/*
 // LOGIC 
 class Snake {
   constructor() {
@@ -156,7 +111,7 @@ class Snake {
   _drawSnake(ms=0) {
     return new Promise((resolve) => {
       // head
-      drawBlock(this.body.head.x, this.body.head.y, `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l * 0.75}%)`);
+      drawstep(this.body.head.x, this.body.head.y, `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l * 0.75}%)`);
       
       //tail
       let i = 0;
@@ -164,7 +119,7 @@ class Snake {
         return new Promise((resolve) => {
           setTimeout(() => {
             const lighterColor = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l + i + 1}%)`
-            drawBlock(this.body.tail[i].x, this.body.tail[i].y, lighterColor);
+            drawstep(this.body.tail[i].x, this.body.tail[i].y, lighterColor);
             i++;
             if (i < this.body.tail.length) resolve(drawTailSection(i)); // each iteration has to pass `resolve` up the chain
             else resolve(true);                                        // otherwise only the last tail section passes up `resolve`
@@ -186,7 +141,7 @@ class Snake {
 
   _deleteTail() {
     let tailPoint = this.body.tail.pop(); // get the last coords of tail
-    plgrndCtx.clearRect(tailPoint.x * block, tailPoint.y * block, block, block);
+    plgrndCtx.clearRect(tailPoint.x * step, tailPoint.y * step, step, step);
   }
 
   _grow() {
@@ -240,7 +195,7 @@ class Snake {
   }
 
   _drawFood() {
-    drawBlock(this.food.x, this.food.y, this.food.color);
+    drawstep(this.food.x, this.food.y, this.food.color);
   } 
 
   _checkSnakeFood() {
@@ -254,8 +209,8 @@ class Snake {
   _init() {
     // snake
     this.body = { //  snake sections coords
-      head: {x: playgroundCenter.x, y: playgroundCenter.y}, 
-      tail: [{x: playgroundCenter.x - 1, y: playgroundCenter.y}],
+      head: {x: containerCenter.x, y: containerCenter.y}, 
+      tail: [{x: containerCenter.x - 1, y: containerCenter.y}],
       }; 
     this.length = 1;
     this.speed = 1;
@@ -304,13 +259,13 @@ class Snake {
   _snakeShrinkCoordsCorrection() {
     // snake is inside right border spikes after shrink()
     if (this.body.tail.some((tailCoord) => tailCoord.x === playgroundWidth - 2) || this.body.head.x === playgroundWidth - 2) {
-       // offset snake one block to the left
+       // offset snake one step to the left
       this.body.tail.forEach((tailCoord) => tailCoord.x -= 1);
       this.body.head.x -= 1;
     }
     // snake is inside bottom border spikes after shrink()
     if (this.body.tail.some((tailCoord) => tailCoord.y === playgroundHeight - 2) || this.body.head.y === playgroundHeight - 2) {
-       // offset snake one block up
+       // offset snake one step up
       this.body.tail.forEach((tailCoord) => tailCoord.y -= 1);
       this.body.head.y -= 1;
     }
@@ -320,7 +275,7 @@ class Snake {
     clearInterval(intervalId); // stop any movement
     this.hsl.s *= 0.1;
     this._drawSnake(250 / this.speed)
-      .then(() => startAgain.style.display = "block");
+      .then(() => startAgain.style.display = "step");
   }
 }
 
@@ -413,4 +368,5 @@ gameStarter(start);
 
 gameStarter(startAgain);
 
+*/
 
