@@ -8,10 +8,14 @@ const container = document.querySelector(".container");
 const score = document.querySelector(".score");
 const record = document.querySelector(".record");
 
+let playgroundWidth = null;
+let playgroundHeight = null;
+let game = null;
+let intervalId = null;
+let playgroundCenter = {};
 const stats = {score: 0, record: 0};
-let containerCenter = {};
-let intervalId = 0;
-let snake;
+
+
 
 
 
@@ -25,34 +29,17 @@ let snake;
 const step = 20;
 root.style.setProperty("--step", `${step}px`);
 
-const snakeColor = "hsl(120, 100%, 25%)";
-
 let clip = step / 2; // clip-path value to use on background inside the walls
 
-function createBlock(x, y, color, i) {
-  const block  = document.createElement('div');
-
-  block.classList.add("block");
-  block.id = i;
-  block.style.left = `${x * step}px`;
-  block.style.top = `${y * step}px`;
-  block.style.backgroundColor = color;
-  
-  container.appendChild(block);
-}
-
-
-
-
-function draw(mode) {
+function size(mode) {
   // fetch sizes
   let containerWidth = parseInt(getComputedStyle(container).width); 
   let containerHeight = parseInt(getComputedStyle(container).height);
 
   if (mode === "init") {
-    // "normalization"
-    containerWidth = Math.round(containerWidth / 20) * 20 ;
-    containerHeight = Math.round(containerHeight / 20) * 20;
+     // "normalization"
+    containerWidth = Math.round(containerWidth / step) * step;
+    containerHeight = Math.round(containerHeight / step) * step;
 
     // apply the sizing 
     container.style.width = containerWidth + "px";
@@ -70,7 +57,11 @@ function draw(mode) {
       background.style.clipPath = `inset(${clip + 1}px)`;
       clip += step/2;
     }
-  containerCenter = {x: Math.floor(containerCenter / 2), y: Math.floor(containerCenter / 2)};
+
+  playgroundWidth = container.clientWidth / step;
+  playgroundHeight = container.clientHeight / step;
+
+  playgroundCenter = {x: Math.floor(playgroundWidth / 2), y: Math.floor(playgroundHeight / 2)};
 }
 
 function resetSize() {
@@ -81,203 +72,94 @@ function resetSize() {
     stats.score = 0;
 }
 
-draw("init");
+function createElement(x, y, color, id="") {
+  const element  = document.createElement('div');
 
-createBlock(1, 1, 'green', 1);
+  element.classList.add("block");
+  element.id = id;
+  element.style.left = `${x * step}px`;
+  element.style.top = `${y * step}px`;
+  element.style.backgroundColor = color;
 
-/*
+  container.appendChild(element);
+}
+
+
 // LOGIC 
-class Snake {
+class SnakeGame {
   constructor() {
-    this._init();
-  }
+    // create snake
+    createElement(playgroundCenter.x, playgroundCenter.y, 'darkgreen', "head"); 
+    createElement(playgroundCenter.x - 1, playgroundCenter.y, 'green', "tail"); 
+    this.head = document.getElementById("head");
+    this.tail = document.getElementById("tail");
 
-  // snake
-  move() {
-    this._updateTail();
-    this.body.head.x += this.xDirection;
-    this.body.head.y += this.yDirection;
-    if (this.length < this.body.tail.length) this._deleteTail();
-
-    if (this._checkCollision()) {
-      this._gameOver();
-    } else {
-      this._checkSnakeFood();
-      //console.log(this.body.head.x, this.body.head.y)
-      this._drawSnake();
-    }
-  }
-
-  _drawSnake(ms=0) {
-    return new Promise((resolve) => {
-      // head
-      drawstep(this.body.head.x, this.body.head.y, `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l * 0.75}%)`);
-      
-      //tail
-      let i = 0;
-      const drawTailSection = (i) => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            const lighterColor = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l + i + 1}%)`
-            drawstep(this.body.tail[i].x, this.body.tail[i].y, lighterColor);
-            i++;
-            if (i < this.body.tail.length) resolve(drawTailSection(i)); // each iteration has to pass `resolve` up the chain
-            else resolve(true);                                        // otherwise only the last tail section passes up `resolve`
-          }, ms)                                                      // to the second to last section and after that nothing happens
-        })
-      }
-
-      drawTailSection(i).then(() => resolve(wait(ms * this.speed)));
-    })
-  }
-  
-
-  _updateTail() {
-    this.body.tail.unshift({  // grow tail by "remembering" head coords
-      x: this.body.head.x, 
-      y: this.body.head.y,
-    });
-  }
-
-  _deleteTail() {
-    let tailPoint = this.body.tail.pop(); // get the last coords of tail
-    plgrndCtx.clearRect(tailPoint.x * step, tailPoint.y * step, step, step);
-  }
-
-  _grow() {
-    stats.score++;
-    if (stats.score > stats.record) {
-      stats.record = stats.score;
-      record.innerText = `Record: ${stats.record}`;
-    }
-    score.innerText = `Score: ${stats.score}`;
-    this.length++;
-    this.speed++;
-    this._checkShrink(); // playground size remains or shrinks
-    if (!this._checkCollision()) { // if the game doesn't get reset because of collision
-      this._randomFoodCreation();
-      this._changeSpeed();
-    }
-  }
-
-  _checkCollision() {
-    if (
-    this._coordInsideTail(this.body.head.x, this.body.head.y) ||
-    this.body.head.x >= playgroundWidth - 2 ||
-    this.body.head.x < 2 || this.body.tail.some((tailCoord) => tailCoord.x < 2) || // head OR tail is in the left border spikes
-    this.body.head.y >= playgroundHeight - 2 ||  
-    this.body.head.y < 2 || this.body.tail.some((tailCoord) => tailCoord.y < 2) // head OR tail is in the top border spikes
-    ) {
-      return true;
-    }
-  }
-
-  // food
-  _getRandomFoodCoord() { 
-    while (true) {
-      let [x, y] = [
-        getRandomInt(2, playgroundWidth - 2), 
-        getRandomInt(2, playgroundHeight - 2)
-        ]; 
-      if (this._coordInsideTail(x, y) ||
-         (x === this.body.head.x && y === this.body.head.y)) {
-          continue;
-        } else {
-          return {x, y};
-        }
-      }
-    }
-
-  _randomFoodCreation() {
-    this.food = this._getRandomFoodCoord();
-    this.food.color = "red";
-    this._drawFood();
-  }
-
-  _drawFood() {
-    drawstep(this.food.x, this.food.y, this.food.color);
-  } 
-
-  _checkSnakeFood() {
-    if (this.body.head.x === this.food.x && this.body.head.y === this.food.y) {
-      this._grow();
-    }
-  }
-  
-
-  // general   
-  _init() {
-    // snake
-    this.body = { //  snake sections coords
-      head: {x: containerCenter.x, y: containerCenter.y}, 
-      tail: [{x: containerCenter.x - 1, y: containerCenter.y}],
-      }; 
-    this.length = 1;
+    // parameters
     this.speed = 1;
-    this.xDirection = 1;
-    this.yDirection = 0;
+    this.direction = {x: 1, y: 0};
 
     // colors
-    this.color = "hsl(120, 100%, 25%)";
+    /*
+    this.snakeColor = "hsl(120, 100%, 25%)";
     this.hsl = this._splitColor();
+    this.headColor = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l * 0.75}%)`
     
     // shrink 
     this.counterOuter = 1;
     this.counterInner = 0;
 
+    this._createSnake();
     this._drawSnake();
-    this._randomFoodCreation();
+     */
+    this._createFood();
   }
 
-  _splitColor() {
-    let hsl = this.color.match(/\d+/g);
-    hsl = hsl.map((val) => Number(val)); 
-    return {h: hsl[0], s: hsl[1], l: hsl[2]};
-  }
-
-  _changeSpeed() { // speed change
-    clearInterval(intervalId); 
-    windup(this.speed);
-  }
-
-  _coordInsideTail(x, y) {
-    return this.body.tail.some((tailCoord) => tailCoord.x === x && tailCoord.y === y);
-  }
-
-  _checkShrink() {
-    if (this.counterInner < this.counterOuter) {
-      this.counterInner++;
-      if (this.counterInner >= this.counterOuter) {
-        this.counterInner = 0;
-        this.counterOuter++;
-        draw("shrink");
-        this._snakeShrinkCoordsCorrection();
-      }
-    }
-  }
-    
-  _snakeShrinkCoordsCorrection() {
-    // snake is inside right border spikes after shrink()
-    if (this.body.tail.some((tailCoord) => tailCoord.x === playgroundWidth - 2) || this.body.head.x === playgroundWidth - 2) {
-       // offset snake one step to the left
-      this.body.tail.forEach((tailCoord) => tailCoord.x -= 1);
-      this.body.head.x -= 1;
-    }
-    // snake is inside bottom border spikes after shrink()
-    if (this.body.tail.some((tailCoord) => tailCoord.y === playgroundHeight - 2) || this.body.head.y === playgroundHeight - 2) {
-       // offset snake one step up
-      this.body.tail.forEach((tailCoord) => tailCoord.y -= 1);
-      this.body.head.y -= 1;
+  move() {
+    this._rememberHead();
+    this.head.style.left = `${parseInt(this.head.style.left) + this.direction.x * step}px`;
+    this.head.style.top = `${parseInt(this.head.style.top) + this.direction.y * step}px`;
+    if (!this._ateFood()) {
+      this._deleteTail();
+    } else {
+      this.food.remove();
+      this._createFood();
+      stats.score++;
+      this.speed++;
+      clearInterval(intervalId);
+      windup(this.speed);      
     }
   }
 
-  _gameOver() {
-    clearInterval(intervalId); // stop any movement
-    this.hsl.s *= 0.1;
-    this._drawSnake(250 / this.speed)
-      .then(() => startAgain.style.display = "step");
+  // snake
+  _rememberHead() {
+    const neck = this.head.cloneNode(false);
+    neck.id = "";
+    neck.style.backgroundColor = "green";
+    this.head.parentNode.insertBefore(neck, this.head.nextSibling);
+  }
+
+  _deleteTail() {
+    const newTail = this.tail.previousElementSibling;
+    newTail.id = "tail";
+    this.tail.remove();
+    this.tail = newTail;
+  }
+
+  // food 
+  _createFood() { 
+     const [x, y] = [getRandomInt(2, playgroundWidth - 1), getRandomInt(2, playgroundHeight - 1)]; 
+     createElement(x, y, 'red', "food");
+     this.food = document.getElementById("food");
+    }
+
+  // general 
+  _ateFood() {
+    if (this.food.style.left === this.head.style.left && this.food.style.top === this.head.style.top) {
+      return true
+    }
   }
 }
+
 
 function getRandomInt(min, max) {
   const result = Math.floor(Math.random() * ((max - min)) + min);
@@ -297,33 +179,33 @@ function wait(ms) {
 const handleKeydown = (event) => {
   switch (event.key) {
     case "ArrowUp":
-      if (snake.yDirection !== 1) {
-        snake.xDirection = 0;
-        snake.yDirection = -1;
+      if (game.direction.y !== 1) {
+        game.direction.x = 0;
+        game.direction.y = -1;
         html.removeEventListener("keydown", handleKeydown); // only one change per frame is allowed
       }
       break;
 
     case "ArrowRight":
-      if (snake.xDirection !== -1) {
-        snake.xDirection = 1;
-        snake.yDirection = 0;
+      if (game.direction.x !== -1) {
+        game.direction.x = 1;
+        game.direction.y = 0;
         html.removeEventListener("keydown", handleKeydown);
       }
       break;
 
     case "ArrowDown":
-      if (snake.yDirection !== -1) {
-        snake.xDirection = 0;
-        snake.yDirection = 1;
+      if (game.direction.y !== -1) {
+        game.direction.x = 0;
+        game.direction.y = 1;
         html.removeEventListener("keydown", handleKeydown);
       }
       break;
 
     case "ArrowLeft":
-      if (snake.xDirection !== 1) {
-        snake.xDirection = -1;
-        snake.yDirection = 0;
+      if (game.direction.x !== 1) {
+        game.direction.x = -1;
+        game.direction.y = 0;
         html.removeEventListener("keydown", handleKeydown);
       }
       break;
@@ -333,7 +215,7 @@ const handleKeydown = (event) => {
         clearInterval(intervalId);
         intervalId = 0;
       } else {
-        windup(snake.speed);
+        windup(game.speed);
       }
       break;
   }
@@ -347,26 +229,24 @@ const control = () => {
 function windup(speed) {
   intervalId = setInterval(() => {
     control();
-    snake.move();
+    game.move();
   }, 500 / speed); 
 }
 
 const gameStarter = (btn) => {
   btn.addEventListener("click", (event) => {
     resetSize();
-    draw("init");
-    snake = new Snake();
-    windup(snake.speed);
+    size("init");
+    game = new SnakeGame();
+    windup(game.speed);
     btn.style.display = "none";
     menu.style.display = "none";
   })
 }
 
-draw("init");
+size("init");
 
 gameStarter(start);
 
-gameStarter(startAgain);
-
-*/
+//gameStarter(startAgain);
 

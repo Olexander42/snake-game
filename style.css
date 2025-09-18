@@ -5,6 +5,7 @@
   src: url("assets/fonts/BrickEdgie-Zp9wz.otf") format('opentype');
 }
 
+
 html {
   font-size: 20px;
 }
@@ -73,7 +74,6 @@ body {
   position: absolute;
   inset: 50%;
   transform: translate(-50%, -50%);
-  display: none;
 }
 
 button {
