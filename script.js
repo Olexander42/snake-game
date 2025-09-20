@@ -1,8 +1,8 @@
 const root = document.documentElement;
 const html = document.querySelector("html");
 const menu = document.querySelector(".menu");
-const start = document.querySelector(".start-btn");
-const startAgain = document.querySelector(".start-again-btn");
+const startBtn = document.querySelector(".start-btn");
+const startAgainBtn = document.querySelector(".start-again-btn");
 const background = document.querySelector(".background");
 const container = document.querySelector(".container");
 const score = document.querySelector(".score");
@@ -15,12 +15,8 @@ let intervalId = null;
 let playgroundCenter = {};
 const stats = {score: 0, record: 0};
 
-
-
-
-
 /* 
-- settings (snake color / step size / hard ))
+- settings (snake color | step size | shrink(on/off) | controls (absolute/relative) | (css/canvas)))
 - minmax size
 - rewrite canvas in css
 */
@@ -33,8 +29,8 @@ let clip = step / 2; // clip-path value to use on background inside the walls
 
 function size(mode) {
   // fetch sizes
-  let containerWidth = parseInt(getComputedStyle(container).width); 
-  let containerHeight = parseInt(getComputedStyle(container).height);
+  containerWidth = parseInt(getComputedStyle(container).width); 
+  containerHeight = parseInt(getComputedStyle(container).height);
 
   if (mode === "init") {
      // "normalization"
@@ -48,6 +44,7 @@ function size(mode) {
     background.style.height = containerHeight + "px";
 
     score.innerText = `Score: ${stats.score}`;
+    record.innerText = `Record: ${stats.record}`;
 
   } else if (mode === "shrink") {
       // shrink container
@@ -64,18 +61,20 @@ function size(mode) {
   playgroundCenter = {x: Math.floor(playgroundWidth / 2), y: Math.floor(playgroundHeight / 2)};
 }
 
-function resetSize() {
-    container.style.width = "";
-    container.style.height = "";
-    background.style.clipPath = "none";
-    clip = step / 2;
-    stats.score = 0;
+function reset() {
+  container.style.width = "";
+  container.style.height = "";
+  background.style.clipPath = "none";
+  clip = step / 2;
+  stats.score = 0;
+  document.querySelectorAll(".block").forEach((el) => el.remove());
 }
 
-function createElement(x, y, color, id="") {
+function createElement(x, y, color, className, id="") {
   const element  = document.createElement('div');
 
   element.classList.add("block");
+  element.classList.add(`${className}`);
   element.id = id;
   element.style.left = `${x * step}px`;
   element.style.top = `${y * step}px`;
@@ -88,54 +87,52 @@ function createElement(x, y, color, id="") {
 // LOGIC 
 class SnakeGame {
   constructor() {
-    // create snake
-    createElement(playgroundCenter.x, playgroundCenter.y, 'darkgreen', "head"); 
-    createElement(playgroundCenter.x - 1, playgroundCenter.y, 'green', "tail"); 
-    this.head = document.getElementById("head");
-    this.tail = document.getElementById("tail");
+    // colors
+    this.snakeColor = "hsl(120, 100%, 25%)";
+    this.hsl = this._splitColor();
+    this.headColor = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l * 0.75}%)`;
 
     // parameters
     this.speed = 1;
     this.direction = {x: 1, y: 0};
 
-    // colors
-    /*
-    this.snakeColor = "hsl(120, 100%, 25%)";
-    this.hsl = this._splitColor();
-    this.headColor = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l * 0.75}%)`
+    // create snake
+    createElement(playgroundCenter.x, playgroundCenter.y, this.headColor, "head", "head") ; 
+    createElement(playgroundCenter.x - 1, playgroundCenter.y, 'green', "snake-body", "tail"); 
+    this.head = document.getElementById("head");
+    this.tail = document.getElementById("tail");
+
     
     // shrink 
     this.counterOuter = 1;
     this.counterInner = 0;
 
-    this._createSnake();
-    this._drawSnake();
-     */
     this._createFood();
   }
 
-  move() {
+  action() {
     this._rememberHead();
-    this.head.style.left = `${parseInt(this.head.style.left) + this.direction.x * step}px`;
-    this.head.style.top = `${parseInt(this.head.style.top) + this.direction.y * step}px`;
-    if (!this._ateFood()) {
-      this._deleteTail();
-    } else {
-      this.food.remove();
-      this._createFood();
-      stats.score++;
-      this.speed++;
-      clearInterval(intervalId);
-      windup(this.speed);      
+    this._move();
+    if (this._collision()) this._gameOver();
+    else {
+      if (!this._ateFood()) this._deleteTail();
+      this._repaintBody();
     }
   }
 
   // snake
+  _move() {
+    this.head.style.left = `${parseInt(this.head.style.left) + this.direction.x * step}px`;
+    this.head.style.top = `${parseInt(this.head.style.top) + this.direction.y * step}px`;
+  }
+
   _rememberHead() {
-    const neck = this.head.cloneNode(false);
-    neck.id = "";
-    neck.style.backgroundColor = "green";
-    this.head.parentNode.insertBefore(neck, this.head.nextSibling);
+    this.neck = this.head.cloneNode(false);
+    this.neck.id = "";
+    this.neck.classList.remove("head");
+    this.neck.classList.add("snake-body");
+    this.neck.style.backgroundColor = "green";
+    this.head.parentNode.insertBefore(this.neck, this.head.nextSibling);
   }
 
   _deleteTail() {
@@ -145,18 +142,132 @@ class SnakeGame {
     this.tail = newTail;
   }
 
+  _repaintBody(ms=0) {
+    return new Promise((resolve) => {
+      const snakeSections = document.querySelectorAll(".snake-body");
+      let i = 0;
+
+      const repaintSection = () => {
+        setTimeout(() => {
+          const lighterColor = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l + i}%)`;
+          const s = snakeSections[i];
+          s.style.backgroundColor = lighterColor;
+          i++;
+          if (i < snakeSections.length) {
+            repaintSection();  
+          } else {
+            resolve(true);
+          }
+        }, ms);
+      };
+
+      repaintSection(i);
+    })
+  }
+
   // food 
-  _createFood() { 
-     const [x, y] = [getRandomInt(2, playgroundWidth - 1), getRandomInt(2, playgroundHeight - 1)]; 
-     createElement(x, y, 'red', "food");
-     this.food = document.getElementById("food");
+  _createFood() { // fix: appears in the middle of the screen from the get-go
+    let [x, y] = [null, null]
+
+    const samePlace = () => {
+      if (document.querySelector(".food")) { 
+        const [foodX, foodY] = [parseInt(this.food.style.left) / step,  parseInt(this.food.style.top) / step]; 
+        this.food.remove();
+        return (x === foodX && y === foodY);
+      } else return false
     }
+
+    while (true) {
+       [x, y] = [getRandomInt(2, playgroundWidth - 1), getRandomInt(2, playgroundHeight - 1)]; 
+       if (this._coordsInsideBody(x, y, "food") || samePlace()) continue;
+       else break;
+    }
+
+    createElement(x, y, 'red', "food");
+    this.food = document.querySelector(".food");
+  }
 
   // general 
   _ateFood() {
     if (this.food.style.left === this.head.style.left && this.food.style.top === this.head.style.top) {
-      return true
+      this._checkShrink();
+      this._createFood();
+
+      stats.score++;
+      this.speed++;
+      score.innerText = `Score: ${stats.score}`;
+
+      clearInterval(intervalId);
+      windup(this.speed); 
+
+      return true;
     }
+  }
+
+  _collision() {
+    if (
+      parseInt(this.head.style.left) < step || parseInt(this.head.style.left) > container.clientWidth - step * 2 // left & right border
+      || parseInt(this.head.style.top) < step || parseInt(this.head.style.top) > container.clientHeight - step * 2 //top & bottom border
+      || this._coordsInsideBody(this.head.style.left, this.head.style.top, "head")
+      ) return true
+  }
+
+  _coordsInsideBody(x, y, obj) {
+    if (obj === "food") {
+      x *= step;
+      y *= step;
+      x = x + "px";
+      y = y + "px";
+    } 
+    return [...document.querySelectorAll(".snake-body")].some((el) => (x === el.style.left && y === el.style.top));
+  }
+
+    _splitColor() {
+    let hsl = this.snakeColor.match(/\d+/g);
+    hsl = hsl.map((val) => Number(val)); 
+    return {h: hsl[0], s: hsl[1], l: hsl[2]};
+  }
+
+  
+  _checkShrink() {
+    if (this.counterInner < this.counterOuter) {
+      this.counterInner++;
+      if (this.counterInner >= this.counterOuter) {
+        this.counterInner = 0;
+        this.counterOuter++;
+        size("shrink");
+        this._snakeShrinkCorrection();
+      }
+    }
+  }
+  
+   _snakeShrinkCorrection() {
+    // snake is inside right border after "shrink"
+    if ([...document.querySelectorAll(".block")].some((el) => (parseInt(el.style.left) === container.clientWidth - step))) {
+      document.querySelectorAll(".block").forEach((el) => el.style.left = parseInt(el.style.left) - step + "px" );
+    }
+    // snake is inside bottom border after "shrink"
+    if ([...document.querySelectorAll(".block")].some((el) => (parseInt(el.style.top) === container.clientHeight - step))) {
+      document.querySelectorAll(".block").forEach((el) => el.style.top = parseInt(el.style.top) - step + "px" );
+    }
+  }
+
+
+  _gameOver() {
+    clearInterval(intervalId);
+
+    // "withdraw" yourself from the point of collision
+    this.head.style.left = `${parseInt(this.head.style.left) - this.direction.x * step}px`;
+    this.head.style.top = `${parseInt(this.head.style.top) - this.direction.y * step}px`;
+    this.neck.remove();
+
+    if (stats.score > stats.record) {
+      stats.record = stats.score;
+    }
+
+    this.hsl.s *= 0.1;
+    this._repaintBody(250 / this.speed)
+      .then(() => startAgainBtn.style.display = "block");
   }
 }
 
@@ -178,8 +289,9 @@ function wait(ms) {
 // controls 
 const handleKeydown = (event) => {
   switch (event.key) {
+    // prevent snake from hitting borders up close
     case "ArrowUp":
-      if (game.direction.y !== 1) {
+      if (!(parseInt(game.neck.style.top) === step && game.direction.y === 0 || game.direction.y == 1)) { // top border
         game.direction.x = 0;
         game.direction.y = -1;
         html.removeEventListener("keydown", handleKeydown); // only one change per frame is allowed
@@ -187,7 +299,7 @@ const handleKeydown = (event) => {
       break;
 
     case "ArrowRight":
-      if (game.direction.x !== -1) {
+      if (!(parseInt(game.neck.style.left) === container.clientWidth - step * 2 && game.direction.x === 0 || game.direction.x == -1)) { // top border
         game.direction.x = 1;
         game.direction.y = 0;
         html.removeEventListener("keydown", handleKeydown);
@@ -195,7 +307,7 @@ const handleKeydown = (event) => {
       break;
 
     case "ArrowDown":
-      if (game.direction.y !== -1) {
+      if (!(parseInt(game.neck.style.top) === container.clientHeight - step * 2 && game.direction.y === 0 || game.direction.y === -1)) { // bottom border
         game.direction.x = 0;
         game.direction.y = 1;
         html.removeEventListener("keydown", handleKeydown);
@@ -203,7 +315,7 @@ const handleKeydown = (event) => {
       break;
 
     case "ArrowLeft":
-      if (game.direction.x !== 1) {
+      if (!(parseInt(game.neck.style.left) === step && game.direction.x === 0 || game.direction.x === 1)) {  // left border
         game.direction.x = -1;
         game.direction.y = 0;
         html.removeEventListener("keydown", handleKeydown);
@@ -229,24 +341,24 @@ const control = () => {
 function windup(speed) {
   intervalId = setInterval(() => {
     control();
-    game.move();
+    game.action();
   }, 500 / speed); 
 }
 
 const gameStarter = (btn) => {
   btn.addEventListener("click", (event) => {
-    resetSize();
+    reset();
     size("init");
     game = new SnakeGame();
     windup(game.speed);
-    btn.style.display = "none";
     menu.style.display = "none";
+    startAgainBtn.style.display = "none";
   })
 }
 
 size("init");
 
-gameStarter(start);
+gameStarter(startBtn);
 
-//gameStarter(startAgain);
+gameStarter(startAgainBtn);
 

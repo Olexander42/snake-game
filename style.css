@@ -93,6 +93,7 @@ button {
   width: max-content;
   height: min-content;
   transform: translate(-50%, -50%);
+  display: none;
 }
 
 .block {
