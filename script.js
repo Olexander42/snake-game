@@ -145,7 +145,6 @@ class SnakeGame {
       let i = 0;
 
       this.head.style.backgroundColor = this._changedColor({l: (-2)});
-      console.log(this.headColor);
       const repaintSection = () => {
         setTimeout(() => {
           const lighterColor = this._changedColor({l: i});
