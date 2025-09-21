@@ -18,7 +18,6 @@ const stats = {score: 0, record: 0};
 /* 
 - settings (snake color | step size | shrink(on/off) | controls (absolute/relative) | (css/canvas)))
 - minmax size
-- rewrite canvas in css
 */
 
 // VISUALS
@@ -26,6 +25,8 @@ const step = 20;
 root.style.setProperty("--step", `${step}px`);
 
 let clip = step / 2; // clip-path value to use on background inside the walls
+
+const mainColor = "hsl(120, 100%, 25%)";
 
 function size(mode) {
   // fetch sizes
@@ -87,18 +88,14 @@ function createElement(x, y, color, className, id="") {
 // LOGIC 
 class SnakeGame {
   constructor() {
-    // colors
-    this.snakeColor = "hsl(120, 100%, 25%)";
-    this.hsl = this._splitColor();
-    this.headColor = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l * 0.75}%)`;
-
     // parameters
     this.speed = 1;
     this.direction = {x: 1, y: 0};
 
     // create snake
-    createElement(playgroundCenter.x, playgroundCenter.y, this.headColor, "head", "head") ; 
-    createElement(playgroundCenter.x - 1, playgroundCenter.y, 'green', "snake-body", "tail"); 
+    this.hsl = this._splitColor();
+    createElement(playgroundCenter.x, playgroundCenter.y, this._changedColor({l: (-2)}), "head", "head") ; 
+    createElement(playgroundCenter.x - 1, playgroundCenter.y, this._changedColor(), "snake-body", "tail"); 
     this.head = document.getElementById("head");
     this.tail = document.getElementById("tail");
 
@@ -131,7 +128,7 @@ class SnakeGame {
     this.neck.id = "";
     this.neck.classList.remove("head");
     this.neck.classList.add("snake-body");
-    this.neck.style.backgroundColor = "green";
+    //this.neck.style.backgroundColor = "green";
     this.head.parentNode.insertBefore(this.neck, this.head.nextSibling);
   }
 
@@ -147,9 +144,11 @@ class SnakeGame {
       const snakeSections = document.querySelectorAll(".snake-body");
       let i = 0;
 
+      this.head.style.backgroundColor = this._changedColor({l: (-2)});
+      console.log(this.headColor);
       const repaintSection = () => {
         setTimeout(() => {
-          const lighterColor = `hsl(${this.hsl.h}, ${this.hsl.s}%, ${this.hsl.l + i}%)`;
+          const lighterColor = this._changedColor({l: i});
           const s = snakeSections[i];
           s.style.backgroundColor = lighterColor;
           i++;
@@ -166,7 +165,7 @@ class SnakeGame {
   }
 
   // food 
-  _createFood() { // fix: appears in the middle of the screen from the get-go
+  _createFood() {
     let [x, y] = [null, null]
 
     const samePlace = () => {
@@ -179,7 +178,7 @@ class SnakeGame {
 
     while (true) {
        [x, y] = [getRandomInt(2, playgroundWidth - 1), getRandomInt(2, playgroundHeight - 1)]; 
-       if (this._coordsInsideBody(x, y, "food") || samePlace()) continue;
+       if (this._coordsInsideBody(x, y, "food") || samePlace() || (x === playgroundCenter.x && y === playgroundCenter.y)) continue;
        else break;
     }
 
@@ -223,9 +222,13 @@ class SnakeGame {
   }
 
     _splitColor() {
-    let hsl = this.snakeColor.match(/\d+/g);
+    let hsl = mainColor.match(/\d+/g);
     hsl = hsl.map((val) => Number(val)); 
     return {h: hsl[0], s: hsl[1], l: hsl[2]};
+  }
+
+  _changedColor({h = 0, s = 0, l = 0} = {}) {
+    return `hsl(${this.hsl.h + h}, ${this.hsl.s + s}%, ${this.hsl.l + l}%)`
   }
 
   
@@ -265,8 +268,9 @@ class SnakeGame {
       stats.record = stats.score;
     }
 
-    this.hsl.s *= 0.1;
+    this.hsl.s *= 0.2;
     this._repaintBody(250 / this.speed)
+      .then(() => wait(250 / this.speed))
       .then(() => startAgainBtn.style.display = "block");
   }
 }
@@ -361,4 +365,7 @@ size("init");
 gameStarter(startBtn);
 
 gameStarter(startAgainBtn);
+
+
+
 
