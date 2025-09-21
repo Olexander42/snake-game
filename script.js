@@ -1,19 +1,19 @@
 const root = document.documentElement;
 const html = document.querySelector("html");
 const menu = document.querySelector(".menu");
-const startBtn = document.querySelector(".start-btn");
-const startAgainBtn = document.querySelector(".start-again-btn");
+const startBtn = document.querySelector(".start");
 const background = document.querySelector(".background");
 const container = document.querySelector(".container");
 const score = document.querySelector(".score");
 const record = document.querySelector(".record");
 
+const stats = {score: 0, record: 0};
 let playgroundWidth = null;
 let playgroundHeight = null;
 let game = null;
 let intervalId = null;
 let playgroundCenter = {};
-const stats = {score: 0, record: 0};
+let ms = 500;
 
 /* 
 - settings (snake color | step size | shrink(on/off) | controls (absolute/relative) | (css/canvas)))
@@ -21,7 +21,7 @@ const stats = {score: 0, record: 0};
 */
 
 // VISUALS
-const step = 20;
+const step = 40;
 root.style.setProperty("--step", `${step}px`);
 
 let clip = step / 2; // clip-path value to use on background inside the walls
@@ -29,16 +29,10 @@ let clip = step / 2; // clip-path value to use on background inside the walls
 const mainColor = "hsl(120, 100%, 25%)";
 
 function size(mode) {
-  // fetch sizes
-  containerWidth = parseInt(getComputedStyle(container).width); 
-  containerHeight = parseInt(getComputedStyle(container).height);
-
   if (mode === "init") {
-     // "normalization"
-    containerWidth = Math.round(containerWidth / step) * step;
-    containerHeight = Math.round(containerHeight / step) * step;
-
-    // apply the sizing 
+     // "round" dimensions
+    containerWidth = Math.round(container.clientWidth / step) * step;
+    containerHeight = Math.round(container.clientHeight / step) * step;
     container.style.width = containerWidth + "px";
     container.style.height = containerHeight + "px";
     background.style.width = containerWidth + "px";
@@ -46,11 +40,11 @@ function size(mode) {
 
     score.innerText = `Score: ${stats.score}`;
     record.innerText = `Record: ${stats.record}`;
-
   } else if (mode === "shrink") {
       // shrink container
-      container.style.width = containerWidth - step + "px";
-      container.style.height = containerHeight - step + "px";
+      container.style.width = container.clientWidth - step + "px";
+      container.style.height = container.clientHeight - step + "px";
+
       // clip background image
       background.style.clipPath = `inset(${clip + 1}px)`;
       clip += step/2;
@@ -267,10 +261,10 @@ class SnakeGame {
       stats.record = stats.score;
     }
 
-    this.hsl.s *= 0.2;
-    this._repaintBody(250 / this.speed)
-      .then(() => wait(250 / this.speed))
-      .then(() => startAgainBtn.style.display = "block");
+    this.hsl.s *= 0.15;
+    this._repaintBody(ms / this.speed / 2)
+      .then(() => wait(ms / this.speed / 2))
+      .then(() => startBtn.style.display = "block");
   }
 }
 
@@ -337,33 +331,40 @@ const handleKeydown = (event) => {
 }
 
 
-const control = () => {
+const controlOn = () => {
   html.addEventListener("keydown", handleKeydown);
 }
+
+const handleStartButton = () => {
+  startBtn.innerText = "Start Again";
+  startBtn.style.setProperty("width", "max-content");
+  document.querySelectorAll("button").forEach((el) => el.style.display = "none");
+}
  
-function windup(speed) {
+function windup(delay) {
   intervalId = setInterval(() => {
-    control();
+    controlOn();
     game.action();
-  }, 500 / speed); 
+  }, delay); 
 }
 
-const gameStarter = (btn) => {
-  btn.addEventListener("click", (event) => {
-    reset();
-    size("init");
-    game = new SnakeGame();
-    windup(game.speed);
-    menu.style.display = "none";
-    startAgainBtn.style.display = "none";
-  })
+const gameStarter = () => {
+  reset();
+  size("init");
+
+  game = new SnakeGame();
+
+  const timeGap = ms / game.speed ;
+  root.style.setProperty("--time-gap", `${timeGap / 1000}s`);
+
+  windup(timeGap);
+  handleStartButton();
 }
 
 size("init");
 
-gameStarter(startBtn);
+startBtn.addEventListener("click", gameStarter);
 
-gameStarter(startAgainBtn);
 
 
 

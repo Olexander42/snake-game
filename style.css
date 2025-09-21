@@ -7,7 +7,7 @@
 
 
 html {
-  font-size: 20px;
+  font-size: var(--step);
 }
 
 body {
@@ -38,7 +38,7 @@ body {
 .container {
   border-image-source: url("assets/images/brick-wall.jpg");
   border-image-slice: 400;
-  border-image-width: 20px;
+  border-image-width: var(--step);
   border-image-repeat: repeat;
 }
 
@@ -46,16 +46,16 @@ body {
 .record { 
   position: absolute;
   inset: 0;
-  height: 20px;
-  margin: 0 20px;
+  height: var(--step);
+  margin: 0 var(--step);
   font-size: 1rem;
-  line-height: 20px;
+  line-height: var(--step);
 }
 
 .score {
   font-family: "Rock Salt";
   font-size: 0.6rem;
-  letter-spacing: 2px;
+  letter-spacing: calc(var(--step) * 0.1);
 }
 
 .record {
@@ -66,14 +66,16 @@ body {
 }
 
 .menu {
+  position: absolute;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  width: min-content;
-  height: min-content;
+  gap: var(--step);
+  width: max-content;
+  height: max-content;
   position: absolute;
   inset: 50%;
   transform: translate(-50%, -50%);
+  z-index: 1;
 }
 
 button {
@@ -83,22 +85,13 @@ button {
   border: 1px solid;
   border-style: outset;
   backdrop-filter: blur(2px);
-  letter-spacing: 4px;
+  letter-spacing:  calc(var(--step) * 0.2);
   background: none;
-  z-index: 1;
-}
-
-.start-again-btn {
-  position: absolute;
-  inset: 50%;
-  width: max-content;
-  height: min-content;
-  transform: translate(-50%, -50%);
-  display: none;
 }
 
 .block {
   width: var(--step);
   height: var(--step);
   position: absolute;
+  transition: left var(--time-gap) linear, top var(--time-gap) linear;
 }
