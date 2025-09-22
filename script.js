@@ -4,19 +4,21 @@ const menu = document.querySelector(".menu");
 const startBtn = document.querySelector(".start");
 const background = document.querySelector(".background");
 const container = document.querySelector(".container");
+const snake = document.querySelector(".snake");
 const score = document.querySelector(".score");
 const record = document.querySelector(".record");
 
+
 const stats = {score: 0, record: 0};
-let playgroundWidth = null;
-let playgroundHeight = null;
-let game = null;
-let intervalId = null;
+let playgroundWidth = 0;
+let playgroundHeight = 0;
+let intervalId = 0;
 let playgroundCenter = {};
-let ms = 500;
+let ms = 1000;
+
 
 /* 
-- settings (snake color | step size | shrink(on/off) | controls (absolute/relative) | (css/canvas)))
+- settings (this.snakeBody color | step size | shrink(on/off) | controls (absolute/relative) | god mode)
 - minmax size
 */
 
@@ -29,7 +31,7 @@ let clip = step / 2; // clip-path value to use on background inside the walls
 const mainColor = "hsl(120, 100%, 25%)";
 
 function size(mode) {
-  if (mode === "init") {
+  if (mode === "ini") {
      // "round" dimensions
     containerWidth = Math.round(container.clientWidth / step) * step;
     containerHeight = Math.round(container.clientHeight / step) * step;
@@ -75,91 +77,108 @@ function createElement(x, y, color, className, id="") {
   element.style.top = `${y * step}px`;
   element.style.backgroundColor = color;
 
-  container.appendChild(element);
+  if (className !== "food") snake.appendChild(element);
+  else container.appendChild(element);
 }
 
 
 // LOGIC 
 class SnakeGame {
   constructor() {
+    this.ini();
+  }
+
+  ini() {
     // parameters
     this.speed = 1;
     this.direction = {x: 1, y: 0};
-
-    // create snake
     this.hsl = this._splitColor();
-    createElement(playgroundCenter.x, playgroundCenter.y, this._changedColor({l: (-2)}), "head", "head") ; 
-    createElement(playgroundCenter.x - 1, playgroundCenter.y, this._changedColor(), "snake-body", "tail"); 
-    this.head = document.getElementById("head");
-    this.tail = document.getElementById("tail");
 
-    
+    // snake 
+    createElement(playgroundCenter.x, playgroundCenter.y, this._changedColor({l: (-2)}), "snake-body", "head") ; 
+    createElement(playgroundCenter.x - 1, playgroundCenter.y, this._changedColor(), "snake-body", "neck"); 
+    this.head = document.getElementById("head");
+    this.neck = document.getElementById("neck");
+
+    this._createFood();
+
     // shrink 
     this.counterOuter = 1;
     this.counterInner = 0;
-
-    this._createFood();
   }
 
   action() {
-    this._rememberHead();
-    this._move();
-    if (this._collision()) this._gameOver();
+    this._snapshotSnake();
+    this._moveHead();
+    if (this._collision()) {
+      this._gameOver(); 
+    }
     else {
-      if (!this._ateFood()) this._deleteTail();
+      this._bodyFollows();
+      this._ateFood();
       this._repaintBody();
     }
   }
 
   // snake
-  _move() {
+  _moveHead() {    
     this.head.style.left = `${parseInt(this.head.style.left) + this.direction.x * step}px`;
     this.head.style.top = `${parseInt(this.head.style.top) + this.direction.y * step}px`;
   }
 
-  _rememberHead() {
-    this.neck = this.head.cloneNode(false);
-    this.neck.id = "";
-    this.neck.classList.remove("head");
-    this.neck.classList.add("snake-body");
-    //this.neck.style.backgroundColor = "green";
-    this.head.parentNode.insertBefore(this.neck, this.head.nextSibling);
+  _bodyFollows() {
+    let i = 1; // because this.snakeBody[0] is head
+    const moveToNextPosition = (i) => {
+      const [left, top] = [this.snakeBodyCoords[i - 1].left, this.snakeBodyCoords[i - 1].top];
+      if (this.snakeBody[i].id === "neck") this.snakeBody[i].id = "";
+      this.snakeBody[i].style.left = left;
+      this.snakeBody[i].style.top = top;
+      if (i < this.snakeBody.length - 1) moveToNextPosition(i + 1);
+    }
+
+    const checkTurn = () => {
+      // vertical turn 
+      
+    }
+    moveToNextPosition(i);
   }
 
-  _deleteTail() {
-    const newTail = this.tail.previousElementSibling;
-    newTail.id = "tail";
-    this.tail.remove();
-    this.tail = newTail;
+  _snapshotSnake() {
+    this.snakeBody = document.querySelectorAll(".snake-body");
+    this.snakeBodyCoords = [];
+    this.snakeBody.forEach((el) => {
+      const [left, top] = [el.style.left, el.style.top];
+      const coords = {left, top};
+      this.snakeBodyCoords.push(coords);
+    })
   }
+
 
   _repaintBody(ms=0) {
     return new Promise((resolve) => {
-      const snakeSections = document.querySelectorAll(".snake-body");
-      let i = 0;
-
       this.head.style.backgroundColor = this._changedColor({l: (-2)});
+
+      let i = 0;
       const repaintSection = () => {
         setTimeout(() => {
           const lighterColor = this._changedColor({l: i});
-          const s = snakeSections[i];
+          const s = this.snakeBody[i];
           s.style.backgroundColor = lighterColor;
           i++;
-          if (i < snakeSections.length) {
+          if (i < this.snakeBody.length) {
             repaintSection();  
           } else {
             resolve(true);
           }
         }, ms);
       };
-
       repaintSection(i);
     })
   }
 
   // food 
   _createFood() {
-    let [x, y] = [null, null]
+    let [x, y] = [1, 1];
 
     const samePlace = () => {
       if (document.querySelector(".food")) { 
@@ -182,6 +201,12 @@ class SnakeGame {
   // general 
   _ateFood() {
     if (this.food.style.left === this.head.style.left && this.food.style.top === this.head.style.top) {
+      clearInterval(intervalId);
+
+      this.snakeBody = document.querySelectorAll(".snake-body");
+      const newTail = this.snakeBody[this.snakeBody.length - 1].cloneNode(false);
+      snake.appendChild(newTail);
+
       this._checkShrink();
       this._createFood();
 
@@ -189,10 +214,7 @@ class SnakeGame {
       this.speed++;
       score.innerText = `Score: ${stats.score}`;
 
-      clearInterval(intervalId);
       windup(this.speed); 
-
-      return true;
     }
   }
 
@@ -201,7 +223,13 @@ class SnakeGame {
       parseInt(this.head.style.left) < step || parseInt(this.head.style.left) > container.clientWidth - step * 2 // left & right border
       || parseInt(this.head.style.top) < step || parseInt(this.head.style.top) > container.clientHeight - step * 2 //top & bottom border
       || this._coordsInsideBody(this.head.style.left, this.head.style.top, "head")
-      ) return true
+      ) {
+      console.log(container.clientWidth, container.clientHeight);
+      console.log(this.head.style.left, this.head.style.top);
+      //return true;
+    }
+
+      
   }
 
   _coordsInsideBody(x, y, obj) {
@@ -211,7 +239,8 @@ class SnakeGame {
       x = x + "px";
       y = y + "px";
     } 
-    return [...document.querySelectorAll(".snake-body")].some((el) => (x === el.style.left && y === el.style.top));
+    if ([...document.querySelectorAll(".snake-body")].some((el, i) => (i !== 0 && (x === el.style.left && y === el.style.top))))  console.log("⚠ Head inside BODY!");
+    return [...document.querySelectorAll(".snake-body")].some((el, i) => (i !== 0 && (x === el.style.left && y === el.style.top))); // head is excluded
   }
 
     _splitColor() {
@@ -232,17 +261,18 @@ class SnakeGame {
         this.counterInner = 0;
         this.counterOuter++;
         size("shrink");
+        //wait(ms / this.speed)
         this._snakeShrinkCorrection();
       }
     }
   }
   
    _snakeShrinkCorrection() {
-    // snake is inside right border after "shrink"
+    // this.snakeBody is inside right border after "shrink"
     if ([...document.querySelectorAll(".block")].some((el) => (parseInt(el.style.left) === container.clientWidth - step))) {
       document.querySelectorAll(".block").forEach((el) => el.style.left = parseInt(el.style.left) - step + "px" );
     }
-    // snake is inside bottom border after "shrink"
+    // this.snakeBody is inside bottom border after "shrink"
     if ([...document.querySelectorAll(".block")].some((el) => (parseInt(el.style.top) === container.clientHeight - step))) {
       document.querySelectorAll(".block").forEach((el) => el.style.top = parseInt(el.style.top) - step + "px" );
     }
@@ -253,9 +283,9 @@ class SnakeGame {
     clearInterval(intervalId);
 
     // "withdraw" yourself from the point of collision
-    this.head.style.left = `${parseInt(this.head.style.left) - this.direction.x * step}px`;
-    this.head.style.top = `${parseInt(this.head.style.top) - this.direction.y * step}px`;
-    this.neck.remove();
+    //this.head.style.left = `${parseInt(this.head.style.left) - this.direction.x * step}px`;
+    //this.head.style.top = `${parseInt(this.head.style.top) - this.direction.y * step}px`;
+    //this.neck.remove();
 
     if (stats.score > stats.record) {
       stats.record = stats.score;
@@ -286,7 +316,7 @@ function wait(ms) {
 // controls 
 const handleKeydown = (event) => {
   switch (event.key) {
-    // prevent snake from hitting borders up close
+    // prevent this.snakeBody from hitting borders up close
     case "ArrowUp":
       if (!(parseInt(game.neck.style.top) === step && game.direction.y === 0 || game.direction.y == 1)) { // top border
         game.direction.x = 0;
@@ -341,30 +371,35 @@ const handleStartButton = () => {
   document.querySelectorAll("button").forEach((el) => el.style.display = "none");
 }
  
-function windup(delay) {
+function windup(speed) {
   intervalId = setInterval(() => {
     controlOn();
+
+    root.style.setProperty("--time-gap", `${ms / speed / 1000}s`);
+
     game.action();
-  }, delay); 
+  }, ms / speed); 
 }
 
 const gameStarter = () => {
-  reset();
-  size("init");
+  if (intervalId > 1) { // for restart
+    reset();
 
-  game = new SnakeGame();
+    size("ini");
 
-  const timeGap = ms / game.speed ;
-  root.style.setProperty("--time-gap", `${timeGap / 1000}s`);
+    game.ini();
+  }
 
-  windup(timeGap);
+  windup(game.speed);
+
   handleStartButton();
 }
 
-size("init");
+size("ini");
+
+const game = new SnakeGame();
 
 startBtn.addEventListener("click", gameStarter);
-
 
 
 
