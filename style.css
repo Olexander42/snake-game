@@ -40,7 +40,7 @@ body {
   border-image-slice: 400;
   border-image-width: var(--step);
   border-image-repeat: repeat;
-  transition:/ width var(--time-gap) linear, height var(--time-gap) linear;
+  transition: width var(--time-gap), height var(--time-gap);
 }
 
 .score,
@@ -77,6 +77,7 @@ body {
   inset: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
+  display:/ none;
 }
 
 button {

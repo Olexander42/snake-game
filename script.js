@@ -8,13 +8,13 @@ const snake = document.querySelector(".snake");
 const score = document.querySelector(".score");
 const record = document.querySelector(".record");
 
-
 const stats = {score: 0, record: 0};
 let playgroundWidth = 0;
 let playgroundHeight = 0;
 let intervalId = 0;
 let playgroundCenter = {};
-let ms = 1000;
+let timeUnit = 1000;
+let timeGap = 1000;
 
 
 /* 
@@ -177,8 +177,7 @@ class SnakeGame {
   }
 
   // food 
-  _createFood() {
-    let [x, y] = [1, 1];
+  _createFood() {let [x, y] = [1, 1];
 
     const samePlace = () => {
       if (document.querySelector(".food")) { 
@@ -201,20 +200,22 @@ class SnakeGame {
   // general 
   _ateFood() {
     if (this.food.style.left === this.head.style.left && this.food.style.top === this.head.style.top) {
+      this._createFood();
       clearInterval(intervalId);
 
       this.snakeBody = document.querySelectorAll(".snake-body");
       const newTail = this.snakeBody[this.snakeBody.length - 1].cloneNode(false);
       snake.appendChild(newTail);
 
-      this._checkShrink();
-      this._createFood();
-
-      stats.score++;
       this.speed++;
-      score.innerText = `Score: ${stats.score}`;
-
-      windup(this.speed); 
+      timeGapUpdate();
+      this._checkShrink()
+        .then(() => wait(timeGap))
+        .then(() => {
+          stats.score++;
+          score.innerText = `Score: ${stats.score}`;
+          windup();
+        })     
     }
   }
 
@@ -224,9 +225,7 @@ class SnakeGame {
       || parseInt(this.head.style.top) < step || parseInt(this.head.style.top) > container.clientHeight - step * 2 //top & bottom border
       || this._coordsInsideBody(this.head.style.left, this.head.style.top, "head")
       ) {
-      console.log(container.clientWidth, container.clientHeight);
-      console.log(this.head.style.left, this.head.style.top);
-      //return true;
+      return true;
     }
 
       
@@ -239,11 +238,11 @@ class SnakeGame {
       x = x + "px";
       y = y + "px";
     } 
-    if ([...document.querySelectorAll(".snake-body")].some((el, i) => (i !== 0 && (x === el.style.left && y === el.style.top))))  console.log("⚠ Head inside BODY!");
+    //if ([...document.querySelectorAll(".snake-body")].some((el, i) => (i !== 0 && (x === el.style.left && y === el.style.top))))  console.log("⚠ Head inside BODY!");
     return [...document.querySelectorAll(".snake-body")].some((el, i) => (i !== 0 && (x === el.style.left && y === el.style.top))); // head is excluded
   }
 
-    _splitColor() {
+  _splitColor() {
     let hsl = mainColor.match(/\d+/g);
     hsl = hsl.map((val) => Number(val)); 
     return {h: hsl[0], s: hsl[1], l: hsl[2]};
@@ -255,25 +254,27 @@ class SnakeGame {
 
   
   _checkShrink() {
-    if (this.counterInner < this.counterOuter) {
+    return new Promise((resolve) => {
       this.counterInner++;
-      if (this.counterInner >= this.counterOuter) {
+      if (this.counterInner < this.counterOuter) {
+        resolve(0);
+      } else {
         this.counterInner = 0;
         this.counterOuter++;
         size("shrink");
-        //wait(ms / this.speed)
         this._snakeShrinkCorrection();
+        resolve(timeGap);
       }
-    }
+    })
   }
   
    _snakeShrinkCorrection() {
-    // this.snakeBody is inside right border after "shrink"
-    if ([...document.querySelectorAll(".block")].some((el) => (parseInt(el.style.left) === container.clientWidth - step))) {
+    // elements are inside right border after "shrink"
+    if ([...document.querySelectorAll(".block")].some((el) => (parseInt(el.style.left) >= container.clientWidth - step * 2))) {
       document.querySelectorAll(".block").forEach((el) => el.style.left = parseInt(el.style.left) - step + "px" );
     }
-    // this.snakeBody is inside bottom border after "shrink"
-    if ([...document.querySelectorAll(".block")].some((el) => (parseInt(el.style.top) === container.clientHeight - step))) {
+    // elements are inside bottom border after "shrink"
+    if ([...document.querySelectorAll(".block")].some((el) => (parseInt(el.style.top) >= container.clientHeight - step * 2))) {
       document.querySelectorAll(".block").forEach((el) => el.style.top = parseInt(el.style.top) - step + "px" );
     }
   }
@@ -283,17 +284,16 @@ class SnakeGame {
     clearInterval(intervalId);
 
     // "withdraw" yourself from the point of collision
-    //this.head.style.left = `${parseInt(this.head.style.left) - this.direction.x * step}px`;
-    //this.head.style.top = `${parseInt(this.head.style.top) - this.direction.y * step}px`;
-    //this.neck.remove();
+    this.head.style.left = `${parseInt(this.head.style.left) - this.direction.x * step}px`;
+    this.head.style.top = `${parseInt(this.head.style.top) - this.direction.y * step}px`;
 
     if (stats.score > stats.record) {
       stats.record = stats.score;
     }
 
     this.hsl.s *= 0.15;
-    this._repaintBody(ms / this.speed / 2)
-      .then(() => wait(ms / this.speed / 2))
+    this._repaintBody(16)
+      .then(() => wait(1000))
       .then(() => startBtn.style.display = "block");
   }
 }
@@ -311,6 +311,12 @@ function wait(ms) {
     }, ms);
   })
 }
+
+function timeGapUpdate() {
+  timeGap = Math.round(timeUnit / game.speed);
+  root.style.setProperty("--time-gap", `${timeGap / 1000}s`);
+}
+
 
 
 // controls 
@@ -354,7 +360,7 @@ const handleKeydown = (event) => {
         clearInterval(intervalId);
         intervalId = 0;
       } else {
-        windup(game.speed);
+        windup(timeGap);
       }
       break;
   }
@@ -371,14 +377,12 @@ const handleStartButton = () => {
   document.querySelectorAll("button").forEach((el) => el.style.display = "none");
 }
  
-function windup(speed) {
+function windup() {
   intervalId = setInterval(() => {
     controlOn();
 
-    root.style.setProperty("--time-gap", `${ms / speed / 1000}s`);
-
     game.action();
-  }, ms / speed); 
+  }, timeGap); 
 }
 
 const gameStarter = () => {
@@ -390,14 +394,15 @@ const gameStarter = () => {
     game.ini();
   }
 
-  windup(game.speed);
-
+  windup(timeGap);
   handleStartButton();
 }
 
 size("ini");
 
 const game = new SnakeGame();
+
+timeGapUpdate();
 
 startBtn.addEventListener("click", gameStarter);
 
