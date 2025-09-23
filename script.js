@@ -9,10 +9,10 @@ const score = document.querySelector(".score");
 const record = document.querySelector(".record");
 
 const stats = {score: 0, record: 0};
-let playgroundWidth = 0;
-let playgroundHeight = 0;
-let intervalId = 0;
-let playgroundCenter = {};
+let containerWidth = null;
+let containerdHeight = null;
+let intervalId = null;
+let containerCenter = {};
 let timeUnit = 1000;
 let timeGap = 1000;
 
@@ -30,18 +30,25 @@ let clip = step / 2; // clip-path value to use on background inside the walls
 
 const mainColor = "hsl(120, 100%, 25%)";
 
+function normalize(val) {
+  return (Math.round(val / step) * step);
+}
+
 function size(mode) {
+  containerWidth = normalize(container.clientWidth);
+  containerHeight = normalize(container.clientHeight);
   if (mode === "ini") {
-     // "round" dimensions
-    containerWidth = Math.round(container.clientWidth / step) * step;
-    containerHeight = Math.round(container.clientHeight / step) * step;
+     // initialization
     container.style.width = containerWidth + "px";
     container.style.height = containerHeight + "px";
     background.style.width = containerWidth + "px";
     background.style.height = containerHeight + "px";
 
+    containerCenter = {x: normalize(Math.round(containerWidth / 2)), y: normalize(Math.round(containerHeight / 2))};
+
     score.innerText = `Score: ${stats.score}`;
     record.innerText = `Record: ${stats.record}`;
+
   } else if (mode === "shrink") {
       // shrink container
       container.style.width = container.clientWidth - step + "px";
@@ -51,11 +58,6 @@ function size(mode) {
       background.style.clipPath = `inset(${clip + 1}px)`;
       clip += step/2;
     }
-
-  playgroundWidth = container.clientWidth / step;
-  playgroundHeight = container.clientHeight / step;
-
-  playgroundCenter = {x: Math.floor(playgroundWidth / 2), y: Math.floor(playgroundHeight / 2)};
 }
 
 function reset() {
@@ -73,8 +75,8 @@ function createElement(x, y, color, className, id="") {
   element.classList.add("block");
   element.classList.add(`${className}`);
   element.id = id;
-  element.style.left = `${x * step}px`;
-  element.style.top = `${y * step}px`;
+  element.style.left = `${x}px`;
+  element.style.top = `${y}px`;
   element.style.backgroundColor = color;
 
   if (className !== "food") snake.appendChild(element);
@@ -95,8 +97,8 @@ class SnakeGame {
     this.hsl = this._splitColor();
 
     // snake 
-    createElement(playgroundCenter.x, playgroundCenter.y, this._changedColor({l: (-2)}), "snake-body", "head") ; 
-    createElement(playgroundCenter.x - 1, playgroundCenter.y, this._changedColor(), "snake-body", "neck"); 
+    createElement(containerCenter.x, containerCenter.y, this._changedColor({l: (-2)}), "snake-body", "head") ; 
+    createElement(containerCenter.x - step ,containerCenter.y, this._changedColor(), "snake-body", "neck"); 
     this.head = document.getElementById("head");
     this.neck = document.getElementById("neck");
 
@@ -177,21 +179,24 @@ class SnakeGame {
   }
 
   // food 
-  _createFood() {let [x, y] = [1, 1];
+  _createFood() {
+    let [x, y] = [null, null];
 
     const samePlace = () => {
       if (document.querySelector(".food")) { 
-        const [foodX, foodY] = [parseInt(this.food.style.left) / step,  parseInt(this.food.style.top) / step]; 
+        const [prevX, prevY] = [parseInt(this.food.style.left),  parseInt(this.food.style.top)]; 
         this.food.remove();
-        return (x === foodX && y === foodY);
+        return (x === prevX && y === prevY);
       } else return false
     }
 
     while (true) {
-       [x, y] = [getRandomInt(2, playgroundWidth - 1), getRandomInt(2, playgroundHeight - 1)]; 
-       if (this._coordsInsideBody(x, y, "food") || samePlace() || (x === playgroundCenter.x && y === playgroundCenter.y)) continue;
+       [x, y] = [getRandomInt(step, containerWidth - step * 2), getRandomInt(step, containerHeight - step * 2)]; 
+       [x, y] = [normalize(x), normalize(y)];
+       if (this._coordsInsideBody(x, y) || samePlace() || (x === containerCenter.x && y === containerCenter.y)) continue;
        else break;
     }
+    
 
     createElement(x, y, 'red', "food");
     this.food = document.querySelector(".food");
@@ -221,9 +226,9 @@ class SnakeGame {
 
   _collision() {
     if (
-      parseInt(this.head.style.left) < step || parseInt(this.head.style.left) > container.clientWidth - step * 2 // left & right border
-      || parseInt(this.head.style.top) < step || parseInt(this.head.style.top) > container.clientHeight - step * 2 //top & bottom border
-      || this._coordsInsideBody(this.head.style.left, this.head.style.top, "head")
+      parseInt(this.head.style.left) < step || parseInt(this.head.style.left) > containerWidth - step // left & right border
+      || parseInt(this.head.style.top) < step || parseInt(this.head.style.top) > containerHeight - step //top & bottom border
+      || this._coordsInsideBody(this.head.style.left, this.head.style.top)
       ) {
       return true;
     }
@@ -231,13 +236,7 @@ class SnakeGame {
       
   }
 
-  _coordsInsideBody(x, y, obj) {
-    if (obj === "food") {
-      x *= step;
-      y *= step;
-      x = x + "px";
-      y = y + "px";
-    } 
+  _coordsInsideBody(x, y) {
     //if ([...document.querySelectorAll(".snake-body")].some((el, i) => (i !== 0 && (x === el.style.left && y === el.style.top))))  console.log("⚠ Head inside BODY!");
     return [...document.querySelectorAll(".snake-body")].some((el, i) => (i !== 0 && (x === el.style.left && y === el.style.top))); // head is excluded
   }
@@ -270,12 +269,12 @@ class SnakeGame {
   
    _snakeShrinkCorrection() {
     // elements are inside right border after "shrink"
-    if ([...document.querySelectorAll(".block")].some((el) => (parseInt(el.style.left) >= container.clientWidth - step * 2))) {
-      document.querySelectorAll(".block").forEach((el) => el.style.left = parseInt(el.style.left) - step + "px" );
+    if ([...document.querySelectorAll(".block")].some((el) => (parseInt(el.style.left) >= containerWidth - step))) {
+      document.querySelectorAll(".block").forEach((el) => el.style.left = parseInt(el.style.left) - step + "px" ); // ⚠
     }
     // elements are inside bottom border after "shrink"
-    if ([...document.querySelectorAll(".block")].some((el) => (parseInt(el.style.top) >= container.clientHeight - step * 2))) {
-      document.querySelectorAll(".block").forEach((el) => el.style.top = parseInt(el.style.top) - step + "px" );
+    if ([...document.querySelectorAll(".block")].some((el) => (parseInt(el.style.top) >= containerHeight - step))) {
+      document.querySelectorAll(".block").forEach((el) => el.style.top = parseInt(el.style.top) - step + "px" );  // ⚠
     }
   }
 
@@ -397,6 +396,7 @@ const gameStarter = () => {
   windup(timeGap);
   handleStartButton();
 }
+
 
 size("ini");
 

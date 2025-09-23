@@ -30,7 +30,8 @@ body {
   inset: 0;
   width: 75vw;
   height: 75vh;
-  margin: auto; 
+  margin: auto;
+  transition: width var(--time-gap, 1s), height var(--time-gap, 1s); 
   /* margin is the only viable way of centering here
    because center has to stay in the center of the screen during shrink() */
 }
@@ -40,7 +41,6 @@ body {
   border-image-slice: 400;
   border-image-width: var(--step);
   border-image-repeat: repeat;
-  transition: width var(--time-gap), height var(--time-gap);
 }
 
 .score,
@@ -76,7 +76,7 @@ body {
   position: absolute;
   inset: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1;
+  z-index: 2;
   display:/ none;
 }
 
@@ -96,4 +96,8 @@ button {
   height: var(--step);
   position: absolute;
   transition: left var(--time-gap) linear, top var(--time-gap) linear;
+}
+
+#head {
+  z-index: 1;
 }
