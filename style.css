@@ -5,6 +5,10 @@
   src: url("assets/fonts/BrickEdgie-Zp9wz.otf") format('opentype');
 }
 
+:root {
+  --step: 40px;
+  --time-gap: 1s;
+}
 
 html {
   font-size: var(--step);
@@ -78,8 +82,7 @@ body {
   position: absolute;
   inset: 50%;
   transform: translate(-50%, -50%);
-  z-index: 2;
-  display:/ none;
+  z-index: 3;
 }
 
 button {
@@ -97,13 +100,19 @@ button {
   width: var(--step);
   height: var(--step);
   position: absolute;
-  transition: left var(--time-gap) linear, top var(--time-gap) linear, background-color calc(var(--time-gap)) linear;
+  transition: all var(--time-gap) linear;
 }
 
-#head {
+.snake-body {
   z-index: 1;
 }
 
-.container {
-  border: 1px solid;
+#head {
+  border-radius: 0 50% 50% 0;
+  z-index: 2;
+  transform: rotate(var(--turn, 0));
+}
+
+.food {
+  border-radius: 50%;
 }
