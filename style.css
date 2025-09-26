@@ -6,12 +6,12 @@
 }
 
 :root {
-  --step: 40px;
+  --size: 40px;
   --time-gap: 1s;
 }
 
 html {
-  font-size: var(--step);
+  font-size: var(--size);
 }
 
 body {
@@ -44,7 +44,7 @@ body {
 .border {
   border-image-source: url("assets/images/brick-wall.jpg");
   border-image-slice: 400;
-  border-image-width: var(--step);
+  border-image-width: var(--size);
   border-image-repeat: repeat;
   transition: width var(--time-gap) linear, height var(--time-gap) linear;
 }
@@ -53,16 +53,16 @@ body {
 .record { 
   position: absolute;
   inset: 0;
-  height: var(--step);
-  margin: 0 var(--step);
+  height: var(--size);
+  margin: 0 var(--size);
   font-size: 1rem;
-  line-height: var(--step);
+  line-height: var(--size);
 }
 
 .score {
   font-family: "Rock Salt";
   font-size: 0.6rem;
-  letter-spacing: calc(var(--step) * 0.1);
+  letter-spacing: calc(var(--size) * 0.1);
 }
 
 .record {
@@ -76,7 +76,7 @@ body {
   position: absolute;
   display: flex;
   flex-direction: column;
-  gap: var(--step);
+  gap: var(--size);
   width: max-content;
   height: max-content;
   position: absolute;
@@ -92,27 +92,35 @@ button {
   border: 1px solid;
   border-style: outset;
   backdrop-filter: blur(2px);
-  letter-spacing:  calc(var(--step) * 0.2);
+  letter-spacing:  calc(var(--size) * 0.2);
   background: none;
 }
 
 .block {
-  width: var(--step);
-  height: var(--step);
   position: absolute;
-  transition: all var(--time-gap) linear;
+  border-radius: 50%;
 }
 
 .snake-body {
+  width: var(--size);
+  height: var(--size);
   z-index: 1;
-}
-
-#head {
-  border-radius: 0 50% 50% 0;
-  z-index: 2;
-  transform: rotate(var(--turn, 0));
+  transition: all var(--time-gap) linear;
 }
 
 .food {
-  border-radius: 50%;
+  width: calc(var(--size) / 2);
+  height: calc(var(--size) / 2);
+  transform: translate(50%, 50%);
 }
+
+#head {
+  border-radius: 25% 50% 50% 25%;
+  transform: rotate(var(--turn, 0));
+  z-index: 2;
+}
+
+
+
+
+
