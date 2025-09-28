@@ -1,7 +1,10 @@
 const root = document.documentElement;
 const html = document.querySelector("html");
 const menu = document.querySelector(".menu");
-const startBtn = document.querySelector(".start");
+const mainMenu = document.querySelector(".main-menu");
+const startBtn = document.querySelector(".start-btn");
+const settingsBtn = document.querySelector(".settings-btn");
+const settingsMenu = document.querySelector(".settings-menu");
 const background = document.querySelector(".background");
 const container = document.querySelector(".container");
 const border = document.querySelector(".border");
@@ -9,7 +12,7 @@ const snake = document.querySelector(".snake");
 const score = document.querySelector(".score");
 const record = document.querySelector(".record");
 
-const size = 40;
+const size =  Math.floor(40 / 2) * 2;
 const step = size / 2;
 const stats = {score: 0, record: 0};
 const containerWidth = normalize(container.clientWidth);
@@ -121,6 +124,9 @@ class SnakeGame {
     this.head = document.getElementById("head");
     this.neck = document.getElementById("neck");
 
+    this.head.style.scale = `${1}`;
+    this.neck.style.scale = `${0.75}`;
+
     // shrink 
     this.counterOuter = 1;
     this.counterInner = 0;
@@ -146,7 +152,7 @@ class SnakeGame {
     this.head.style.left = `${parseInt(this.head.style.left) + this.direction.x * step}px`;
     this.head.style.top = `${parseInt(this.head.style.top) + this.direction.y * step}px`;
 
-    this.head.style.transform = `rotate(${this.turn}turn)`;
+    this.head.style.rotate = `${this.turn}turn`;
   }
 
   _bodyFollows() {
@@ -156,11 +162,11 @@ class SnakeGame {
       const prevEl = this.snakeBodyData[i - 1];
       const currEl = this.snakeBody[i];
 
-      const [nextLeft, nextTop, nextTransform] = [prevEl.left, prevEl.top, prevEl.transform];
+      const [nextLeft, nextTop, nextrotate] = [prevEl.left, prevEl.top, prevEl.rotate];
 
       currEl.style.left = nextLeft;
       currEl.style.top = nextTop;
-      currEl.style.transform = nextTransform;
+      currEl.style.rotate = nextrotate;
 
       if (i < this.snakeBody.length - 1) moveToNextPosition(i + 1);
     }
@@ -172,8 +178,8 @@ class SnakeGame {
     this.snakeBody = [...document.querySelectorAll(".snake-body")];
     this.snakeBodyData = [];
     this.snakeBody.forEach((el) => {
-      const [left, top, transform] = [el.style.left, el.style.top, el.style.transform];
-      const data = {left, top, transform};
+      const [left, top, rotate] = [el.style.left, el.style.top, el.style.rotate];
+      const data = {left, top, rotate};
       this.snakeBodyData.push(data);
     })
   }
@@ -214,20 +220,34 @@ class SnakeGame {
     this.tail.style.zIndex = `-${this.snakeBody.length}`
     snake.appendChild(this.tail);
 
-    this._shrinkTail();
+    this._rescaleBody();;
     this._repaintTail();
   }
 
   _repaintTail() {
     const lighterColor = this._changedColor({l: this.snakeBody.length});
     this.tail.style.backgroundColor = lighterColor;
-    console.log("repaint tail", this.snakeBody.length);
   }
 
-  _shrinkTail() {
-    const newSize = size - (this.snakeBody.length ** 2) / 128;
-    this.tail.style.width = newSize + "px";
-    this.tail.style.height = newSize + "px"
+  _rescaleBody() {
+    this._snapshotSnake();
+
+    const length = this.snakeBody.length;
+    let i = length - 1;
+    let j = 1;
+    let scale = 0;
+
+    const rescaleSection = () => {
+      scale += 1 / (2 ** j); 
+      this.snakeBody[i].style.scale = `${roundTo(scale, 2)}`;
+      console.log("i", i, "j", j, "scale:", scale);
+
+      i--;
+      j++;
+      if (i > 0) rescaleSection();  
+    }
+
+    rescaleSection();
   }
 
   // food 
@@ -403,6 +423,10 @@ function timeGapUpdate() {
   root.style.setProperty("--time-gap", `${timeGap / 1000}s`);
 }
 
+function roundTo(value, decimals) {
+  const factor = 10 ** decimals
+  return Math.round(value * factor) / factor
+}
 
 
 // controls 
@@ -482,6 +506,11 @@ function windup() {
   }, timeGap); 
 }
 
+const handleSettingsButton = () => {
+  mainMenu.style.display = "none";
+  settingsMenu.style.display = "flex"
+}
+
 async function gameStarter() {
   handleStartButton();
 
@@ -507,13 +536,6 @@ const game = new SnakeGame();
 
 startBtn.addEventListener("click", gameStarter);
 
+settingsBtn.addEventListener("click", handleSettingsButton);
 
-/*
-const secondHead = game.head.cloneNode(false);
 
-snake.insertBefore(secondHead, game.head);
-
-for (let i = 0; i < 20; i++) {
-  game._lengthenSnake()
-}
-*/

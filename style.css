@@ -72,7 +72,8 @@ body {
   font-size: 1rem;
 }
 
-.menu {
+.menu,
+.main-menu {
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -122,6 +123,14 @@ button {
   transform: rotate(var(--turn, 0));
   z-index: 1
 }
+
+.settings-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size);
+  display: none;
+}
+
 
 
 
