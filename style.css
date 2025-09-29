@@ -11,7 +11,7 @@
 }
 
 html {
-  font-size: var(--size);
+  font-size: 40px;
 }
 
 body {
@@ -25,6 +25,7 @@ body {
 .background {
   background-image: url("assets/images/sand.jpg");
   background-repeat: repeat;
+  clip-path: inset(var(--size));
   transition: clip-path var(--time-gap) linear;
 }
 
@@ -46,7 +47,7 @@ body {
   border-image-slice: 400;
   border-image-width: var(--size);
   border-image-repeat: repeat;
-  transition: width var(--time-gap) linear, height var(--time-gap) linear;
+  transition: all var(--time-gap) linear;
 }
 
 .score,
@@ -55,13 +56,12 @@ body {
   inset: 0;
   height: var(--size);
   margin: 0 var(--size);
-  font-size: 1rem;
   line-height: var(--size);
 }
 
 .score {
   font-family: "Rock Salt";
-  font-size: 0.6rem;
+  font-size: calc(var(--size) * 0.5);
   letter-spacing: calc(var(--size) * 0.1);
 }
 
@@ -69,31 +69,31 @@ body {
   align-self: end;
   font-family: "Permanent Marker";
   padding-bottom: 1px;
-  font-size: 1rem;
+  font-size: calc(var(--size) * 0.75);
 }
 
 .menu,
 .main-menu {
-  position: absolute;
+  position: fixed;
   display: flex;
   flex-direction: column;
-  gap: var(--size);
+  gap: 40px;
   width: max-content;
   height: max-content;
-  position: absolute;
   inset: 50%;
   transform: translate(-50%, -50%);
   z-index: 3;
 }
 
-button {
+button,
+label {
   font-family: "Brick Edgie";
-  font-size: 2rem;
+  font-size: 1rem;
   padding: 0.1rem 0.4rem;
   border: 1px solid;
   border-style: outset;
   backdrop-filter: blur(2px);
-  letter-spacing:  calc(var(--size) * 0.2);
+  letter-spacing: 8px ;
   background: none;
 }
 
@@ -113,9 +113,9 @@ button {
 }
 
 .food {
-  width: calc(var(--size) / 2);
-  height: calc(var(--size) / 2);
-  transform: translate(50%, 50%);
+  width: var(--size);
+  height: var(--size);
+  scale: 0.5;
 }
 
 #head {
@@ -127,8 +127,47 @@ button {
 .settings-menu {
   display: flex;
   flex-direction: column;
-  gap: var(--size);
+  gap: 40px;
   display: none;
+}
+
+label {
+  display: flex;
+  justify-content: space-between;
+}
+
+input[type='range'] {
+  width: 50%;
+  -webkit-appearance: none;
+  background: transparent;
+
+  &::-webkit-slider-runnable-track {
+   background-color: black;
+   border-radius: 10px;
+  }
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    background: white;
+    border: none;
+    box-shadow: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    transition: all 0.1s ease;
+  }
+}
+
+datalist {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  left: 42.5%;
+  top: 65%;
+  font-family: "Permanent Marker";
+  font-size: 10px;
+  letter-spacing: 1px;
+  width: 57%;
 }
 
 
