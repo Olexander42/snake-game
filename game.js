@@ -1,43 +1,20 @@
-const root = document.documentElement;
-const html = document.querySelector("html");
-const menu = document.querySelector(".menu");
-const mainMenu = document.querySelector(".main-menu");
-const startBtn = document.querySelector(".start-btn");
-const settingsBtn = document.querySelector(".settings-btn");
-const settingsMenu = document.querySelector(".settings-menu");
-const sizeSettings = document.getElementById("size");
-const background = document.querySelector(".background");
-const container = document.querySelector(".container");
-const border = document.querySelector(".border");
-const snake = document.querySelector(".snake");
-const score = document.querySelector(".score");
-const record = document.querySelector(".record");
+import { normalize, getRandomInt, wait, roundTo, splitColor, changedColor } from './helpers.js';
 
-let size =  Math.floor(sizeSettings.value / 2) * 2;
-let step = size / 2;
-let clip = size; 
-let game = null;
+import { root, html, backgroundEl, containerEl, borderEl, snakeDiv, scoreEl, recordEl, buttons } from './elements.js';
 
-const stats = {score: 0, record: 0};
-const containerWidth = normalize(container.clientWidth);
-const containerHeight = normalize(container.clientHeight);
+import { sizes, stats, container, border, borderCenter, time } from './variables.js';
 
+let game = null; // ⚠
 
-let borderWidth = containerWidth;
-let borderdHeight = containerHeight;
-let intervalId = 0;
-let borderCenter = {};
-let timeUnit = 500;
-let timeGap = timeUnit;
-
-sizeSettings.addEventListener('input', () => {
+buttons.size.addEventListener('input', () => {
   reset();
-  size = Math.floor(sizeSettings.value / 2) * 2;
-  step = size / 2;
-  root.style.setProperty("--size", `${size}px`);
+  sizes.width = Math.floor(buttons.size.value / 2) * 2;
+  sizes.step = sizes.width / 2;
+  root.style.setProperty("--sizes.width", `${sizes.width}px`);
   borderSize("ini");
   game = new SnakeGame();
 })
+
 
 
 /* 
@@ -47,55 +24,52 @@ sizeSettings.addEventListener('input', () => {
 */
 
 // VISUALS
-container.style.width = containerWidth + "px";
-container.style.height = containerHeight + "px";
+containerEl.style.width = container.width + "px";
+containerEl.style.height = container.height + "px";
 
-root.style.setProperty("--size", `${size}px`);
-root.style.setProperty("--time-gap", `${timeGap / 1000}s`);
+root.style.setProperty("--size", `${sizes.width}px`);
+root.style.setProperty("--time-gap", `${time.gap / 1000}s`);
 
-
-const mainColor = "hsl(120, 100%, 25%)";
-
-function normalize(val) {
-  return (Math.floor(val / step) * step);
-}
+const mainColor = ("hsl(120, 100%, 25%)");
+const hslMain = splitColor(mainColor);
 
 function borderSize(mode) {
   if (mode === "ini") {
      // initialization
-    borderWidth = containerWidth; 
-    borderHeight = containerHeight;
+    border.width = container.width; 
+    border.height = container.height;
 
-    border.style.width = borderWidth + "px";
-    border.style.height = borderHeight + "px";
-    background.style.width = borderWidth + "px";
-    background.style.height = borderHeight + "px";
+    borderEl.style.width = border.width + "px";
+    borderEl.style.height = border.height + "px";
+    backgroundEl.style.width = border.width + "px";
+    backgroundEl.style.height = border.height + "px";
 
-    borderCenter = {x: normalize(Math.round(borderWidth / 2)), y: normalize(Math.round(borderHeight / 2))};
+    borderCenter.x = normalize(Math.round(border.width / 2), sizes.step);
+    borderCenter.y = normalize(Math.round(border.height / 2), sizes.step);
 
-    score.innerText = `Score: ${stats.score}`;
-    record.innerText = `Record: ${stats.record}`;
+    scoreEl.innerText = `Score: ${stats.score}`;
+    recordEl.innerText = `Record: ${stats.record}`;
 
   } else if (mode === "shrink") {
       // shrink border
-      borderWidth = border.clientWidth - size;
-      borderHeight = border.clientHeight - size;
-      border.style.width = borderWidth + "px";
-      border.style.height = borderHeight + "px";
+      border.width = borderEl.clientWidth - sizes.width;
+      border.height = borderEl.clientHeight - sizes.width;
+      borderEl.style.width = border.width + "px";
+      borderEl.style.height = border.height + "px";
 
-       // clip background image
-      clip += step;
-      background.style.clipPath = `inset(${clip - 1}px)`;
+       // sizes.clip background image
+      sizes.clip += sizes.step;
+      backgroundEl.style.clipPath = `inset(${sizes.clip - 1}px)`;
     }
 }
 
 function reset() {
-  border.style.width = containerWidth;
-  border.style.height = containerHeight;
-  background.style.clipPath = "";
-  clip = size;
+  borderEl.style.width = container.width;
+  borderEl.style.height = container.height;
+  backgroundEl.style.clipPath = "";
+  sizes.clip = sizes.width;
   stats.score = 0;
-  timeGap = 1000;
+  time.gap = 1000;
   document.querySelectorAll(".block").forEach((el) => el.remove())
   root.style.setProperty("--turn", "");
 }
@@ -111,8 +85,8 @@ function createElement(x, y, color, className, id="") {
   element.style.top = `${y}px`;
   element.style.backgroundColor = color;
 
-  if (className !== "food") snake.appendChild(element);
-  else container.appendChild(element);
+  if (className !== "food") snakeDiv.appendChild(element);
+  else containerEl.appendChild(element);
 }
 
 
@@ -128,11 +102,10 @@ class SnakeGame {
     this.speed = 1;
     this.direction = {"x": 1, "y": 0};
     this.turn = 0;
-    this.hsl = this._splitColor();
 
     // snake 
-    createElement(borderCenter.x, borderCenter.y, this._changedColor({l: -2}), "snake-body", "head") ; 
-    createElement(borderCenter.x - step ,borderCenter.y, mainColor, "snake-body", "neck"); 
+    createElement(borderCenter.x, borderCenter.y, changedColor(hslMain , {l: -2}), "snake-body", "head") ; 
+    createElement(borderCenter.x - sizes.step ,borderCenter.y, mainColor, "snake-body", "neck"); 
     this.head = document.getElementById("head");
     this.neck = document.getElementById("neck");
 
@@ -161,8 +134,8 @@ class SnakeGame {
 
   // snake
   _moveHead() {    
-    this.head.style.left = `${parseInt(this.head.style.left) + this.direction.x * step}px`;
-    this.head.style.top = `${parseInt(this.head.style.top) + this.direction.y * step}px`;
+    this.head.style.left = `${parseInt(this.head.style.left) + this.direction.x * sizes.step}px`;
+    this.head.style.top = `${parseInt(this.head.style.top) + this.direction.y * sizes.step}px`;
 
     this.head.style.rotate = `${this.turn}turn`;
   }
@@ -203,7 +176,7 @@ class SnakeGame {
       ms === 0 ? i = 1 : i = 0; // only go to head upon death
       const repaintSection = () => {
         setTimeout(() => {
-          const lighterColor = this._changedColor({l: i});
+          const lighterColor = changedColor(hslMain , {l: i});
           const s = this.snakeBody[i];
           s.style.backgroundColor = lighterColor;
           i++;
@@ -230,14 +203,14 @@ class SnakeGame {
     this.tail = oldTail.cloneNode(false);
     this.tail.id = "tail";
     this.tail.style.zIndex = `-${this.snakeBody.length}`
-    snake.appendChild(this.tail);
+    snakeDiv.appendChild(this.tail);
 
     this._rescaleBody();;
     this._repaintTail();
   }
 
   _repaintTail() {
-    const lighterColor = this._changedColor({l: this.snakeBody.length});
+    const lighterColor = changedColor(hslMain , {l: this.snakeBody.length});
     this.tail.style.backgroundColor = lighterColor;
   }
 
@@ -273,8 +246,8 @@ class SnakeGame {
     }
 
     while (true) {
-       [x, y] = [getRandomInt(clip + step, containerWidth - clip - step * 2), getRandomInt(clip + step, containerHeight - clip - step * 2)]; 
-       [x, y] = [normalize(x), normalize(y)];
+       [x, y] = [getRandomInt(sizes.clip + sizes.step, container.width - sizes.clip - sizes.step * 2), getRandomInt(sizes.clip + sizes.step, container.height - sizes.clip - sizes.step * 2)]; 
+       [x, y] = [normalize(x, sizes.step), normalize(y, sizes.step)];
        if (this._coordsInsideBody(x, y) || samePlace() || (x === borderCenter.x && y === borderCenter.y)) continue;
        else break;
     }
@@ -297,7 +270,7 @@ class SnakeGame {
       this._checkShrinkBorder();
 
       stats.score++;
-      score.innerText = `Score: ${stats.score}`;
+      scoreEl.innerText = `Score: ${stats.score}`;
 
       clearInterval(intervalId);
       windup(); 
@@ -306,8 +279,8 @@ class SnakeGame {
 
   _collision() {
     return (
-      parseInt(this.head.style.left) < clip || parseInt(this.head.style.left) > containerWidth - (clip + size) // left & right border
-      || parseInt(this.head.style.top) < clip || parseInt(this.head.style.top) > containerHeight - (clip + size) //top & bottom border
+      parseInt(this.head.style.left) < sizes.clip || parseInt(this.head.style.left) > container.width - (sizes.clip + sizes.width) // left & right border
+      || parseInt(this.head.style.top) < sizes.clip || parseInt(this.head.style.top) > container.height - (sizes.clip + sizes.width) //top & bottom border
       || this._coordsInsideBody(this.head.style.left, this.head.style.top)
       ) 
   }
@@ -317,17 +290,6 @@ class SnakeGame {
     //if ([...document.querySelectorAll(".snake-body")].some((coord, i) => (i !== 0 && (x === coord.style.left && y === coord.style.top))))  console.log("⚠ Head inside BODY!");
     return this.snakeBody.some((coord, i) => (i !== 0 && (x === coord.style.left && y === coord.style.top))); // head is excluded
   }
-
-  _splitColor() {
-    let hsl = mainColor.match(/\d+/g);
-    hsl = hsl.map((val) => Number(val)); 
-    return {h: hsl[0], s: hsl[1], l: hsl[2]};
-  }
-
-  _changedColor({h = 0, s = 0, l = 0} = {}) {
-    return `hsl(${this.hsl.h + h}, ${this.hsl.s + s}%, ${this.hsl.l + l}%)`
-  }
-
   
   _checkShrinkBorder() {
     this.counterInner++;
@@ -343,108 +305,90 @@ class SnakeGame {
     this._snapshotSnake();
 
     // if snake inside top border
-    if (this.snakeBodyData.some((coord) => (parseInt(coord.top) <= clip + step))) {
-      this.snakeBody.forEach((el) => el.style.top = parseInt(el.style.top) + step + "px" );
+    if (this.snakeBodyData.some((coord) => (parseInt(coord.top) < sizes.clip + sizes.step))) {
+      this.snakeBody.forEach((el) => el.style.top = parseInt(el.style.top) + sizes.step + "px" );
       console.log("snake inside top border")
     }
 
     // if snake inside bottom border
-    if (this.snakeBodyData.some((coord) => (parseInt(coord.top) >= containerHeight - clip - step))) {
-      this.snakeBody.forEach((el) => el.style.top = parseInt(el.style.top) - step + "px" );
+    if (this.snakeBodyData.some((coord) => (parseInt(coord.top) > container.height - sizes.clip - sizes.step))) {
+      this.snakeBody.forEach((el) => el.style.top = parseInt(el.style.top) - sizes.step + "px" );
       console.log("snake inside bottom border")
     }
 
     // if snake inside left border
-    if (this.snakeBodyData.some((coord) => (parseInt(coord.left) <= clip + step))) {
-      this.snakeBody.forEach((el) => el.style.left = parseInt(el.style.left) + step + "px" );
+    if (this.snakeBodyData.some((coord) => (parseInt(coord.left) < sizes.clip + sizes.step))) {
+      this.snakeBody.forEach((el) => el.style.left = parseInt(el.style.left) + sizes.step + "px" );
       console.log("snake inside left border")
     }
     
     // if snake inside right border
-    if (this.snakeBodyData.some((coord) => (parseInt(coord.left) >= containerWidth - clip - size))) {
-      this.snakeBody.forEach((el) => el.style.left = parseInt(el.style.left) - step + "px" );
+    if (this.snakeBodyData.some((coord) => (parseInt(coord.left) > container.width - sizes.clip - sizes.width))) {
+      this.snakeBody.forEach((el) => el.style.left = parseInt(el.style.left) - sizes.step + "px" );
       console.log("snake inside right border")
     }
 
 
     // if food inside top border
-    if (parseInt(this.food.style.top) <= clip) {
-      this.food.style.top = parseInt(this.food.style.top) + size + "px";
+    if (parseInt(this.food.style.top) <= sizes.clip) {
+      this.food.style.top = parseInt(this.food.style.top) + sizes.width + "px";
     } 
 
     // if food inside bottom border
-    if (parseInt(this.food.style.top) >= containerHeight - clip) {
-      this.food.style.top = parseInt(this.food.style.top) - size + "px";
+    if (parseInt(this.food.style.top) >= container.height - sizes.clip) {
+      this.food.style.top = parseInt(this.food.style.top) - sizes.width + "px";
     } 
 
     // if food inside right border
-    if (parseInt(this.food.style.left) >= containerWidth - clip) {
-      this.food.style.left = parseInt(this.food.style.left) - size + "px";
+    if (parseInt(this.food.style.left) >= container.width - sizes.clip) {
+      this.food.style.left = parseInt(this.food.style.left) - sizes.width + "px";
     }
 
     // if food inside left border
-    if (parseInt(this.food.style.left) < clip) {
-      this.food.style.left = parseInt(this.food.style.left) + size + "px";
+    if (parseInt(this.food.style.left) < sizes.clip) {
+      this.food.style.left = parseInt(this.food.style.left) + sizes.width + "px";
     }    
 
     this._ateFood(); // in case snake eats food during the offset process
   }
 
   _nearOppositeSides() {
-    return ((this.snakeBodyData.some((coord) => (parseInt(coord.top) <= clip + step ) 
-        && this.snakeBodyData.some((coord) => (parseInt(coord.top) >= containerHeight - clip - step * 2))))  // top - bottom
-        || ((this.snakeBodyData.some((coord) => (parseInt(coord.left) <= clip + step)))) // left - right
-           && (this.snakeBodyData.some((coord) => parseInt(coord.left) >= containerWidth - clip - step * 2)))
+    return ((this.snakeBodyData.some((coord) => (parseInt(coord.top) <= sizes.clip + sizes.step ) 
+        && this.snakeBodyData.some((coord) => (parseInt(coord.top) >= container.height - sizes.clip - sizes.step * 2))))  // top - bottom
+        || ((this.snakeBodyData.some((coord) => (parseInt(coord.left) <= sizes.clip + sizes.step)))) // left - right
+           && (this.snakeBodyData.some((coord) => parseInt(coord.left) >= container.width - sizes.clip - sizes.step * 2)))
   }
 
   _gameOver() {
     clearInterval(intervalId);
 
     // "withdraw" snake from the point of collision
-    this.head.style.left = `${parseInt(this.head.style.left) - this.direction.x * step}px`;
-    this.head.style.top = `${parseInt(this.head.style.top) - this.direction.y * step}px`;
+    this.head.style.left = `${parseInt(this.head.style.left) - this.direction.x * sizes.step}px`;
+    this.head.style.top = `${parseInt(this.head.style.top) - this.direction.y * sizes.step}px`;
 
     if (stats.score > stats.record) {
       stats.record = stats.score;
     }
 
-    this.hsl.s *= 0.15;
-    this._repaintBody(timeGap)
+    hslMain .s *= 0.15;
+    this._repaintBody(time.gap)
       .then(() => wait(1000))
-      .then(() => startBtn.style.display = "block");
+      .then(() => buttons.start.style.display = "block");
   }
 }
 
-function getRandomInt(min, max) { // max excluded
-  const result = Math.floor(Math.random() * ((max - min)) + min); 
-  return result;
-}
-
-function wait(ms) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true)
-    }, ms);
-  })
-}
-
 function timeGapUpdate() {
-  timeGap = Math.round(timeUnit / game.speed);
-  root.style.setProperty("--time-gap", `${timeGap / 1000}s`);
+  time.gap = Math.round(time.unit / game.speed);
+  root.style.setProperty("--time-gap", `${time.gap / 1000}s`);
 }
-
-function roundTo(value, decimals) {
-  const factor = 10 ** decimals
-  return Math.round(value * factor) / factor
-}
-
 
 // controls 
+let intervalId = 0; // ⚠ for debugging use only
 const handleKeydown = (event) => {
   switch (event.key) {
     // prevent this.snakeBody from hitting borders up close
     case "ArrowUp":
-      if (!(parseInt(game.head.style.top) === clip && game.direction.y === 0 || game.direction.y === 1)) { // top border
+      if (!(parseInt(game.head.style.top) === sizes.clip && game.direction.y === 0 || game.direction.y === 1)) { // top border
         game.turn += -(0.25 * game.direction.x);
 
         game.direction.x = 0;
@@ -455,7 +399,7 @@ const handleKeydown = (event) => {
       break;
 
     case "ArrowRight":
-      if (!(parseInt(game.head.style.left) === containerWidth - clip - size && game.direction.x === 0 || game.direction.x == -1)) { // top border
+      if (!(parseInt(game.head.style.left) === container.width - sizes.clip - sizes.width && game.direction.x === 0 || game.direction.x == -1)) { // top border
         game.turn +=  -(0.25 * game.direction.y);
 
         game.direction.x = 1;
@@ -466,7 +410,7 @@ const handleKeydown = (event) => {
       break;
 
     case "ArrowDown":
-      if (!(parseInt(game.head.style.top) === containerHeight - clip - size && game.direction.y === 0 || game.direction.y === -1)) { // bottom border
+      if (!(parseInt(game.head.style.top) === container.height - sizes.clip - sizes.width && game.direction.y === 0 || game.direction.y === -1)) { // bottom border
         game.turn +=  (0.25 * game.direction.x);
 
         game.direction.x = 0;
@@ -477,7 +421,7 @@ const handleKeydown = (event) => {
       break;
 
     case "ArrowLeft":
-      if (!(parseInt(game.head.style.left) === clip && game.direction.x === 0 || game.direction.x === 1)) {  // left border
+      if (!(parseInt(game.head.style.left) === sizes.clip && game.direction.x === 0 || game.direction.x === 1)) {  // left border
         game.turn +=  (0.25 * game.direction.y);
 
         game.direction.x = -1;
@@ -492,7 +436,7 @@ const handleKeydown = (event) => {
         clearInterval(intervalId);
         intervalId = 0;
       } else {
-        windup(timeGap);
+        windup(time.gap);
       }
       break;
   }
@@ -504,7 +448,7 @@ const controlOn = () => {
 }
 
 const handleStartButton = () => {
-  startBtn.innerText = "Start Again";
+  buttons.start.innerText = "Start Again";
   document.querySelectorAll("button").forEach((coord) => coord.style.display = "none");
 }
  
@@ -513,7 +457,7 @@ function windup() {
     controlOn();
 
     game.action();
-  }, timeGap); 
+  }, time.gap); 
 }
 
 const handleSettingsButton = () => {
@@ -540,11 +484,11 @@ async function gameStarter() {
   windup();
 }
 
-sizeSettings.dispatchEvent(new Event('input'));
+buttons.size.dispatchEvent(new Event('input'));
 
-startBtn.addEventListener("click", gameStarter);
+buttons.start.addEventListener("click", gameStarter);
 
-settingsBtn.addEventListener("click", handleSettingsButton);
+buttons.settings.addEventListener("click", handleSettingsButton);
 
 
 

@@ -73,7 +73,7 @@ body {
 }
 
 .menu,
-.main-menu {
+.menu-main {
   position: fixed;
   display: flex;
   flex-direction: column;
@@ -124,7 +124,7 @@ label {
   z-index: 1
 }
 
-.settings-menu {
+.menu-settings {
   display: flex;
   flex-direction: column;
   gap: 40px;

@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="game.css">
+    <script type='module' src="game.js" defer></script>
     <title>Snake Game</title>
   </head>
 
@@ -13,11 +13,11 @@
     <div class="container">
       <div class="border">
         <div class="menu">
-          <div class="main-menu">
+          <div class="menu-main">
             <button class="start-btn">Start</button>
             <button class="settings-btn">Settings</button>
           </div>
-          <div class="settings-menu">
+          <div class="menu-settings">
             <label>Size<input type='range' id="size" name="size" min='20' max='60' value='40' step='20' list="markers"/>
               <datalist id="markers">
                 <option value='20' label="Small"></option>
