@@ -4,6 +4,7 @@ const backgroundEl = document.querySelector(".background");
 const containerEl = document.querySelector(".container");
 const borderEl = document.querySelector(".border");
 const snakeDiv = document.querySelector(".snake");
+const foodEl = document.querySelector(".foodEl");
 const scoreEl = document.querySelector(".score");
 const recordEl = document.querySelector(".record");
 
@@ -14,4 +15,4 @@ const buttons = {
                 };     
 
 
-export { root, html, backgroundEl, containerEl, borderEl, snakeDiv, scoreEl, recordEl, buttons }
+export { root, html, backgroundEl, containerEl, borderEl, snakeDiv, foodEl scoreEl, recordEl, buttons }
