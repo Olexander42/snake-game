@@ -1,0 +1,8 @@
+#food {
+  position: absolute;
+  border-radius: 50%;
+  width: var(--size);
+  height: var(--size);
+  scale: 0.5;
+  background-color: red;
+}

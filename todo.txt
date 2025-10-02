@@ -1,4 +1,4 @@
-
+- css fragmentation
 - slider (progress / animation)
 - settings  
 - give food dynamic color changes 

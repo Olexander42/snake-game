@@ -1,0 +1,18 @@
+.snake {
+  position: absolute;
+  z-index: 1;
+}
+
+.snake-body {
+  position: absolute;
+  border-radius: 50%;
+  width: var(--size);
+  height: var(--size);
+  transition: all var(--time-gap) linear;
+}
+
+#head {
+  border-radius: 25% 50% 50% 25%;
+  transform: rotate(var(--turn, 0));
+  z-index: 1
+}

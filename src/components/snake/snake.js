@@ -1,9 +1,13 @@
-import { sizes, color } from "./variables.js";
+import { splitColor, changedColor, roundTo } from './utils.js';
 
-import { changedColor } from "./utils.js";
+import { board } from '../../ui/board/board.js';
+
+const color = { string: "hsl(120, 100%, 25%)" }
+color.hsl = splitColor(color.string);
 
 class Snake {
   constructor() {
+    this.snakeDiv = document.querySelector(".snake")
   }
 
   ini() {
@@ -13,8 +17,8 @@ class Snake {
     this.turn = 0;
 
     // body 
-    this._createSection(sizes.containerCenter.x, sizes.containerCenter.y, changedColor(color.hsl , {l: -2}), "snake-body", "head") ; 
-    this._createSection(sizes.containerCenter.x - sizes.step ,sizes.containerCenter.y, color.string, "snake-body", "neck"); 
+    this._createSection(board.container.center.x, board.container.center.y, changedColor(color.hsl , {l: -2}), "head") ; 
+    this._createSection(board.container.center.x - board.step ,board.container.center.y, color.string, "neck"); 
     this.head = document.getElementById("head");
     this.neck = document.getElementById("neck");
 
@@ -33,14 +37,14 @@ class Snake {
     element.style.top = `${y}px`;
     element.style.backgroundColor = color;
 
-    snakeDiv.appendChild(element);
+    this.snakeDiv.appendChild(element);
   }
 
   moveHead() {   
-    this._snapshotSnake();
+    this.snapshot();
 
-    this.head.style.left = `${parseInt(this.head.style.left) + this.direction.x * sizes.step}px`;
-    this.head.style.top = `${parseInt(this.head.style.top) + this.direction.y * sizes.step}px`;
+    this.head.style.left = `${parseInt(this.head.style.left) + this.direction.x * board.step}px`;
+    this.head.style.top = `${parseInt(this.head.style.top) + this.direction.y * board.step}px`;
 
     this.head.style.rotate = `${this.turn}turn`;
   }
@@ -52,11 +56,11 @@ class Snake {
       const prevEl = this.snakeBodyData[i - 1];
       const currEl = this.snakeBody[i];
 
-      const [nextLeft, nextTop, nextrotate] = [prevEl.left, prevEl.top, prevEl.rotate];
+      const [nextLeft, nextTop, nextRotate] = [prevEl.left, prevEl.top, prevEl.rotate];
 
       currEl.style.left = nextLeft;
       currEl.style.top = nextTop;
-      currEl.style.rotate = nextrotate;
+      currEl.style.rotate = nextRotate;
 
       if (i < this.snakeBody.length - 1) moveToNextPosition(i + 1);
     }
@@ -64,7 +68,7 @@ class Snake {
     moveToNextPosition(i);
   }
 
-  _snapshotSnake() {
+  snapshot() {
     this.snakeBody = [...document.querySelectorAll(".snake-body")];
     this.snakeBodyData = [];
     this.snakeBody.forEach((el) => {
@@ -106,7 +110,7 @@ class Snake {
     this.tail = oldTail.cloneNode(false);
     this.tail.id = "tail";
     this.tail.style.zIndex = `-${this.snakeBody.length}`
-    snakeDiv.appendChild(this.tail);
+    this.snakeDiv.appendChild(this.tail);
 
     this._rescaleBody();;
     this._repaintTail();
@@ -118,7 +122,7 @@ class Snake {
   }
 
   _rescaleBody() {
-    this._snapshotSnake();
+    this.snapshot();
 
     const length = this.snakeBody.length;
     let i = length - 1;
@@ -127,7 +131,7 @@ class Snake {
 
     const rescaleSection = () => {
       scale += 1 / (2 ** j); 
-      this.snakeBody[i].style.scale = `${roundTo(scale, 2)}`;
+      snake.snakeBody[i].style.scale = `${roundTo(scale, 2)}`;
       i--;
       j++;
       if (i > 0) rescaleSection();  
@@ -138,8 +142,8 @@ class Snake {
 
   collision() {
     return (
-      parseInt(this.head.style.left) < sizes.clip || parseInt(this.head.style.left) > container.width - (sizes.clip + sizes.width) // left & right border
-      || parseInt(this.head.style.top) < sizes.clip || parseInt(this.head.style.top) > container.height - (sizes.clip + sizes.width) //top & bottom border
+      parseInt(this.head.style.left) < board.clip || parseInt(this.head.style.left) > board.container.width - (board.clip + board.width) // left & right border
+      || parseInt(this.head.style.top) < board.clip || parseInt(this.head.style.top) > board.container.height - (board.clip + board.width) //top & bottom border
       || this._coordsInsideBody(this.head.style.left, this.head.style.top)
       ) 
   }
@@ -149,65 +153,46 @@ class Snake {
     return this.snakeBody.some((coord, i) => (i !== 0 && (x === coord.style.left && y === coord.style.top))); // head is excluded
   }
 
-  borderShrinkOffset() {
-    this._snapshotSnake();
+
+  shrinkOffset() {
+    this.snapshot();
 
     // if snake inside top border
-    if (this.snakeBodyData.some((coord) => (parseInt(coord.top) < sizes.clip + sizes.step))) {
-      this.snakeBody.forEach((el) => el.style.top = parseInt(el.style.top) + sizes.step + "px" );
+    if (this.snakeBodyData.some((coord) => (parseInt(coord.top) < board.clip + board.step))) {
+      this.snakeBody.forEach((el) => el.style.top = parseInt(el.style.top) + board.step + "px" );
       console.log("snake inside top border")
     }
 
     // if snake inside bottom border
-    if (this.snakeBodyData.some((coord) => (parseInt(coord.top) > container.height - sizes.clip - sizes.step))) {
-      this.snakeBody.forEach((el) => el.style.top = parseInt(el.style.top) - sizes.step + "px" );
+    if (this.snakeBodyData.some((coord) => (parseInt(coord.top) > board.container.height - board.clip - board.step))) {
+      this.snakeBody.forEach((el) => el.style.top = parseInt(el.style.top) - board.step + "px" );
       console.log("snake inside bottom border")
     }
 
     // if snake inside left border
-    if (this.snakeBodyData.some((coord) => (parseInt(coord.left) < sizes.clip + sizes.step))) {
-      this.snakeBody.forEach((el) => el.style.left = parseInt(el.style.left) + sizes.step + "px" );
+    if (this.snakeBodyData.some((coord) => (parseInt(coord.left) < board.clip + board.step))) {
+      this.snakeBody.forEach((el) => el.style.left = parseInt(el.style.left) + board.step + "px" );
       console.log("snake inside left border")
     }
     
     // if snake inside right border
-    if (this.snakeBodyData.some((coord) => (parseInt(coord.left) > container.width - sizes.clip - sizes.width))) {
-      this.snakeBody.forEach((el) => el.style.left = parseInt(el.style.left) - sizes.step + "px" );
+    if (this.snakeBodyData.some((coord) => (parseInt(coord.left) > board.container.width - board.clip - board.width))) {
+      this.snakeBody.forEach((el) => el.style.left = parseInt(el.style.left) - board.step + "px" );
       console.log("snake inside right border")
     }
-
-
-    // if food inside top border
-    if (parseInt(this.food.style.top) <= sizes.clip) {
-      this.food.style.top = parseInt(this.food.style.top) + sizes.width + "px";
-    } 
-
-    // if food inside bottom border
-    if (parseInt(this.food.style.top) >= container.height - sizes.clip) {
-      this.food.style.top = parseInt(this.food.style.top) - sizes.width + "px";
-    } 
-
-    // if food inside right border
-    if (parseInt(this.food.style.left) >= container.width - sizes.clip) {
-      this.food.style.left = parseInt(this.food.style.left) - sizes.width + "px";
-    }
-
-    // if food inside left border
-    if (parseInt(this.food.style.left) < sizes.clip) {
-      this.food.style.left = parseInt(this.food.style.left) + sizes.width + "px";
-    }    
-
     this._ateFood(); // in case snake eats food during the offset process
   }
 
   nearOppositeSides() {
     return (
-      (this.snakeBodyData.some((coord) => (parseInt(coord.top) <= sizes.clip + sizes.step ) 
-      && this.snakeBodyData.some((coord) => (parseInt(coord.top) >= container.height - sizes.clip - sizes.step * 2))))  // top - bottom
-      || ((this.snakeBodyData.some((coord) => (parseInt(coord.left) <= sizes.clip + sizes.step)))) // left - right
-      && (this.snakeBodyData.some((coord) => parseInt(coord.left) >= container.width - sizes.clip - sizes.step * 2))
+      (this.snakeBodyData.some((coord) => (parseInt(coord.top) <= board.clip + board.step ) 
+      && this.snakeBodyData.some((coord) => (parseInt(coord.top) >= board.container.height - board.clip - board.step * 2))))  // top - bottom
+      || ((this.snakeBodyData.some((coord) => (parseInt(coord.left) <= board.clip + board.step)))) // left - right
+      && (this.snakeBodyData.some((coord) => parseInt(coord.left) >= board.container.width - board.clip - board.step * 2))
     )
   }
 }
 
-export { Snake }
+const snake = new Snake();
+
+export { snake }

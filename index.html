@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="game.css">
-    <script type='module' src="game.js" defer></script>
+    <link rel="stylesheet" href="./src/main/main.css">
+    <script type='module' src="./src/main/main.js" defer></script>
     <title>Snake Game</title>
   </head>
 
   <body> 
-    <div class="background"></div>
     <div class="container">
+      <div class="background"></div>
       <div class="border">
         <div class="menu">
           <div class="menu-main">
@@ -33,7 +33,7 @@
         <div class="record">Record: 0</div>
       </div>
       <div class="snake"></div>
-      <div class="food"></div>
+      <div id="food"></div>
     </div>
     </body>
 </html>

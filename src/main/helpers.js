@@ -1,23 +1,30 @@
-import { borderEl, backgroundEl, root } from "./elements.js";
 
-import { sizes, time, snake } from "./variables.js";
+function windup() {
+  interval.id = setInterval(() => {
+    html.addEventListener("keydown", controls);
 
+    snake.action();
+  }, time.gap); 
+}
 
+function action() {
+  snake.moveHead();
+  if (snake.collision()) {
+    clearInterval(interval.id);
+    gameOver(); 
+  }
+  else {
+    snake.bodyFollows();
+    if (food.style.left === game.head.style.left && food.style.top === game.head.style.top) { // if ate food
+      ateFood();
 
-function reset() {
-  borderEl.style.width = container.width;
-  borderEl.style.height = container.height;
+      clearInterval(interval.id);
 
-  backgroundEl.style.clipPath = "";
-  sizes.clip = sizes.width;
+      windup(); 
 
-  stats.score = 0;
-
-  time.gap = 1000;
-
-  document.querySelectorAll(".block").forEach((el) => el.remove())
-
-  root.style.setProperty("--turn", "");
+      snake.repaintBody();
+    }
+  }
 }
 
 function ateFood() {
@@ -32,6 +39,17 @@ function ateFood() {
 
   stats.score++;
   scoreEl.innerText = `Score: ${stats.score}`;
+}
+
+function checkShrinkBoard() {
+  shrinkCounter.inner++;
+  if (shrinkCounter.inner >= shrinkCounter.outer && snake.nearOppositeSides()) {
+    boardSize("shrink");
+
+    snake.boardShrinkOffset();
+
+    shrinkCounter.inner = 0;
+    shrinkCounter.outer++;
 }
 
 function timeGapUpdate() {
@@ -52,6 +70,22 @@ function gameOver() {
   snake.repaintBody(time.gap)
     .then(() => wait(1000))
     .then(() => buttons.start.style.display = "block");
+}
+
+function reset() {
+  borderEl.style.width = container.width;
+  borderEl.style.height = container.height;
+
+  backgroundEl.style.clipPath = "";
+  sizes.clip = sizes.width;
+
+  stats.score = 0;
+
+  time.gap = 1000;
+
+  document.querySelectorAll(".block").forEach((el) => el.remove())
+
+  root.style.setProperty("--turn", "");
 }
 
 function controls(event) {
@@ -112,3 +146,10 @@ function controls(event) {
   }
 }
 
+function wait(ms) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true)
+    }, ms);
+  })
+}
