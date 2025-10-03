@@ -32,7 +32,7 @@ class Food {
     }
   }
 
-  shrinkOffset() {
+  offsetShrink() {
     // if food inside top border
     if (parseInt(this.element.style.top) <= board.clip) {
       this.element.style.top = parseInt(this.element.style.top) + board.thickness + "px";

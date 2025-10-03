@@ -7,7 +7,7 @@ color.hsl = splitColor(color.string);
 
 class Snake {
   constructor() {
-    this.snakeDiv = document.querySelector(".snake")
+    this.div = document.querySelector(".snake")
   }
 
   ini() {
@@ -101,7 +101,7 @@ class Snake {
     })
   }
 
-  lengthenSnake() {
+  lengthen() {
     this.snakeBody = document.querySelectorAll(".snake-body");
     const oldTail = this.snakeBody[this.snakeBody.length - 1];
 
@@ -112,7 +112,7 @@ class Snake {
     this.tail.style.zIndex = `-${this.snakeBody.length}`
     this.snakeDiv.appendChild(this.tail);
 
-    this._rescaleBody();;
+    this._rescaleBody();
     this._repaintTail();
   }
 
@@ -148,13 +148,13 @@ class Snake {
       ) 
   }
 
-  coordsInsideBody(x, y) {
+  isCoordsInsideBody(x, y) {
     if (typeof x === "number") [x, y] = [x + "px", y + "px"];
     return this.snakeBody.some((coord, i) => (i !== 0 && (x === coord.style.left && y === coord.style.top))); // head is excluded
   }
 
 
-  shrinkOffset() {
+  offsetShrink() {
     this.snapshot();
 
     // if snake inside top border
@@ -180,10 +180,10 @@ class Snake {
       this.snakeBody.forEach((el) => el.style.left = parseInt(el.style.left) - board.step + "px" );
       console.log("snake inside right border")
     }
-    this._ateFood(); // in case snake eats food during the offset process
+    //ateFood(); // in case snake eats food during the offset process // find a way to implement it
   }
 
-  nearOppositeSides() {
+  isNearOppositeSides() {
     return (
       (this.snakeBodyData.some((coord) => (parseInt(coord.top) <= board.clip + board.step ) 
       && this.snakeBodyData.some((coord) => (parseInt(coord.top) >= board.container.height - board.clip - board.step * 2))))  // top - bottom
@@ -191,8 +191,13 @@ class Snake {
       && (this.snakeBodyData.some((coord) => parseInt(coord.left) >= board.container.width - board.clip - board.step * 2))
     )
   }
+
+  withdrawHead() {
+    this.head.style.left = `${parseInt(this.head.style.left) - this.direction.x * board.step}px`;
+    this.head.style.top = `${parseInt(this.head.style.top) - this.direction.y * board.step}px`;
+  }
 }
 
 const snake = new Snake();
 
-export { snake }
+export { snake, color };

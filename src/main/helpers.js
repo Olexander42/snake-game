@@ -1,155 +1,91 @@
+import { board, borderEl, backgroundEl } from "../ui/board/board.js";
+
+import { snake, color } from "../components/snake/snake.js";
+
+import { food } from "../components/food/food.js";
+
+import { time, stats, shrinkCounter } from "../common/variables.js";
+
+import { wait } from "../common/utils.js";
+
+import { reset, timeGapUpdate } from "../common/utils.js";
+
+import { snakeControl } from "../controls/button-handlers.js";
+
+import { interval } from "./variables.js";
+
+import { html } from "./elements.js";
 
 function windup() {
-  interval.id = setInterval(() => {
-    html.addEventListener("keydown", controls);
+  clearInterval(interval.id);
 
-    snake.action();
+  interval.id = setInterval(() => {
+    html.addEventListener('keydown', snakeControl);
+
+    action();
   }, time.gap); 
 }
 
 function action() {
   snake.moveHead();
+
   if (snake.collision()) {
-    clearInterval(interval.id);
     gameOver(); 
   }
+
   else {
     snake.bodyFollows();
-    if (food.style.left === game.head.style.left && food.style.top === game.head.style.top) { // if ate food
-      ateFood();
-
-      clearInterval(interval.id);
-
-      windup(); 
-
-      snake.repaintBody();
-    }
+    
+    if ( // snake ate food?
+      food.element.style.left === snake.head.style.left 
+      && food.element.style.top === snake.head.style.top
+    ) levelUp();
+      
   }
 }
 
-function ateFood() {
-  moveFood();
-
-  snake.lengthenSnake();
+function levelUp() {
+  snake.lengthen();
   snake.speed++;
-
-  timeGapUpdate();
-
-  checkShrinkBorder();
 
   stats.score++;
   scoreEl.innerText = `Score: ${stats.score}`;
-}
 
-function checkShrinkBoard() {
+  food.teleport(); 
+
   shrinkCounter.inner++;
-  if (shrinkCounter.inner >= shrinkCounter.outer && snake.nearOppositeSides()) {
-    boardSize("shrink");
+  if (shrinkCounter.inner >= shrinkCounter.outer && !snake.nearOppositeSides()) { // time to shrink?
+    board.shrink();
 
-    snake.boardShrinkOffset();
+    snake.offsetShrink();
+    food.offsetShrink();
 
     shrinkCounter.inner = 0;
     shrinkCounter.outer++;
-}
+  }
 
-function timeGapUpdate() {
-  time.gap = Math.round(time.unit / game.speed);
-  root.style.setProperty("--time-gap", `${time.gap / 1000}s`);
+  timeGapUpdate();
+
+  windup(); 
 }
 
 function gameOver() {
-  // "withdraw" snake from the point of collision
-  snake.head.style.left = `${parseInt(snake.head.style.left) - snake.direction.x * sizes.step}px`;
-  snake.head.style.top = `${parseInt(snake.head.style.top) - snake.direction.y * sizes.step}px`;
+  snake.withdrawHead();
 
   if (stats.score > stats.record) {
     stats.record = stats.score;
   }
 
-  hslMain.s *= 0.15;
+  color.hsl.s *= 0.15;
   snake.repaintBody(time.gap)
     .then(() => wait(1000))
     .then(() => buttons.start.style.display = "block");
 }
 
-function reset() {
-  borderEl.style.width = container.width;
-  borderEl.style.height = container.height;
 
-  backgroundEl.style.clipPath = "";
-  sizes.clip = sizes.width;
 
-  stats.score = 0;
+export { windup }
 
-  time.gap = 1000;
 
-  document.querySelectorAll(".block").forEach((el) => el.remove())
 
-  root.style.setProperty("--turn", "");
-}
 
-function controls(event) {
-  switch (event.key) {
-    // prevent snake from hitting borders up close
-    case "ArrowUp":
-      if (!(parseInt(game.head.style.top) === sizes.clip && game.direction.y === 0 || game.direction.y === 1)) { // top border
-        game.turn += -(0.25 * game.direction.x);
-
-        game.direction.x = 0;
-        game.direction.y = -1;
-
-        html.removeEventListener("keydown", handleKeydown); // only one change per frame is allowed
-      }
-      break;
-
-    case "ArrowRight":
-      if (!(parseInt(game.head.style.left) === container.width - sizes.clip - sizes.width && game.direction.x === 0 || game.direction.x == -1)) { // top border
-        game.turn +=  -(0.25 * game.direction.y);
-
-        game.direction.x = 1;
-        game.direction.y = 0;
-
-        html.removeEventListener("keydown", handleKeydown);
-      }
-      break;
-
-    case "ArrowDown":
-      if (!(parseInt(game.head.style.top) === container.height - sizes.clip - sizes.width && game.direction.y === 0 || game.direction.y === -1)) { // bottom border
-        game.turn +=  (0.25 * game.direction.x);
-
-        game.direction.x = 0;
-        game.direction.y = 1;
-
-        html.removeEventListener("keydown", handleKeydown);
-      }
-      break;
-
-    case "ArrowLeft":
-      if (!(parseInt(game.head.style.left) === sizes.clip && game.direction.x === 0 || game.direction.x === 1)) {  // left border
-        game.turn +=  (0.25 * game.direction.y);
-
-        game.direction.x = -1;
-        game.direction.y = 0;
- 
-        html.removeEventListener("keydown", handleKeydown);
-      }
-      break;
-
-    case "p": // pause
-      if (gameState.active === true) {
-        clearInterval(intervalId);
-        gameState.active = false;
-      } else {
-        windup(time.gap);
-      }
-      break;
-  }
-}
-
-function wait(ms) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true)
-    }, ms);
-  })
-}

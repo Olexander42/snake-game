@@ -7,6 +7,14 @@ function getRandomInt(min, max) { // max excluded
   return result;
 }
 
-export { normalize, getRandomInt };
+function wait(ms) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true)
+    }, ms);
+  })
+}
+
+export { normalize, getRandomInt, wait };
 
 
