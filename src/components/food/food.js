@@ -23,7 +23,7 @@ class Food {
         normalize(getRandomInt(board.clip + board.step, board.container.height - board.clip - board.step * 2), board.step),
       ]; 
 
-      if (snake.coordsInsideBody(x, y) || (x === this.x && y === this.y) || (x === board.container.center.x && y === board.container.center.y)) continue;
+      if (snake.isCoordsInsideBody(x, y) || (x === this.x && y === this.y) || (x === board.container.center.x && y === board.container.center.y)) continue;
       else {
         this.x = x;
         this.y = y;

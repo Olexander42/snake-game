@@ -11,4 +11,6 @@ const shrinkCounter = {
   } 
 }
 
-export { time, stats, shrinkCounter };
+const interval = { id: null };
+
+export { time, stats, shrinkCounter, interval };

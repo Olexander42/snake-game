@@ -1,8 +1,14 @@
-import { reset, timeGapUpdate } from "../common/helpers.js";
+import { board } from "../ui/board/board.js";
 
-import { wait } from "../../common/utils.js";
+import { snake } from "../components/snake/snake.js";
 
-import { snake } from "../components/snake.js";
+import { windup, reset, timeGapUpdate } from "../common/helpers.js";
+
+import { wait } from "../common/utils.js";
+
+import { root, html } from "../common/elements.js";
+
+import { interval } from "../common/variables.js";
 
 import { menuButtons, menuDiv } from "./elements.js";
 
@@ -18,7 +24,7 @@ function snakeControl(event) {
         snake.direction.x = 0;
         snake.direction.y = -1;
 
-        html.removeEventListener('keydown', controls); // only one change per frame is allowed
+        html.removeEventListener('keydown', snakeControl); // only one change per frame is allowed
       }
       break;
 
@@ -29,7 +35,7 @@ function snakeControl(event) {
         snake.direction.x = 1;
         snake.direction.y = 0;
 
-        html.removeEventListener('keydown', controls);
+        html.removeEventListener('keydown', snakeControl);
       }
       break;
 
@@ -40,7 +46,7 @@ function snakeControl(event) {
         snake.direction.x = 0;
         snake.direction.y = 1;
 
-        html.removeEventListener('keydown', controls);
+        html.removeEventListener('keydown', snakeControl);
       }
       break;
 
@@ -51,7 +57,7 @@ function snakeControl(event) {
         snake.direction.x = -1;
         snake.direction.y = 0;
  
-        html.removeEventListener('keydown', controls);
+        html.removeEventListener('keydown', snakeControl);
       }
       break;
 
@@ -60,48 +66,43 @@ function snakeControl(event) {
         clearInterval(interval.id);
         interval.id = 0;
       } else {
-        windup(time.gap);
+        windup();
       }
       break;
   }
 }
 
 const menuControl = {
-  mainMenu: {
-    startHandler() {
-      if (buttons.start.innerText === "Start Again") {
-        reset();
-
-        wait(1000).then(() => board.ini())
-      }
-
-      buttons.start.innerText = "Start Again";
-      menuDiv.style.display = 'none';
-
-      snake.ini();
-
-      timeGapUpdate();
-
-      windup();
-    },
-
-    settingsHandler() {
-      mainMenu.style.display = "none";
-      settingsMenu.style.display = "flex"
-    },
-  }
-
-  settings: {
-    sizeHandler() {
+  startHandler() {
+    if (menuButtons.start.innerText === "Start Again") {
       reset();
-      sizes.width = Math.floor(buttons.size.value / 2) * 2;
-      sizes.step = sizes.width / 2;
-      root.style.setProperty("--sizes.width", `${sizes.width}px`);
-      borderSize("ini");
-      game = new SnakeGame();
-    }
-  }
 
+      //wait(1000).then(() => board.ini();
+    }
+
+    menuButtons.start.innerText = "Start Again";
+    Object.values(menuButtons).forEach((button) => button.style.display = 'none');
+
+    snake.ini();
+
+    timeGapUpdate();
+
+    windup();
+  },
+
+  settingsHandler() {
+    mainMenu.style.display = "none";
+    settingsMenu.style.display = "flex"
+  },
+
+  sizeHandler() {
+    reset();
+    sizes.width = Math.floor(menuButtons.size.value / 2) * 2;
+    sizes.step = sizes.width / 2;
+    root.style.setProperty("--sizes.width", `${sizes.width}px`);
+    borderSize("ini");
+    game = new SnakeGame();
+  },
 }
 
 export { snakeControl, menuControl };

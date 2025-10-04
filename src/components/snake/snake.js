@@ -2,12 +2,9 @@ import { splitColor, changedColor, roundTo } from './utils.js';
 
 import { board } from '../../ui/board/board.js';
 
-const color = { string: "hsl(120, 100%, 25%)" }
-color.hsl = splitColor(color.string);
-
 class Snake {
   constructor() {
-    this.div = document.querySelector(".snake")
+    this.div = document.querySelector(".snake");
   }
 
   ini() {
@@ -15,10 +12,12 @@ class Snake {
     this.speed = 1;
     this.direction = {"x": 1, "y": 0};
     this.turn = 0;
+    this.color = { string: "hsl(120, 100%, 25%)" };
+    this.color.hsl = splitColor(this.color.string);
 
     // body 
-    this._createSection(board.container.center.x, board.container.center.y, changedColor(color.hsl , {l: -2}), "head") ; 
-    this._createSection(board.container.center.x - board.step ,board.container.center.y, color.string, "neck"); 
+    this._createSection(board.container.center.x, board.container.center.y, changedColor(this.color.hsl , {l: -2}), "head") ; 
+    this._createSection(board.container.center.x - board.step ,board.container.center.y, this.color.string, "neck"); 
     this.head = document.getElementById("head");
     this.neck = document.getElementById("neck");
 
@@ -26,7 +25,7 @@ class Snake {
     this.neck.style.scale = `${0.75}`;
   }
 
-  _createSection(x, y, color, id="") {
+  _createSection(x, y, col, id="") {
     const element  = document.createElement('div');
 
     element.classList.add("block");
@@ -35,9 +34,9 @@ class Snake {
 
     element.style.left = `${x}px`;
     element.style.top = `${y}px`;
-    element.style.backgroundColor = color;
+    element.style.backgroundColor = col;
 
-    this.snakeDiv.appendChild(element);
+    this.div.appendChild(element);
   }
 
   moveHead() {   
@@ -85,7 +84,7 @@ class Snake {
       ms === 0 ? i = 1 : i = 0; // only go to head upon death
       const repaintSection = () => {
         setTimeout(() => {
-          const lighterColor = changedColor(hslMain , {l: i});
+          const lighterColor = changedColor(this.color.hsl, {l: i});
           const s = this.snakeBody[i];
           s.style.backgroundColor = lighterColor;
           i++;
@@ -110,7 +109,7 @@ class Snake {
     this.tail = oldTail.cloneNode(false);
     this.tail.id = "tail";
     this.tail.style.zIndex = `-${this.snakeBody.length}`
-    this.snakeDiv.appendChild(this.tail);
+    this.div.appendChild(this.tail);
 
     this._rescaleBody();
     this._repaintTail();
@@ -142,10 +141,12 @@ class Snake {
 
   collision() {
     return (
-      parseInt(this.head.style.left) < board.clip || parseInt(this.head.style.left) > board.container.width - (board.clip + board.width) // left & right border
-      || parseInt(this.head.style.top) < board.clip || parseInt(this.head.style.top) > board.container.height - (board.clip + board.width) //top & bottom border
-      || this._coordsInsideBody(this.head.style.left, this.head.style.top)
-      ) 
+      parseInt(this.head.style.left) < board.clip // left border
+      || parseInt(this.head.style.left) > board.container.width - board.clip - board.thick // right border
+      || parseInt(this.head.style.top) < board.clip // top border
+      || parseInt(this.head.style.top) > board.container.height - board.clip - board.thick // bottom border
+      || this.isCoordsInsideBody(this.head.style.left, this.head.style.top)
+    ) 
   }
 
   isCoordsInsideBody(x, y) {
@@ -185,10 +186,10 @@ class Snake {
 
   isNearOppositeSides() {
     return (
-      (this.snakeBodyData.some((coord) => (parseInt(coord.top) <= board.clip + board.step ) 
-      && this.snakeBodyData.some((coord) => (parseInt(coord.top) >= board.container.height - board.clip - board.step * 2))))  // top - bottom
-      || ((this.snakeBodyData.some((coord) => (parseInt(coord.left) <= board.clip + board.step)))) // left - right
-      && (this.snakeBodyData.some((coord) => parseInt(coord.left) >= board.container.width - board.clip - board.step * 2))
+      (this.snakeBodyData.some((coord) => (parseInt(coord.top) <= board.clip + board.step ) // top border
+      && this.snakeBodyData.some((coord) => (parseInt(coord.top) >= board.container.height - board.clip - board.step * 2))))  // bottom border
+      || ((this.snakeBodyData.some((coord) => (parseInt(coord.left) <= board.clip + board.step)))) // left border
+      && (this.snakeBodyData.some((coord) => parseInt(coord.left) >= board.container.width - board.clip - board.step * 2)) // right border
     )
   }
 
@@ -200,4 +201,4 @@ class Snake {
 
 const snake = new Snake();
 
-export { snake, color };
+export { snake };
