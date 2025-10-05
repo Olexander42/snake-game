@@ -1,16 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rock+Salt&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rock+Salt&display=swap");
 
-@import url('../ui/board/board.css');
+@import url("../ui/board.css");
 
-@import url('../ui/menu/menu.css');
+@import url("../ui/menu/menu.css");
 
-@import url('../components/snake/snake.css');
+@import url("../components/snake/snake.css");
 
-@import url('../components/food/food.css');
+@import url("../components/food/food.css");
 
 @font-face {
   font-family: "Brick Edgie";
-  src: url('../../assets/fonts/BrickEdgie-Zp9wz.otf') format('opentype');
+  src: url("../../assets/fonts/BrickEdgie-Zp9wz.otf") format('opentype');
 }
 
 :root {
@@ -26,7 +26,7 @@ body {
   margin: 0;
   overflow: hidden;
   height: 100vh;
-  background-image: url('../../assets/images/grass.jpg');
+  background-image: url("../../assets/images/grass.jpg");
   background-repeat: repeat;
 }
 

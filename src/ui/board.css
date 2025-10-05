@@ -26,6 +26,7 @@
   border-image-width: var(--size);
   border-image-repeat: repeat;
   transition: all var(--time-gap) linear;
+  z-index: 2;
 }
 
 .score,

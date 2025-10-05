@@ -1,6 +1,16 @@
 const time = { unit: 500, gap: 500 };
 
-const stats = { score: 0, record: 0 };
+const stats = { 
+  score: {
+    element: document.querySelector(".score"),
+    value: 0,
+  },
+
+  record: {
+    element: document.querySelector(".record"),
+    value: 0,
+  }
+}
 
 const shrinkCounter = { 
   outer: 1,

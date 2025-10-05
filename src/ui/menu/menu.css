@@ -1,10 +1,12 @@
-
+.menu {
+  --letter-gap: 8px;
+}
 .menu,
-.menu-main {
+.game-menu {
   position: fixed;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 1rem;
   width: max-content;
   height: max-content;
   inset: 50%;
@@ -12,23 +14,25 @@
   z-index: 3;
 }
 
-button,
-label {
+button {
   font-family: "Brick Edgie";
   font-size: 1rem;
   padding: 0.1rem 0.4rem;
-  border: 1px solid;
+  border: 1px solid black;
   border-style: outset;
-  backdrop-filter: blur(2px);
-  letter-spacing: 8px ;
+  backdrop-filter: blur(3px);
+  letter-spacing: var(--letter-gap);
   background: none;
 }
 
-.menu-settings {
+.settings-menu {
   display: flex;
   flex-direction: column;
-  gap: 40px;
   display: none;
+
+  & button + button:not(:last-child) {
+    margin-top: 1rem;
+  }
 }
 
 label {
@@ -66,7 +70,16 @@ datalist {
   top: 65%;
   font-family: "Permanent Marker";
   font-size: 10px;
-  letter-spacing: 1px;
+  letter-spacing: calc(var(--letter-gap) / 8);
   width: 57%;
+}
+
+#back {
+  font-family: "Permanent Marker";
+  font-size: 0.5rem;
+  letter-spacing: calc(var(--letter-gap) / 4);
+  width: max-content;
+  align-self: end;
+  margin-top: 0.5rem;
 }
 

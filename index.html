@@ -13,27 +13,29 @@
       <div class="background"></div>
       <div class="border">
         <div class="menu">
-          <div class="menu-main">
+          <div class="game-menu">
             <button class="start-btn">Start</button>
             <button class="settings-btn">Settings</button>
           </div>
-          <div class="menu-settings">
-            <label>Size<input type='range' id="size" name="size" min='20' max='60' value='40' step='20' list="markers"/>
-              <datalist id="markers">
-                <option value='20' label="Small"></option>
-                <option value='40' label="Normal"></option>
-                <option value='60' label="Large"></option>
-              </datalist>
-            </label>
+          <div class="settings-menu">
+            <button>
+              <label>Size<input type='range' id="size" name="size" min='20' max='60' value='40' step='20' list="markers"/>
+                <datalist id="markers">
+                  <option value='20' label="Small"></option>
+                  <option value='40' label="Normal"></option>
+                  <option value='60' label="Large"></option>
+                </datalist>
+              </label>
+            </button>
             <button>Color</button>
             <button>Theme</button>
+            <button id="back">Back ↩</button>
           </div>
         </div>
         <div class="score">Score: 0</div>
         <div class="record">Record: 0</div>
       </div>
       <div class="snake"></div>
-      <div id="food"></div>
     </div>
     </body>
 </html>

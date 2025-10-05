@@ -2,7 +2,7 @@ import { root } from "../common/elements.js";
 
 import { time } from "../common/variables.js";
 
-import { board } from "../ui/board/board.js";
+import { board } from "../components/board.js";
 
 import { menuButtons } from "../controls/elements.js";
 
@@ -13,6 +13,8 @@ root.style.setProperty("--time-gap", `${time.gap / 1000}s`);
 
 menuButtons.start.addEventListener('click', menuControl.startHandler);
 menuButtons.settings.addEventListener('click', menuControl.settingsHandler);
+
+
 
 
 

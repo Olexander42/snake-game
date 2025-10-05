@@ -1,16 +1,21 @@
-import { menuButtons } from '../../controls/elements.js';
+import { menuButtons } from '../controls/elements.js';
 
-import { normalize } from '../../common/utils.js';
+import { normalize } from '../common/utils.js';
 
 class Board {
   constructor() {
-    this.thick = Math.floor(40 / 2) * 2 ; // replace "40" with menuButtons.size.value
-    this.clip = this.thick;
-    this.step = this.thick / 2;
+    this.thick = parseInt(menuButtons.size.value);
 
     this.containerEl = document.querySelector(".container");
     this.backgroundEl = document.querySelector(".background");
     this.borderEl = document.querySelector(".border");
+
+    this.init();
+  }
+
+  init() {
+    this.clip = this.thick;
+    this.step = this.thick / 2;
 
     this.container = { 
       width: normalize(this.containerEl.clientWidth, this.step),
@@ -35,7 +40,7 @@ class Board {
     this.border.height = this.borderEl.clientHeight - this.thick;
     this._applyNewDimensions("border");
 
-    this.sizes.clip += this.sizes.step;
+    this.clip += this.step;
     this.backgroundEl.style.clipPath = `inset(${this.clip - 1}px)`;
   }
 

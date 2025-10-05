@@ -1,6 +1,8 @@
-import { board } from "../ui/board/board.js";
+import { board } from "../components/board.js";;
 
 import { snake } from "../components/snake/snake.js";
+
+import { food } from "../components/food/food.js";
 
 import { windup, reset, timeGapUpdate } from "../common/helpers.js";
 
@@ -8,9 +10,9 @@ import { wait } from "../common/utils.js";
 
 import { root, html } from "../common/elements.js";
 
-import { interval } from "../common/variables.js";
+import { interval, stats } from "../common/variables.js";
 
-import { menuButtons, menuDiv } from "./elements.js";
+import { menuButtons, gameMenuDiv, settingsMenuDiv } from "./elements.js";
 
 
 
@@ -74,16 +76,21 @@ function snakeControl(event) {
 
 const menuControl = {
   startHandler() {
-    if (menuButtons.start.innerText === "Start Again") {
-      reset();
+    if (menuButtons.start.innerText === "Start Again") { // not first game?
+      if (stats.score.value > stats.record.value) { // new record?
+        stats.record.value = stats.score.value;
+        stats.record.element.innerText = "Record: " + stats.record.value;
+      }
 
-      //wait(1000).then(() => board.ini();
+      reset();
     }
 
     menuButtons.start.innerText = "Start Again";
     Object.values(menuButtons).forEach((button) => button.style.display = 'none');
 
-    snake.ini();
+    snake.init();
+
+    food.teleport();
 
     timeGapUpdate();
 
@@ -91,18 +98,24 @@ const menuControl = {
   },
 
   settingsHandler() {
-    mainMenu.style.display = "none";
-    settingsMenu.style.display = "flex"
+    gameMenuDiv.style.display = 'none';
+    settingsMenuDiv.style.display = 'flex';
+
+    menuButtons.size.addEventListener('input', menuControl.sizeHandler);
+    menuButtons.back.addEventListener('click', menuControl.backHandler);
   },
 
   sizeHandler() {
-    reset();
-    sizes.width = Math.floor(menuButtons.size.value / 2) * 2;
-    sizes.step = sizes.width / 2;
-    root.style.setProperty("--sizes.width", `${sizes.width}px`);
-    borderSize("ini");
-    game = new SnakeGame();
+    //reset(); // ?
+    board.thick = parseInt(menuButtons.size.value); 
+    root.style.setProperty("--size", `${board.thick}px`);
+    board.init();
   },
+
+  backHandler() {
+    settingsMenuDiv.style.display = 'none';
+    gameMenuDiv.style.display = 'flex';
+  }
 }
 
 export { snakeControl, menuControl };
