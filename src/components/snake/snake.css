@@ -13,6 +13,25 @@
 
 #head {
   border-radius: 25% 50% 50% 25%;
-  transform:/ rotate(var(--turn, 0));
   z-index: 1;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+
+    width: calc(var(--size) / 4);
+    height: calc(var(--size) / 4);
+    background-color: black;
+    border-radius: 50%;
+  }
+
+  &::before {
+    left: 25%;
+    top: 5%;   
+  }
+  &::after {
+    left: 25%;
+    bottom: 5%;
+  }
 }

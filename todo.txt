@@ -1,4 +1,6 @@
-- css fragmentation
-- slider (progress / animation)
+
 - settings  
-- give food dynamic color changes 
+- food dynamic color 
+- snake realistic skin
+- flipping settings buttons
+

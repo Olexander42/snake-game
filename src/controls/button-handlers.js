@@ -81,7 +81,6 @@ const menuControl = {
         stats.record.value = stats.score.value;
         stats.record.element.innerText = "Record: " + stats.record.value;
       }
-
       reset();
     }
 

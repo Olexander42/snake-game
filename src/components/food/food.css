@@ -4,5 +4,5 @@
   width: var(--size);
   height: var(--size);
   scale: 0.5;
-  background-color: red;
+  transition: background-color 1s linear;
 }

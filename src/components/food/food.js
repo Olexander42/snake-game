@@ -1,4 +1,4 @@
-import { normalize, getRandomInt } from "../../common/utils.js";
+import { normalize, getRandomInt, splitColor, changedColor } from "../../common/utils.js";
 
 import { board } from "../board.js";
 
@@ -9,6 +9,11 @@ class Food {
     this.element = document.createElement('div');
     this.element.id = "food";
     board.containerEl.appendChild(this.element);
+
+    this.color = { string: 'rgb(0, 0, 0)' };
+    this.color.hsl = splitColor(this.color.string);
+
+    this.changeColor();
   }
 
   teleport() {
@@ -31,6 +36,12 @@ class Food {
         break;
       }
     }
+  }
+
+  changeColor() {
+    const randomColor = changedColor(this.color.hsl, { h: getRandomInt(0, 360), s: getRandomInt(25, 75), l: getRandomInt(25, 75)});
+    console.log(randomColor);
+    this.element.style.backgroundColor = randomColor;
   }
 }
 

@@ -17,8 +17,14 @@ import { wait } from "./utils.js";
 function windup() {
   interval.id = setInterval(() => {
     html.addEventListener('keydown', snakeControl);
+
     action();
+
   }, time.gap); 
+
+  setInterval(() => {
+    food.changeColor();
+  }, 1000)
 }
 
 function action() {
@@ -27,10 +33,9 @@ function action() {
   if (snake.collision()) {
     gameOver(); 
   }
-
   else {
     snake.bodyFollows();
-    
+
     if ( // snake ate food?
       food.element.style.left === snake.head.style.left 
       && food.element.style.top === snake.head.style.top 
@@ -89,6 +94,8 @@ function reset() {
 
   stats.score.value = 0;
 
+  stats.score.element.innerText = "Score: 0";
+
   shrinkCounter.reset();
 
   timeGapUpdate();
@@ -109,7 +116,7 @@ function snakeIsNearOppositeSides() {
 }
 
 function offsetShrink() {
-  //snake._snapshot();
+  //snake.snapshot();
 
   // if snake inside top border
   if (snake.snakeBodyData.some((coord) => (parseInt(coord.top) < board.clip + board.step))) {
@@ -118,7 +125,7 @@ function offsetShrink() {
   }
 
   // if snake inside bottom border
-  if (snake.snakeBodyData.some((coord) => (parseInt(coord.top) > board.container.height - board.clip - board.step))) {
+  if (snake.snakeBodyData.some((coord) => (parseInt(coord.top) > board.container.height - board.clip - board.thick))) {
     snake.snakeBody.forEach((el) => el.style.top = parseInt(el.style.top) - board.step + "px" );
     console.log("snake inside bottom border")
   }
@@ -130,7 +137,7 @@ function offsetShrink() {
   }
   
   // if snake inside right border
-  if (snake.snakeBodyData.some((coord) => (parseInt(coord.left) > board.container.width - board.clip - board.width))) {
+  if (snake.snakeBodyData.some((coord) => (parseInt(coord.left) > board.container.width - board.clip - board.thick))) {
     snake.snakeBody.forEach((el) => el.style.left = parseInt(el.style.left) - board.step + "px" );
     console.log("snake inside right border")
   }
