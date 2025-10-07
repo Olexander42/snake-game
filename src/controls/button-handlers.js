@@ -12,9 +12,9 @@ import { root, html } from "../common/elements.js";
 
 import { interval, stats } from "../common/variables.js";
 
+import { slider } from "../ui/menu/menu.js";
+
 import { menuButtons, gameMenuDiv, settingsMenuDiv } from "./elements.js";
-
-
 
 function snakeControl(event) {
   switch (event.key) {
@@ -106,10 +106,7 @@ const menuControl = {
   },
 
   sizeHandler() {
-    //reset(); // ?
-    board.thick = parseInt(menuButtons.size.value); 
-    root.style.setProperty("--size", `${board.thick}px`);
-    board.init();
+    slider.thumbTransition();
   },
 
   backHandler() {

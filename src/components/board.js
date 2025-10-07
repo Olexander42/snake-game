@@ -1,4 +1,6 @@
-import { menuButtons } from '../controls/elements.js';
+import { menuButtons } from "../controls/elements.js";
+
+import { root } from "../common/elements.js";
 
 import { normalize } from '../common/utils.js';
 
@@ -11,12 +13,17 @@ class Board {
     this.borderEl = document.querySelector(".border");
 
     this.init();
+    this.normalize();
   }
 
   init() {
     this.clip = this.thick;
     this.step = this.thick / 2;
 
+    this._setSizeProperty();
+  }
+
+  normalize() {
     this.container = { 
       width: normalize(this.containerEl.clientWidth, this.step),
       height: normalize(this.containerEl.clientHeight, this.step), 
@@ -47,6 +54,10 @@ class Board {
   _applyNewDimensions(name) {
     this[`${name}El`].style.width = this[`${name}`].width + "px";
     this[`${name}El`].style.height = this[`${name}`].height + "px";
+  }
+
+  _setSizeProperty() {
+    root.style.setProperty("--size", `${this.thick}px`);
   }
 }
 

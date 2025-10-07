@@ -1,6 +1,7 @@
 .menu {
   --letter-gap: 8px;
 }
+
 .menu,
 .game-menu {
   position: fixed;
@@ -40,27 +41,30 @@ label {
   justify-content: space-between;
 }
 
-input[type='range'] {
+#size {
+  --responsive-gradient: linear-gradient(to right, black, black 50%, transparent 50%, transparent);
   width: 50%;
   -webkit-appearance: none;
   background: transparent;
 
   &::-webkit-slider-runnable-track {
-   background-color: black;
+   background: var(--responsive-gradient);
    border-radius: 10px;
+   border: 1px solid white;
   }
 
   &::-webkit-slider-thumb {
+    position:/ absolute;
     appearance: none;
-    background: white;
-    border: none;
+    background: black;
+    outline: 2px solid white;
     box-shadow: none;
     width: 15px;
     height: 15px;
     border-radius: 50%;
-    transition: all 0.1s ease;
   }
 }
+
 
 datalist {
   display: flex;

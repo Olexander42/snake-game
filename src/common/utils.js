@@ -1,5 +1,5 @@
 function normalize(value, denominator) {
-  return (Math.floor(value / denominator) * denominator);
+  return (Math.round(value / denominator) * denominator);
 }
 
 function getRandomInt(min, max) { // max excluded
