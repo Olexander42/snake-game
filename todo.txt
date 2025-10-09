@@ -1,6 +1,6 @@
-
-- settings  
-- food dynamic color 
-- snake realistic skin
 - flipping settings buttons
+- background zoom in / out
+- settings  
+- snake realistic skin
+
 

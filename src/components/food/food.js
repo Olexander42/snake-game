@@ -12,8 +12,6 @@ class Food {
 
     this.color = { string: 'rgb(0, 0, 0)' };
     this.color.hsl = splitColor(this.color.string);
-
-    this.changeColor();
   }
 
   teleport() {
@@ -40,7 +38,6 @@ class Food {
 
   changeColor() {
     const randomColor = changedColor(this.color.hsl, { h: getRandomInt(0, 360), s: getRandomInt(25, 75), l: getRandomInt(25, 75)});
-    console.log(randomColor);
     this.element.style.backgroundColor = randomColor;
   }
 }

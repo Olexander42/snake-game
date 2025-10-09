@@ -6,7 +6,7 @@ import { food } from "../components/food/food.js";
 
 import { snakeControl } from "../controls/button-handlers.js";
 
-import { menuButtons } from "../controls/elements.js";
+import { menu } from "../controls/elements.js";
 
 import { root, html } from "./elements.js";
 
@@ -79,7 +79,7 @@ function gameOver() {
   snake.color.hsl.s *= 0.15;
   snake.repaintBody(time.gap)
     .then(() => wait(1000))
-    .then(() => menuButtons.start.style.display = "block");
+    .then(() => menu.start.style.display = "block");
 }
 
 function reset() {

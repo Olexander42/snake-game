@@ -2,11 +2,23 @@
 const gameMenuDiv = document.querySelector(".game-menu");
 const settingsMenuDiv = document.querySelector(".settings-menu");
 
-const menuButtons = { 
-  start: document.querySelector(".start-btn"),
-  settings: document.querySelector(".settings-btn"),
-  size: document.getElementById("size"),
-  back: document.getElementById("back"),
+const menu = { 
+  start: { 
+    button: document.getElementById("start-btn"),
+  },
+
+  settings: { 
+    button: document.getElementById("settings-btn"),
+  }, 
+
+  size: {
+    button: document.getElementById("size-btn"),
+    slider: document.getElementById("size-slider"),
+  },
+
+  back: {
+    button: document.getElementById("back-btn"),
+  },
 }
 
-export { menuButtons, gameMenuDiv, settingsMenuDiv };
+export { menu, gameMenuDiv, settingsMenuDiv };

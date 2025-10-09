@@ -12,9 +12,9 @@ import { root, html } from "../common/elements.js";
 
 import { interval, stats } from "../common/variables.js";
 
-import { slider } from "../ui/menu/menu.js";
+import { slider, flipButton } from "../ui/menu/menu.js";
 
-import { menuButtons, gameMenuDiv, settingsMenuDiv } from "./elements.js";
+import { menu, gameMenuDiv, settingsMenuDiv } from "./elements.js";
 
 function snakeControl(event) {
   switch (event.key) {
@@ -76,7 +76,7 @@ function snakeControl(event) {
 
 const menuControl = {
   startHandler() {
-    if (menuButtons.start.innerText === "Start Again") { // not first game?
+    if (menu.start.innerText === "Start Again") { // not first game?
       if (stats.score.value > stats.record.value) { // new record?
         stats.record.value = stats.score.value;
         stats.record.element.innerText = "Record: " + stats.record.value;
@@ -84,8 +84,8 @@ const menuControl = {
       reset();
     }
 
-    menuButtons.start.innerText = "Start Again";
-    Object.values(menuButtons).forEach((button) => button.style.display = 'none');
+    menu.start.innerText = "Start Again";
+    Object.values(menu).forEach((button) => button.style.display = 'none');
 
     snake.init();
 
@@ -100,12 +100,15 @@ const menuControl = {
     gameMenuDiv.style.display = 'none';
     settingsMenuDiv.style.display = 'flex';
 
-    menuButtons.size.addEventListener('input', menuControl.sizeHandler);
-    menuButtons.back.addEventListener('click', menuControl.backHandler);
+    menu.size.button.addEventListener('click', (e) => menuControl.sizeHandler(e));
+    menu.back.button.addEventListener('click', () => menuControl.backHandler());
   },
 
-  sizeHandler() {
-    slider.thumbTransition();
+  sizeHandler(e) {
+    flipButton(e.currentTarget);
+
+    menu.size.button.removeEventListener('click', menuControl.sizeHandler); // temp
+    menu.size.slider.addEventListener('input', slider.thumbTransition());
   },
 
   backHandler() {

@@ -26,7 +26,6 @@
   border-image-width: var(--size);
   border-image-repeat: repeat;
   transition: all var(--time-gap) linear;
-  z-index: 2;
 }
 
 .score,
@@ -36,6 +35,7 @@
   height: var(--size);
   margin: 0 var(--size);
   line-height: var(--size);
+  transition: all var(--time-gap) linear;
 }
 
 .score {

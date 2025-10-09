@@ -1,8 +1,10 @@
 import { board } from "../../components/board.js";
 
+import { menu } from "../../controls/elements.js";
+
 class Slider {
   constructor() {
-    this.range = document.getElementById("size");
+    this.range = menu.size.slider;
     this.oldValue = this.range.value;
   }
 
@@ -39,5 +41,9 @@ class Slider {
 
 const slider = new Slider();
 
-export { slider };
+function flipButton(button) {
+  button.classList.contains("clicked") ? button.classList.remove("clicked") : button.classList.add("clicked");
+}
+
+export { slider, flipButton };
 
