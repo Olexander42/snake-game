@@ -1,8 +1,12 @@
-import { board } from "../components/board.js";;
-
 import { snake } from "../components/snake/snake.js";
 
 import { food } from "../components/food/food.js";
+
+import { board } from "../components/board/board.js";;
+
+import { slider, flipButton } from "../components/menu/helpers.js";
+
+import { buttonSides, sizeSlider } from "../components/menu/elements.js";
 
 import { windup, reset, timeGapUpdate } from "../common/helpers.js";
 
@@ -10,11 +14,9 @@ import { wait } from "../common/utils.js";
 
 import { root, html } from "../common/elements.js";
 
-import { interval, stats } from "../common/variables.js";
+import { interval, states, stats } from "../common/variables.js";
 
-import { slider, flipButton } from "../ui/menu/menu.js";
-
-import { menu, gameMenuDiv, settingsMenuDiv } from "./elements.js";
+import { menuButtons, gameMenuDiv, settingsMenuDiv } from "./elements.js";
 
 function snakeControl(event) {
   switch (event.key) {
@@ -76,7 +78,7 @@ function snakeControl(event) {
 
 const menuControl = {
   startHandler() {
-    if (menu.start.innerText === "Start Again") { // not first game?
+    if (menuButtons.start.innerText === "Start Again") { // not first game?
       if (stats.score.value > stats.record.value) { // new record?
         stats.record.value = stats.score.value;
         stats.record.element.innerText = "Record: " + stats.record.value;
@@ -84,8 +86,8 @@ const menuControl = {
       reset();
     }
 
-    menu.start.innerText = "Start Again";
-    Object.values(menu).forEach((button) => button.style.display = 'none');
+    menuButtons.start.innerText = "Start Again";
+    Object.values(menuButtons).forEach((button) => button.style.display = 'none');
 
     snake.init();
 
@@ -100,15 +102,11 @@ const menuControl = {
     gameMenuDiv.style.display = 'none';
     settingsMenuDiv.style.display = 'flex';
 
-    menu.size.button.addEventListener('click', (e) => menuControl.sizeHandler(e));
-    menu.back.button.addEventListener('click', () => menuControl.backHandler());
-  },
+    [...buttonSides].forEach((side) => side.addEventListener('click', flipButton));
 
-  sizeHandler(e) {
-    flipButton(e.currentTarget);
+    sizeSlider.addEventListener('input', () => slider.thumbTransition());
 
-    menu.size.button.removeEventListener('click', menuControl.sizeHandler); // temp
-    menu.size.slider.addEventListener('input', slider.thumbTransition());
+    menuButtons.back.addEventListener('click', menuControl.backHandler);
   },
 
   backHandler() {

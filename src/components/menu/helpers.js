@@ -1,10 +1,12 @@
-import { board } from "../../components/board.js";
+import { board } from "../board/board.js";
 
-import { menu } from "../../controls/elements.js";
+import { menuButtons } from "../../controls/elements.js";
+
+import { sizeSlider } from "./elements.js";
 
 class Slider {
   constructor() {
-    this.range = menu.size.slider;
+    this.range = sizeSlider;
     this.oldValue = this.range.value;
   }
 
@@ -39,11 +41,20 @@ class Slider {
   }
 }
 
+function flipButton(e) {
+  const side = this; 
+  const button = side.parentNode;
+
+  const flipButton = () => {    
+    button.classList.contains("clicked") ? button.classList.remove("clicked") : button.classList.add("clicked"); 
+  }
+
+  if (!(side.classList.contains("rear") && e.target !== this)) flipButton();  // don't react to .rear.side children events 
+
+}
+
 const slider = new Slider();
 
-function flipButton(button) {
-  button.classList.contains("clicked") ? button.classList.remove("clicked") : button.classList.add("clicked");
-}
 
 export { slider, flipButton };
 

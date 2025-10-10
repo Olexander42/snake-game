@@ -1,6 +1,6 @@
 import { normalize, getRandomInt, splitColor, changedColor } from "../../common/utils.js";
 
-import { board } from "../board.js";
+import { board } from "../board/board.js";
 
 import { snake } from "../snake/snake.js";
 
@@ -10,7 +10,7 @@ class Food {
     this.element.id = "food";
     board.containerEl.appendChild(this.element);
 
-    this.color = { string: 'rgb(0, 0, 0)' };
+    this.color = { string: 'hsl(0, 0%, 0%)' };
     this.color.hsl = splitColor(this.color.string);
   }
 
@@ -37,7 +37,7 @@ class Food {
   }
 
   changeColor() {
-    const randomColor = changedColor(this.color.hsl, { h: getRandomInt(0, 360), s: getRandomInt(25, 75), l: getRandomInt(25, 75)});
+    const randomColor = changedColor(this.color.hsl, { h: getRandomInt(0, 360), s: getRandomInt(50, 100), l: getRandomInt(25, 75)});
     this.element.style.backgroundColor = randomColor;
   }
 }

@@ -1,4 +1,6 @@
 const time = { unit: 500, gap: 500 };
+const interval = { id: null };
+const states = { gameActive: false, controlsActive: false }
 
 const stats = { 
   score: {
@@ -21,6 +23,6 @@ const shrinkCounter = {
   } 
 }
 
-const interval = { id: null };
 
-export { time, stats, shrinkCounter, interval };
+
+export { time, interval, states, stats, shrinkCounter };

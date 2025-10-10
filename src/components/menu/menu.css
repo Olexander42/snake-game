@@ -106,15 +106,14 @@ button {
 }
 
 
-.front-side,
-.rear-side {
+.side {
   position: absolute;
   inset: 0;
   backdrop-filter: blur(3px);
   backface-visibility: hidden;
 }
 
-.rear-side {
+.rear {
   transform: rotateX(180deg);
 }
 
@@ -127,3 +126,6 @@ button {
   margin-top: 0.5rem;
 }
 
+#size-btn {
+  /*transform: rotateX(180deg);*/
+}

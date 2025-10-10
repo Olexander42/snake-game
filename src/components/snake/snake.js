@@ -1,6 +1,6 @@
 import { splitColor, changedColor, roundTo } from "../../common/utils.js";
 
-import { board } from "../board.js";
+import { board } from "../board/board.js";
 
 class Snake {
   constructor() {

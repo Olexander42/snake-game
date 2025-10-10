@@ -1,8 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rock+Salt&display=swap");
 
-@import url("../ui/board.css");
+@import url("../components/board/board.css");
 
-@import url("../ui/menu/menu.css");
+@import url("../components/menu/menu.css");
 
 @import url("../components/snake/snake.css");
 

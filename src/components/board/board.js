@@ -1,12 +1,12 @@
-import { menu } from "../controls/elements.js";
+import { sizeSlider } from "../menu/elements.js";
 
-import { root } from "../common/elements.js";
+import { root } from "../../common/elements.js";
 
-import { normalize } from '../common/utils.js';
+import { normalize } from '../../common/utils.js';
 
 class Board {
   constructor() {
-    this.thick = parseInt(menu.size.slider.value);
+    this.thick = parseInt(sizeSlider.value);
 
     this.containerEl = document.querySelector(".container");
     this.backgroundEl = document.querySelector(".background");

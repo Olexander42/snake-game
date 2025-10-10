@@ -2,5 +2,6 @@
 - background zoom in / out
 - settings  
 - snake realistic skin
+- choose your "fighter" - caterpillar or snake
 
 
