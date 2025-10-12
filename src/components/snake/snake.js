@@ -1,10 +1,10 @@
+import { board } from "../board/board.js";
 import { splitColor, changedColor, roundTo } from "../../common/utils.js";
 
-import { board } from "../board/board.js";
 
 class Snake {
   constructor() {
-    this.div = document.querySelector(".snake");
+    this.div = document.getElementById("snake");
   }
 
   init() {
@@ -20,10 +20,10 @@ class Snake {
     this._createSection(board.container.center.x - board.step ,board.container.center.y, this.color.string, "neck"); 
     this.head = document.getElementById("head");
     this.neck = document.getElementById("neck");
-    this._snapshot();
-
     this.head.style.scale = `${1}`;
     this.neck.style.scale = `${0.75}`;
+
+    this._snapshot();
   }
 
   _createSection(x, y, col, id="") {
@@ -45,7 +45,6 @@ class Snake {
 
     this.head.style.left = `${parseInt(this.head.style.left) + this.direction.x * board.step}px`;
     this.head.style.top = `${parseInt(this.head.style.top) + this.direction.y * board.step}px`;
-
     this.head.style.rotate = `${this.turn}turn`;
   }
 
@@ -80,17 +79,18 @@ class Snake {
 
   repaintBody(ms=0) {
     return new Promise((resolve) => {
-      let i;
-      ms === 0 ? i = 1 : i = 0; // only go to head upon death
+      let i = ms === 0 ? 1 : 0; // only go to head upon death
+
       const repaintSection = () => {
         setTimeout(() => {
           const lighterColor = changedColor(this.color.hsl, {l: i});
           const s = this.snakeBody[i];
+
           s.style.backgroundColor = lighterColor;
+
           i++;
-          if (i < this.snakeBody.length) {
-            repaintSection();  
-          } else {
+          if (i < this.snakeBody.length) repaintSection();  
+          else {
             resolve(true);
           }
         }, ms);
@@ -101,9 +101,9 @@ class Snake {
   }
 
   lengthen() {
-    this.snakeBody = document.querySelectorAll(".snake-body");
-    const oldTail = this.snakeBody[this.snakeBody.length - 1];
+    this._snapshot(); // test without it
 
+    const oldTail = this.snakeBody[this.snakeBody.length - 1];
     if (oldTail.id === "tail") oldTail.id = "";
 
     this.tail = oldTail.cloneNode(false);
@@ -121,14 +121,15 @@ class Snake {
   }
 
   _rescaleBody() {
-    this._snapshot();
+    this._snapshot(); // try move it outside
 
     const length = this.snakeBody.length;
     let i = length - 1;
-    let j = 1;
+    let j = 1; 
     let scale = 0;
 
-    const rescaleSection = () => {
+    const rescaleSection = () => { 
+      // move from tail to neck
       scale += 1 / (2 ** j); 
       snake.snakeBody[i].style.scale = `${roundTo(scale, 2)}`;
       i--;
@@ -156,5 +157,6 @@ class Snake {
 }
 
 const snake = new Snake();
+
 
 export { snake };

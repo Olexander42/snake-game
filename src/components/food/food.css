@@ -1,8 +1,27 @@
 #food {
+  --color: hsl(0, 0%, 0%);
+  --prev-color: hsl(0, 0%, 0%);
+  --pseudo-opacity: 1;
+  --pseudo-transition: opacity 1s linear;
+}
+
+#food,
+#food::before {
   position: absolute;
   border-radius: 50%;
   width: var(--size);
   height: var(--size);
+}
+
+#food {
   scale: 0.5;
-  transition: background-color 1s linear;
+  background-color: var(--color);
+}
+
+#food::before {
+  content: "";
+  inset: 0;
+  background-color: var(--prev-color);
+  opacity: var(--pseudo-opacity);
+  transition: var(--pseudo-transition);
 }

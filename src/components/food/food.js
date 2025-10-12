@@ -1,8 +1,7 @@
+import { board } from "../board/board.js";
+import { snake } from "../snake/snake.js";
 import { normalize, getRandomInt, splitColor, changedColor } from "../../common/utils.js";
 
-import { board } from "../board/board.js";
-
-import { snake } from "../snake/snake.js";
 
 class Food {
   constructor() {
@@ -27,21 +26,48 @@ class Food {
         normalize(getRandomInt(board.clip, board.container.height - board.clip - board.step * 2), board.step),
       ]; 
 
-      if (snake.isCoordsInsideBody(x, y) || (x === this.x && y === this.y) || (x === board.container.center.x && y === board.container.center.y)) continue;
+      if (
+        snake.isCoordsInsideBody(x, y) 
+        || (x === this.x && y === this.y) 
+        || (x === board.container.center.x && y === board.container.center.y)
+      ) continue;
       else {
         this.x = x;
         this.y = y;
+
         break;
       }
     }
   }
 
   changeColor() {
-    const randomColor = changedColor(this.color.hsl, { h: getRandomInt(0, 360), s: getRandomInt(50, 100), l: getRandomInt(25, 75)});
-    this.element.style.backgroundColor = randomColor;
+    this.element.style.setProperty("--prev-color", this.color.string);
+    this.color.string = changedColor(this.color.hsl, { h: getRandomInt(0, 360), s: getRandomInt(50, 100), l: getRandomInt(25, 75)});
+
+    this._changePseudoOpacity(); // hide #food with fully opaque ::before
+    requestAnimationFrame(() => this.element.style.setProperty("--color", this.color.string));  // then change color of #food
+  }
+
+  _changePseudoOpacity() { //
+    let opacity = 0;
+    this.element.style.setProperty("--color", this.color.string)
+    
+    const switchOpacity = () => {
+      opacity = opacity === 1 ? 0 : 1;
+      this.element.style.setProperty("--pseudo-opacity", opacity);
+      if (opacity === 1) {
+        this.element.style.setProperty("--pseudo-transition", "no transition"); // immediately switch to the new color
+        requestAnimationFrame(switchOpacity);
+      } else {
+        this.element.style.setProperty("--pseudo-transition", "opacity 1s linear"); //  css will transition from opaque to transparent
+      }
+    }
+
+   switchOpacity();
   }
 }
 
 const food = new Food();
+
 
 export { food }

@@ -1,8 +1,6 @@
 import { board } from "../board/board.js";
+import { menuButtons, sizeSlider } from "./elements.js";
 
-import { menuButtons } from "../../controls/elements.js";
-
-import { sizeSlider } from "./elements.js";
 
 class Slider {
   constructor() {
@@ -15,23 +13,24 @@ class Slider {
     this.range.value = this.oldValue;
     this.range.step = 1;
 
-    this.interval = setInterval(() => {
-      this.range.value > this.targetValue ? this.range.value-- : this.range.value++;
-
+    const step = (timestamp) => {
+      this.range.value += this.range.value > this.targetValue ? -1 : +1;
       board.thick = parseInt(this.range.value); 
       board.init();
 
       this._updateGradient();
-      
-      if (this.range.value === this.targetValue) {
-        clearInterval(this.interval);
 
+      if (this.range.value === this.targetValue) {
         this.range.step = 10;
         this.oldValue = this.range.value;
 
         board.normalize();       
+      } else {
+        requestAnimationFrame(step);
       }
-    }, 4)
+    }
+
+    requestAnimationFrame(step);
   }
 
   _updateGradient() {
@@ -42,15 +41,12 @@ class Slider {
 }
 
 function flipButton(e) {
-  const side = this; 
+  const side = this;  
   const button = side.parentNode;
 
-  const flipButton = () => {    
-    button.classList.contains("clicked") ? button.classList.remove("clicked") : button.classList.add("clicked"); 
-  }
+  const flipButton = () => { button.classList.contains("clicked") ? button.classList.remove("clicked") : button.classList.add("clicked") }
 
   if (!(side.classList.contains("rear") && e.target !== this)) flipButton();  // don't react to .rear.side children events 
-
 }
 
 const slider = new Slider();

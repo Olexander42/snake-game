@@ -1,8 +1,7 @@
 import { sizeSlider } from "../menu/elements.js";
-
 import { root } from "../../common/elements.js";
-
 import { normalize } from '../../common/utils.js';
+
 
 class Board {
   constructor() {
@@ -20,7 +19,7 @@ class Board {
     this.clip = this.thick;
     this.step = this.thick / 2;
 
-    this._setSizeProperty();
+    root.style.setProperty("--size", `${this.thick}px`);
   }
 
   normalize() {
@@ -55,13 +54,10 @@ class Board {
     this[`${name}El`].style.width = this[`${name}`].width + "px";
     this[`${name}El`].style.height = this[`${name}`].height + "px";
   }
-
-  _setSizeProperty() {
-    root.style.setProperty("--size", `${this.thick}px`);
-  }
 }
 
 const board = new Board();
+
 
 export { board };
 

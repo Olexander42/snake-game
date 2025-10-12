@@ -29,6 +29,7 @@ function roundTo(value, decimals) {
   return Math.round(value * factor) / factor
 }
 
+
 export { normalize, getRandomInt, wait, splitColor, changedColor, roundTo };
 
 

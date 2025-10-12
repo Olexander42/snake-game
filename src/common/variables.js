@@ -1,6 +1,28 @@
-const time = { unit: 500, gap: 500 };
-const interval = { id: null };
-const states = { gameActive: false, controlsActive: false }
+import { snake } from "../components/snake/snake.js";
+import { root } from "./elements.js";
+
+
+const timeUnit = 1000; 
+
+const time = { 
+  gap: timeUnit,
+
+  updateGap() {
+    this.gap = Math.round(timeUnit / snake.speed);
+    root.style.setProperty("--time-gap", `${this.gap / 1000}s`);
+  },
+
+  reset() { 
+    this.gap = timeUnit;
+  },
+}
+
+const raf = { id: undefined };
+
+const states = { 
+  gameActive: false,
+  controlsOn: false, 
+}
 
 const stats = { 
   score: {
@@ -17,6 +39,7 @@ const stats = {
 const shrinkCounter = { 
   outer: 1,
   inner: 0,
+
   reset() {
     this.outer = 1;
     this.inner = 0; 
@@ -24,5 +47,4 @@ const shrinkCounter = {
 }
 
 
-
-export { time, interval, states, stats, shrinkCounter };
+export { time, raf, states, stats, shrinkCounter };
