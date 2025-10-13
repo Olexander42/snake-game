@@ -14,6 +14,7 @@ const time = {
 
   reset() { 
     this.gap = timeUnit;
+    root.style.setProperty("--time-gap", `${this.gap / 1000}s`);
   },
 }
 

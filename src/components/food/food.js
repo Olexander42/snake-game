@@ -11,6 +11,8 @@ class Food {
 
     this.color = { string: 'hsl(0, 0%, 0%)' };
     this.color.hsl = splitColor(this.color.string);
+    this.color.string = changedColor(this.color.hsl, { h: getRandomInt(0, 360), s: getRandomInt(50, 100), l: getRandomInt(25, 75)});
+    this.element.style.setProperty('background-color', this.color.string); // have to set color right away for the fade-in to work
   }
 
   teleport() {
@@ -50,6 +52,7 @@ class Food {
 
   _changePseudoOpacity() { //
     let opacity = 0;
+
     this.element.style.setProperty("--color", this.color.string)
     
     const switchOpacity = () => {

@@ -4,13 +4,13 @@ import { snake } from "../components/snake/snake.js";
 import { food } from "../components/food/food.js";
 
 // common 
-import { root, html,  menuButtons, gameMenuDiv, settingsMenuDiv } from "../common/elements.js";
+import { root, html } from "../common/elements.js";
 import { raf, states, stats, time } from "../common/variables.js";
 import { windup, reset } from "../common/helpers.js";
 import { wait } from "../common/utils.js";
 
 // menu
-import { buttonSides, sizeSlider } from "../components/menu/elements.js";
+import { gameMenuDiv, settingsMenuDiv, buttonSides, sizeSlider, menuButtons } from "../components/menu/elements.js";
 import { slider, flipButton } from "../components/menu/helpers.js";
 
 
@@ -86,12 +86,18 @@ const menuControl = {
       reset();
     }
 
-    menuButtons.start.innerText = "Start Again";
+    if (menuButtons.start.innerText === "Start") menuButtons.start.innerText = "Start Again";
     Object.values(menuButtons).forEach((button) => button.style.display = 'none');
 
     snake.init();
     food.teleport();
-    time.updateGap();
+    
+    food.element.style.setProperty("--transition", 'opacity 1s linear')
+    requestAnimationFrame(() => {
+      food.element.style.opacity = 1;
+      requestAnimationFrame(() => food.element.style.setProperty("--transition", 'no transition')); 
+    })
+
     windup();
   },
 

@@ -17,11 +17,14 @@ import { menuButtons } from "../components/menu/elements.js";
 
 
 function windup() {
-  let start;
+  const initTimer = (t, f) => {
+    let start = t;
+    f(t, start);
+  }
 
-  const nextFrame = (timestamp) => {
-    const timeElapsed = timestamp - start;
-    if (timeElapsed >= time.gap) { // it's time for an update
+  const nextStep = (t, start) => {
+    const timeElapsed = t - start;
+    if (timeElapsed >= time.gap) { // time for a move
       // update states
       if (!states.gameActive) states.gameActive = true;
       if (!states.controlsOn) {
@@ -29,21 +32,28 @@ function windup() {
         states.controlsOn = true;
       }
 
-      action();
-      food.changeColor();
-      
-      if (raf.id !== "game over") initTimer(timestamp); // restart 
+      action();    
+      if (raf.id !== "game over") initTimer(t, nextStep); // restart the countdown to the next move
     } else {
-      raf.id = requestAnimationFrame(nextFrame); 
+      raf.id = requestAnimationFrame((t) => nextStep(t, start)); 
     }
   }
 
-  const initTimer = (timestamp) => {
-    start = timestamp;
-    nextFrame(timestamp);
+  const nextColor = (t, start) => {
+    const timeElapsed = t - start;
+
+    if (timeElapsed >= 1000) {
+      food.changeColor();
+      initTimer(t, nextColor); // restart the countdown to the next color change
+    } else {
+      requestAnimationFrame((t) => nextColor(t, start));
+    }
   }
 
-  raf.id = requestAnimationFrame(initTimer);
+  requestAnimationFrame((timestamp) => {
+    initTimer(timestamp, nextColor);
+    initTimer(timestamp, nextStep);
+  });
 }
 
 function action() {
@@ -93,6 +103,9 @@ function gameOver() {
 
 function reset() {
   snake.div.replaceChildren(); // delete snake
+  food.element.style.opacity = 0; // hide food till the next game begins
+
+  time.reset();
 
   // back to initial size
   board.borderEl.style.width = board.container.width + "px";
@@ -100,11 +113,10 @@ function reset() {
   board.backgroundEl.style.clipPath = "";
   board.clip = board.thick;
 
-  stats.score.value = 0;
-  stats.score.element.innerText = "Score: 0";
-
   shrinkCounter.reset();
-  time.updateGap();
+
+  stats.score.value = 0;
+  stats.score.element.innerText = "Score: 0";  
 }
 
 function snakeIsNearOppositeSides() {

@@ -1,10 +1,3 @@
-#food {
-  --color: hsl(0, 0%, 0%);
-  --prev-color: hsl(0, 0%, 0%);
-  --pseudo-opacity: 1;
-  --pseudo-transition: opacity 1s linear;
-}
-
 #food,
 #food::before {
   position: absolute;
@@ -16,10 +9,12 @@
 #food {
   scale: 0.5;
   background-color: var(--color);
+  opacity: 0;
+  transition: var(--transition);
 }
 
 #food::before {
-  content: "";
+  content: '';
   inset: 0;
   background-color: var(--prev-color);
   opacity: var(--pseudo-opacity);
