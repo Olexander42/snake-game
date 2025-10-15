@@ -16,7 +16,7 @@
 }
 
 button {
-  font-family: "Brick Edgie";
+  font-family: "main";
   font-size: 1rem;
   padding: 0.1rem 0.4rem;
   border: 1px solid black;
@@ -98,7 +98,7 @@ button {
     position: absolute;
     left: 12.5%;
     bottom: 2.5%;
-    font-family: "Permanent Marker";
+    font-family: "secondary";
     font-size: 10px;
     letter-spacing: calc(var(--letter-gap) / 8);
     width: 75%;
@@ -156,7 +156,7 @@ input[type='radio'] {
 
 
 #back-btn {
-  font-family: "Permanent Marker";
+  font-family: "secondary";
   font-size: 0.5rem;
   letter-spacing: calc(var(--letter-gap) / 4);
   width: max-content;

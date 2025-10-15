@@ -55,7 +55,7 @@ function flipButton(event) {
   if (
     (!(side.classList.contains("rear") && event.target !== this)) 
     || [...document.querySelectorAll('fieldset')].includes(event.target)
-  ) switchClass();  // don't react to .rear.side children events and react to the empty space in <fieldset>
+  ) switchClass();  // don't react to .rear.side children events, but react to the empty space in <fieldset>
 }
 
 function closeButtons(event) {
