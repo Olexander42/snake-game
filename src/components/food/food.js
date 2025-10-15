@@ -5,14 +5,14 @@ import { normalize, getRandomInt, splitColor, changedColor } from "../../common/
 
 class Food {
   constructor() {
-    this.element = document.createElement('div');
+    this.element = document.createElement('span');
     this.element.id = "food";
     board.containerEl.appendChild(this.element);
 
     this.color = { string: 'hsl(0, 0%, 0%)' };
     this.color.hsl = splitColor(this.color.string);
     this.color.string = changedColor(this.color.hsl, { h: getRandomInt(0, 360), s: getRandomInt(50, 100), l: getRandomInt(25, 75)});
-    this.element.style.setProperty('background-color', this.color.string); // have to set color right away for the fade-in to work
+    this.element.style.setProperty('--color', this.color.string); // have to set color from the get-go for the fade-in to work
   }
 
   teleport() {

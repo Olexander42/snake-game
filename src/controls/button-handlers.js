@@ -10,8 +10,8 @@ import { windup, reset } from "../common/helpers.js";
 import { wait } from "../common/utils.js";
 
 // menu
-import { gameMenuDiv, settingsMenuDiv, buttonSides, sizeSlider, menuButtons } from "../components/menu/elements.js";
-import { slider, flipButton } from "../components/menu/helpers.js";
+import { gameMenuDiv, settingsMenuDiv, buttonSides, sizeSlider, menuButtons, colorBoxes  } from "../components/menu/elements.js";
+import { slider, flipButton, closeButtons, moveBoxOutline } from "../components/menu/helpers.js";
 
 
 function snakeControl(event) {
@@ -92,6 +92,7 @@ const menuControl = {
     snake.init();
     food.teleport();
     
+    // initial food fade-in
     food.element.style.setProperty("--transition", 'opacity 1s linear')
     requestAnimationFrame(() => {
       food.element.style.opacity = 1;
@@ -106,6 +107,11 @@ const menuControl = {
     settingsMenuDiv.style.display = 'flex';
 
     [...buttonSides].forEach((side) => side.addEventListener('click', flipButton));
+    board.borderEl.addEventListener('click', closeButtons);
+
+    [...colorBoxes].forEach((box) => box.addEventListener('click', moveBoxOutline));
+    colorBoxes[0].dispatchEvent(new Event('click')); // set the outline on the first box (default color)
+
     sizeSlider.addEventListener('input', () => slider.thumbTransition());
     menuButtons.back.addEventListener('click', menuControl.backHandler);
   },

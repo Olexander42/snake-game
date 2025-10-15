@@ -8,7 +8,12 @@ const menuButtons = {
 }
 
 const buttonSides = document.querySelectorAll(".side");
+
 const sizeSlider = document.getElementById("size-slider");
 
+const colorBoxes = document.querySelectorAll("#snake-color label");
+const boxOutline = document.getElementById("box-outline");
 
-export { gameMenuDiv, settingsMenuDiv, menuButtons, buttonSides, sizeSlider };
+
+
+export { gameMenuDiv, settingsMenuDiv, menuButtons, buttonSides, colorBoxes, sizeSlider, boxOutline }

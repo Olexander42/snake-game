@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
@@ -20,10 +20,10 @@
           <div class="settings-menu">
             <button id="size-btn">
               <div class="front side">
-                <label for="size-slider">Size</label>
+                <span>Size</span>
               </div>
               <div class="rear side">
-                <input type='range' id="size-slider" name="size-slider" min='20' max='60' value='60' step='10' list="markers"/>
+                <input type='range' id="size-slider" name="size-slider" min='20' max='60' value='40' step='10' list="markers"/>
                   <datalist id="markers">
                     <option value='20' label="Small"></option>
                     <option value='40' label="Normal"></option>
@@ -31,17 +31,31 @@
                   </datalist>
               </div>
             </button>
-            <button>
+            <button id="snake-color">
               <div class="front side">
-                <label for="snake-color">Snake Color</label>
+                <span>Snake Color<span>
               </div>
               <div class="rear side">
-                <span>placeholder</span>
+                <fieldset>
+                  <span id="box-outline"></span>
+                  <label>
+                    <input type='radio' name="snakeColor" id="green" value='hsl(120, 40%, 30%)' checked>
+                    <span class="color-box" style='background-color: hsl(120, 40%, 30%)'></span>
+                  </label>
+                  <label>
+                    <input type='radio' name="snakeColor" id="yellow" value='hsl(50, 80%, 50%)'>
+                    <span class="color-box" style='background-color: hsl(50, 80%, 50%)'></span>
+                  </label>
+                  <label>
+                    <input type='radio' name="snakeColor" id="red" value='hsl(0, 70%, 40%)'>
+                    <span class="color-box" style='background-color: hsl(0, 70%, 40%)'></span>
+                  </label>
+                </fieldset>
               </div>
             </button>
             <button>
               <div class="front side">
-                <label for="theme">Snake Color</label>
+                <label for="theme">Theme</label>
               </div>
               <div class="rear side">
                 <span>placeholder</span>

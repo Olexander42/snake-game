@@ -1,7 +1,8 @@
-- flipping settings buttons
 - background zoom in / out
-- settings  
+- snake color
+- theme
 - snake realistic skin
-- choose your "fighter" - caterpillar or snake
+- make everything controllable with a keyboard
+
 
 

@@ -1,5 +1,5 @@
-import { board } from "../board/board.js";
-import { splitColor, changedColor, roundTo } from "../../common/utils.js";
+import { board } from '../board/board.js';
+import { splitColor, changedColor, roundTo } from '../../common/utils.js';
 
 
 class Snake {
@@ -12,7 +12,7 @@ class Snake {
     this.speed = 1;
     this.direction = {"x": 1, "y": 0};
     this.turn = 0;
-    this.color = { string: "hsl(120, 100%, 25%)" };
+    this.color = { string: document.querySelector('input[name="snakeColor"]:checked').value };
     this.color.hsl = splitColor(this.color.string);
 
     // body 
@@ -24,20 +24,6 @@ class Snake {
     this.neck.style.scale = `${0.75}`;
 
     this._snapshot();
-  }
-
-  _createSection(x, y, col, id="") {
-    const element  = document.createElement('div');
-
-    element.classList.add("block");
-    element.classList.add(`${"snake-body"}`);
-    element.id = id;
-
-    element.style.left = `${x}px`;
-    element.style.top = `${y}px`;
-    element.style.backgroundColor = col;
-
-    this.div.appendChild(element);
   }
 
   moveHead() {   
@@ -65,16 +51,6 @@ class Snake {
     }
 
     moveToNextPosition(i);
-  }
-
-  _snapshot() {
-    this.snakeBody = [...document.querySelectorAll(".snake-body")];
-    this.snakeBodyData = [];
-    this.snakeBody.forEach((el) => {
-      const [left, top, rotate] = [el.style.left, el.style.top, el.style.rotate];
-      const data = {left, top, rotate};
-      this.snakeBodyData.push(data);
-    })
   }
 
   repaintBody(ms=0) {
@@ -115,6 +91,45 @@ class Snake {
     this._repaintTail();
   }
 
+  collision() {
+    return (
+      parseInt(this.head.style.left) < board.clip // left border
+      || parseInt(this.head.style.left) > board.container.width - board.clip - board.thick // right border
+      || parseInt(this.head.style.top) < board.clip // top border
+      || parseInt(this.head.style.top) > board.container.height - board.clip - board.thick // bottom border
+      || this.isCoordsInsideBody(this.head.style.left, this.head.style.top)
+    ) 
+  }
+
+  isCoordsInsideBody(x, y) {
+    if (typeof x === 'number') [x, y] = [x + 'px', y + 'px'];
+    return this.snakeBody.some((coord, i) => (i !== 0 && (x === coord.style.left && y === coord.style.top))); // head is excluded
+  }
+
+  _createSection(x, y, col, id="") {
+    const element  = document.createElement('span');
+
+    element.classList.add("block");
+    element.classList.add(`${"snake-body"}`);
+    element.id = id;
+
+    element.style.left = `${x}px`;
+    element.style.top = `${y}px`;
+    element.style.backgroundColor = col;
+
+    this.div.appendChild(element);
+  }
+
+  _snapshot() {
+    this.snakeBody = [...document.querySelectorAll(".snake-body")];
+    this.snakeBodyData = [];
+    this.snakeBody.forEach((el) => {
+      const [left, top, rotate] = [el.style.left, el.style.top, el.style.rotate];
+      const data = {left, top, rotate};
+      this.snakeBodyData.push(data);
+    })
+  }
+
   _repaintTail() {
     const lighterColor = changedColor(this.color.hsl , {l: this.snakeBody.length});
     this.tail.style.backgroundColor = lighterColor;
@@ -138,21 +153,6 @@ class Snake {
     }
 
     rescaleSection();
-  }
-
-  collision() {
-    return (
-      parseInt(this.head.style.left) < board.clip // left border
-      || parseInt(this.head.style.left) > board.container.width - board.clip - board.thick // right border
-      || parseInt(this.head.style.top) < board.clip // top border
-      || parseInt(this.head.style.top) > board.container.height - board.clip - board.thick // bottom border
-      || this.isCoordsInsideBody(this.head.style.left, this.head.style.top)
-    ) 
-  }
-
-  isCoordsInsideBody(x, y) {
-    if (typeof x === "number") [x, y] = [x + "px", y + "px"];
-    return this.snakeBody.some((coord, i) => (i !== 0 && (x === coord.style.left && y === coord.style.top))); // head is excluded
   }
 }
 
