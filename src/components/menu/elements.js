@@ -1,5 +1,5 @@
 const gameMenuDiv = document.querySelector(".game-menu");
-const settingsMenuDiv = document.querySelector(".settings-menu");
+const settingsMenuDiv = document.getElementById("settings-menu");
 
 const menuButtons = { 
   start: document.getElementById("start-btn"),
@@ -11,9 +11,13 @@ const buttonSides = document.querySelectorAll(".side");
 
 const sizeSlider = document.getElementById("size-slider");
 
-const colorBoxes = document.querySelectorAll("#snake-color label");
-const boxOutline = document.getElementById("box-outline");
+const colorBoxes = document.querySelectorAll(".color-box");
+const thumbnails = document.querySelectorAll(".thumbnail");
+
+const outlines = {
+  colorBox: document.getElementById("color-box-outline"),
+  thumbnail: document.getElementById("thumbnail-outline"),
+}
 
 
-
-export { gameMenuDiv, settingsMenuDiv, menuButtons, buttonSides, colorBoxes, sizeSlider, boxOutline }
+export { gameMenuDiv, settingsMenuDiv, menuButtons, buttonSides, colorBoxes, thumbnails, sizeSlider, outlines }

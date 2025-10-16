@@ -9,7 +9,9 @@ import { root, html } from "./elements.js";
 import { menuButtons } from "../components/menu/elements.js";
 
 
-function setTheme(theme) {
+function setTheme() {
+  const theme = document.querySelector('input[name="theme"]:checked').value;
+
   html.style.setProperty('background-image', `url(./assets/${theme}/images/outside.jpg)`);
   board.borderEl.style.setProperty('border-image-source', `url(./assets/${theme}/images/border.jpg`);
   board.backgroundEl.style.setProperty('background-image', `url(./assets/${theme}/images/inside.jpg`);

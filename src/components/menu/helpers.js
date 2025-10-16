@@ -1,5 +1,5 @@
 import { board } from "../board/board.js";
-import { menuButtons, sizeSlider, boxOutline } from "./elements.js";
+import { menuButtons, sizeSlider, outlines } from "./elements.js";
 import { html } from "../../common/elements.js";
 
  
@@ -51,7 +51,7 @@ function flipButton(event) {
   const button = side.parentNode;
 
   const switchClass = () => { button.classList.contains("clicked") ? button.classList.remove("clicked") : button.classList.add("clicked") }
-
+  
   if (
     (!(side.classList.contains("rear") && event.target !== this)) 
     || [...document.querySelectorAll('fieldset')].includes(event.target)
@@ -59,16 +59,16 @@ function flipButton(event) {
 }
 
 function closeButtons(event) {
-  if (event.target === this) {
+  // close buttons if clicked anywhere outside the buttons
+  if (event.target === this || document.getElementById("settings-menu") === event.target ) { 
     [...document.querySelectorAll(".clicked")].forEach((clickedButton) => clickedButton.classList.remove("clicked"));
   }
 }
 
-function moveBoxOutline(event) {
-  const box = this;
-  boxOutline.style.left = box.offsetLeft + 'px';
+function moveOutline(box, outline) {
+  outline.style.left = box.offsetLeft + 'px';
 }
 
 
-export { slider, flipButton, closeButtons, moveBoxOutline }
+export { slider, flipButton, closeButtons, moveOutline }
 

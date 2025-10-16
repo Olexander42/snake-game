@@ -6,12 +6,12 @@ import { food } from "../food/food.js";
 // common 
 import { root, html } from "../../common/elements.js";
 import { raf, states, stats, time } from "../../common/variables.js";
-import { windup, reset } from "../../common/helpers.js";
+import { windup, reset, setTheme } from "../../common/helpers.js";
 import { wait } from "../../common/utils.js";
 
 // menu
-import { gameMenuDiv, settingsMenuDiv, buttonSides, sizeSlider, menuButtons, colorBoxes  } from "./elements.js";
-import { slider, flipButton, closeButtons, moveBoxOutline } from "./helpers.js";
+import { gameMenuDiv, settingsMenuDiv, buttonSides, sizeSlider, menuButtons, colorBoxes, thumbnails, outlines } from "./elements.js";
+import { slider, flipButton, closeButtons, moveOutline } from "./helpers.js";
 
 /* something has to be removed 👆 because there's no snakeControl anymore here */
 
@@ -49,10 +49,23 @@ const menuControl = {
     [...buttonSides].forEach((side) => side.addEventListener('click', flipButton));
     board.borderEl.addEventListener('click', closeButtons);
 
-    [...colorBoxes].forEach((box) => box.addEventListener('click', moveBoxOutline));
-    colorBoxes[0].dispatchEvent(new Event('click')); // set the outline on the first box (default color)
-
+    // size
     sizeSlider.addEventListener('input', () => slider.thumbTransition());
+
+    // color
+    [...colorBoxes].forEach((colorBox) => colorBox.addEventListener('click', (event) => moveOutline(event.currentTarget, outlines.colorBox)));
+    colorBoxes[0].dispatchEvent(new Event('click')); // set the outline on the first color box (default color)
+
+    // theme
+    [...thumbnails].forEach((thumbnail) => thumbnail.addEventListener('click', (event) => {
+      moveOutline(event.currentTarget, outlines.thumbnail);
+      requestAnimationFrame(setTheme);
+    })) 
+    thumbnails[0].dispatchEvent(new Event('click')); // set the outline on the first theme (default theme)
+
+    
+
+    
     menuButtons.back.addEventListener('click', menuControl.backHandler);
   },
 

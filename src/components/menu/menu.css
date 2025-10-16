@@ -1,5 +1,6 @@
 .menu {
-  --letter-gap: 8px;
+  --letter-gap: 16px;
+  --white: hsl(57, 100%, 95%);
 }
 
 .menu,
@@ -17,14 +18,14 @@
 
 button {
   font-family: "main";
-  font-size: 1rem;
-  padding: 0.1rem 0.4rem;
-  border: 1px solid black;
+  font-size: 2rem;
+  padding: 0.2rem 0.8rem;
+  border: 2px solid black;
   border-style: outset;
   letter-spacing: var(--letter-gap);
   background: none;
   backdrop-filter: blur(3px);
-  transition: scale 0.1s linear,  transform 0.5s linear; 
+  transition: scale 0.1s linear; 
 
   &, * {
     cursor: pointer;
@@ -37,11 +38,59 @@ button {
   &:active {
     scale: 1;
   }
+}
 
+input[type='radio'] {
+  display: none;
+}
+
+fieldset {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border: none;
+  padding: 0;
+  height: 100%;
+
+  & label {
+    font-family: "secondary";
+    font-size: 0.25rem;
+    width: 2.2rem;
+    height: 2rem;
+    letter-spacing: calc(var(--letter-gap) / 8);
+  }
+}
+
+.side {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(3px);
+  backface-visibility: hidden;
+}
+
+.rear {
+  transform: rotateX(180deg);
+}
+
+.color-box,
+.thumbnail {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  border-radius: 10%;
+}
+
+#color-box-outline {
+  position: absolute;
+  width: 2.2rem;
+  height: 2rem;
+  outline: 4px solid var(--white);
+  border-radius: 10%;
+  transition: left 0.25s ease-out;
 }
 
 
-.settings-menu {
+#settings-menu {
   display: flex;
   flex-direction: column;
   perspective: 1000px;
@@ -49,18 +98,19 @@ button {
 
   & button:not(:last-child) {
     position: relative;
-    width: 310px;
-    height: 50px;
+    width: 620px;
+    height: 100px;
     backdrop-filter: unset;
     transform-style: preserve-3d;
+    transition: scale 0.2s linear,  transform 0.5s linear; 
   }
 
   & button + button:not(:last-child) {
     margin-top: 1rem;
   }
 
-  & button:active {
-    scale: 1.1;
+  & button:hover:not(:last-child) {
+    scale: 1.25;
   }
 
   & .clicked {
@@ -78,17 +128,17 @@ button {
 
   &::-webkit-slider-runnable-track {
    background: var(--responsive-gradient);
-   border-radius: 10px;
-   border: 1px solid white;
+   border-radius: 20px;
+   border: 2px solid var(--white);
   }
 
   &::-webkit-slider-thumb {
     appearance: none;
     background: black;
-    outline: 2px solid white;
+    outline: 4px solid var(--white);
     box-shadow: none;
-    width: 15px;
-    height: 15px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
   }
 
@@ -96,64 +146,46 @@ button {
     display: flex;
     justify-content: space-between;
     position: absolute;
-    left: 12.5%;
+    left: 10%;
     bottom: 2.5%;
     font-family: "secondary";
-    font-size: 10px;
+    font-size: 0.5rem;
     letter-spacing: calc(var(--letter-gap) / 8);
-    width: 75%;
+    width: 80%;
   }
 }
 
+#theme .rear {
+  padding-bottom: 0.25rem;
 
-.side {
-  position: absolute;
-  inset: 0;
-  backdrop-filter: blur(3px);
-  backface-visibility: hidden;
-}
-
-.rear {
-  transform: rotateX(180deg);
-}
-
-#snake-color {
   & fieldset {
-    display: flex;
     justify-content: space-around;
-    align-items: center;
-    border: none;
-    padding: 0;
-    height: 100%;
   }
 
-  & label {
-    width: 1.1rem;
-    height: 1rem;
-  }
-
-  & .color-box {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    border-radius: 10%;
+  & label, 
+  #thumbnail-outline {
+    width: 5rem;
+    height: 1.75rem;
+    border-radius: 5px;
   }
 }
 
-input[type='radio'] {
-  display: none;
+#street + .thumbnail {
+  background-image: url(../../../assets/street/images/outside.jpg);
+  background-size: 150%;
 }
 
-#box-outline {
+#ocean + .thumbnail {
+  background-image: url(../../../assets/ocean/images/outside.jpg);
+  background-size: 150%;
+}
+
+
+#thumbnail-outline {
   position: absolute;
-  width: 1.1rem;
-  height: 1rem;
-  outline: 2px solid hsl(57, 100%, 95%);
-  border-radius: 10%;
+  outline: 4px solid var(--white);
   transition: left 0.25s ease-out;
 }
-
-
 
 #back-btn {
   font-family: "secondary";

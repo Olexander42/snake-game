@@ -17,7 +17,7 @@
             <button id="start-btn">Start</button>
             <button id="settings-btn">Settings</button>
           </div>
-          <div class="settings-menu">
+          <div id="settings-menu">
             <button id="size-btn">
               <div class="front side">
                 <span>Size</span>
@@ -37,7 +37,7 @@
               </div>
               <div class="rear side">
                 <fieldset>
-                  <span id="box-outline"></span>
+                  <span id="color-box-outline"></span>
                   <label>
                     <input type='radio' name="snakeColor" id="green" value='hsl(120, 40%, 30%)' checked>
                     <span class="color-box" style='background-color: hsl(120, 40%, 30%)'></span>
@@ -53,14 +53,23 @@
                 </fieldset>
               </div>
             </button>
-            <button>
+            <button id="theme">
               <div class="front side">
                 <span>Theme</span>
               </div>
               <div class="rear side">
                 <fieldset>
-                  <label for="street">Street<label>
-                  <input type='radio' name="theme" id="street" value="street" checked>
+                  <span id="thumbnail-outline"></span>
+                  <label>
+                    <input type='radio' name="theme" id="street" value="street" checked>
+                    <span class="thumbnail"></span>
+                    <span>Street</span>
+                  </label>
+                  <label>
+                    <input type='radio' name="theme" id="ocean" value="ocean">
+                    <span class="thumbnail"></span>
+                    <span>Ocean</span>
+                  </label>
                 </fieldset>
               </div>
             </button>
