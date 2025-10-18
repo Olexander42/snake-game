@@ -27,14 +27,9 @@ const menuHandlers = {
     Object.values(menuButtons).forEach((button) => button.style.display = 'none');
 
     snake.init();
+
     food.teleport();
-    
-    // initial food fade-in
-    food.element.style.setProperty("--transition", 'opacity 1s linear')
-    requestAnimationFrame(() => {
-      food.element.style.opacity = 1;
-      requestAnimationFrame(() => food.element.style.setProperty("--transition", 'no transition')); 
-    })
+    food.fadeIn();
 
     windup();
   },
@@ -44,8 +39,6 @@ const menuHandlers = {
     settingsMenuDiv.style.display = 'flex';
 
     if (!states.settingsVisited) { 
-      states.settingsVisited = true;
-
       [...buttonSides].forEach((side) => side.addEventListener('click', flipButton));
       board.borderEl.addEventListener('click', closeButtons);
 
@@ -67,6 +60,8 @@ const menuHandlers = {
 
       menuButtons.back.addEventListener('click', menuHandlers.backHandler);
     }
+
+    states.settingsVisited = true;
   },
 
   backHandler() {

@@ -26,8 +26,8 @@
   transition: all var(--time-gap) linear;
 }
 
-.score,
-.record { 
+#score,
+#record { 
   position: absolute;
   inset: 0;
   height: var(--size);
@@ -36,13 +36,13 @@
   transition: all var(--time-gap) linear;
 }
 
-.score {
+#score {
   font-family: "score";
   font-size: calc(var(--size) * 0.5);
   letter-spacing: calc(var(--size) * 0.1);
 }
 
-.record {
+#record {
   align-self: end;
   font-family: "secondary";
   padding-bottom: 1px;

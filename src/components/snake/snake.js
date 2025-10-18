@@ -12,7 +12,7 @@ class Snake {
     this.speed = 1;
     this.direction = {"x": 1, "y": 0};
     this.turn = 0;
-    this.color = { string: this._getSnakeColor() };
+    this.color = { string: document.querySelector('input[name="color-snake"]:checked').value };
     this.color.hsl = splitColor(this.color.string);
 
     // body 
@@ -144,7 +144,7 @@ class Snake {
     let scale = 0;
 
     const rescaleSection = () => { 
-      // move from tail to neck
+      // rescale from tail to neck
       scale += 1 / (2 ** j); 
       snake.snakeBody[i].style.scale = `${roundTo(scale, 2)}`;
       i--;
@@ -153,10 +153,6 @@ class Snake {
     }
 
     rescaleSection();
-  }
-
-  _getSnakeColor() {
-    return document.querySelector('input[name="color-snake"]:checked').value;
   }
 }
 

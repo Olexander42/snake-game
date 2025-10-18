@@ -21,6 +21,21 @@ class Food {
     this.element.style.top = this.y + "px";
   }
 
+  changeColor() {
+    this.element.style.setProperty("--prev-color", this.color.string);
+    this.color.string = changedColor(this.color.hsl, { h: getRandomInt(0, 360), s: getRandomInt(50, 100), l: getRandomInt(25, 75)});
+
+    this._changePseudoOpacity(); // hide #food with fully opaque ::before
+    requestAnimationFrame(() => this.element.style.setProperty("--color", this.color.string));  // then change color of #food
+  }
+
+  fadeIn() {
+    this.element.style.setProperty("--transition", 'opacity 1s linear')
+    requestAnimationFrame(() => food.element.style.opacity = 1);
+    this.element.addEventListener('transitionend', () => this.element.style.setProperty("--transition", 'no transition')); 
+  }
+
+
   _generateRandomCoords() {
     while (true) {
       const [x, y] = [
@@ -40,14 +55,6 @@ class Food {
         break;
       }
     }
-  }
-
-  changeColor() {
-    this.element.style.setProperty("--prev-color", this.color.string);
-    this.color.string = changedColor(this.color.hsl, { h: getRandomInt(0, 360), s: getRandomInt(50, 100), l: getRandomInt(25, 75)});
-
-    this._changePseudoOpacity(); // hide #food with fully opaque ::before
-    requestAnimationFrame(() => this.element.style.setProperty("--color", this.color.string));  // then change color of #food
   }
 
   _changePseudoOpacity() { //

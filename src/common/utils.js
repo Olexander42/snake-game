@@ -1,10 +1,9 @@
 function normalize(value, denominator) {
-  return (Math.round(value / denominator) * denominator);
+  return Math.round(value / denominator) * denominator;
 }
 
 function getRandomInt(min, max) { // max excluded
-  const result = Math.floor(Math.random() * ((max - min)) + min); 
-  return result;
+  return (Math.floor(Math.random() * ((max - min)) + min));
 }
 
 function wait(ms) {
@@ -25,8 +24,8 @@ function changedColor(hsl, {h = 0, s = 0, l = 0} = {}) {
 }
 
 function roundTo(value, decimals) {
-  const factor = 10 ** decimals
-  return Math.round(value * factor) / factor
+  const factor = 10 ** decimals;
+  return Math.round(value * factor) / factor;
 }
 
 

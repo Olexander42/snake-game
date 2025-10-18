@@ -6,7 +6,7 @@ import { time } from "../common/variables.js";
 import { root } from "../common/elements.js";
 
 
-setTheme(document.querySelector('input[name="theme"]:checked').value); // set default theme
+setTheme(); 
 
 root.style.setProperty("--size", `${board.thick}px`);
 root.style.setProperty("--time-gap", `${time.gap / 1000}s`);

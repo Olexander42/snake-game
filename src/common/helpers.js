@@ -5,7 +5,7 @@ import { food } from "../components/food/food.js";
 import { wait } from "./utils.js";
 import { raf, states, time, stats, shrinkCounter } from "./variables.js";
 
-import { root, html, style } from "./elements.js";
+import { html, style } from "./elements.js";
 import { menuButtons } from "../components/menu/elements.js";
 
 
@@ -139,11 +139,12 @@ function action() {
   if (snake.collision()) gameOver();
   else {
     snake.bodyFollows();
-
-    if (food.element.style.left === snake.head.style.left && food.element.style.top === snake.head.style.top) {
-      levelUp(); 
-    }
+    if (snakeAteFood()) levelUp();   
   }
+}
+
+function snakeAteFood() {
+  return (food.element.style.left === snake.head.style.left && food.element.style.top === snake.head.style.top);
 }
 
 function levelUp() {
@@ -226,27 +227,6 @@ function offsetShrink() {
   if (snake.snakeBodyData.some((coord) => (parseInt(coord.left) > board.container.width - board.clip - board.thick))) { // right border
     snake.snakeBody.forEach((el) => el.style.left = parseInt(el.style.left) - board.step + "px" );
   }
-  /*
-  // if food inside top border
-  if (parseInt(food.element.style.top) <= board.clip) {
-    food.element.style.top = parseInt(food.element.style.top) + board.thickness + "px";
-  } 
-
-  // if food inside bottom border
-  if (parseInt(food.element.style.top) >= board.container.height - board.clip) {
-    food.element.style.top = parseInt(food.element.style.top) - board.thickness + "px";
-  } 
-
-  // if food inside right border
-  if (parseInt(food.element.style.left) >= board.container.width - board.clip) {
-    food.element.style.left = parseInt(food.element.style.left) - board.thickness + "px";
-  }
-
-  // if food inside left border
-  if (parseInt(food.element.style.left) < board.clip) {
-    food.element.style.left = parseInt(food.element.style.left) + board.thickness + "px";
-  }
-  */
 }
 
 

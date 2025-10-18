@@ -2,7 +2,7 @@ import { snake } from "../components/snake/snake.js";
 import { root } from "./elements.js";
 
 
-const timeUnit = 1000; 
+const timeUnit = 500; 
 
 const time = { 
   gap: timeUnit,
@@ -28,12 +28,12 @@ const states = {
 
 const stats = { 
   score: {
-    element: document.querySelector(".score"),
+    element: document.getElementById("score"),
     value: 0,
   },
 
   record: {
-    element: document.querySelector(".record"),
+    element: document.getElementById("record"),
     value: 0,
   }
 }
