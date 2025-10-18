@@ -5,7 +5,7 @@ import { food } from "../components/food/food.js";
 import { wait } from "./utils.js";
 import { raf, states, time, stats, shrinkCounter } from "./variables.js";
 
-import { root, html } from "./elements.js";
+import { root, html, style } from "./elements.js";
 import { menuButtons } from "../components/menu/elements.js";
 
 
@@ -16,24 +16,22 @@ function setTheme() {
   board.borderEl.style.setProperty('border-image-source', `url(./assets/${theme}/images/border.jpg`);
   board.backgroundEl.style.setProperty('background-image', `url(./assets/${theme}/images/inside.jpg`);
 
-  const style = document.createElement('style');
   style.innerHTML = `
     @font-face {
       font-family: "main";
-      src: url("./assets/${theme}/fonts/main.otf") format('opentype');
+      src: url("./assets/${theme}/fonts/main.woff2") format('woff2');
     }
 
     @font-face {
       font-family: "secondary";
-      src: url("./assets/${theme}/fonts/secondary.ttf") format('truetype');
+      src: url("./assets/${theme}/fonts/secondary.woff2") format('woff2');
     }
 
     @font-face {
       font-family: "score";
-      src: url("./assets/${theme}/fonts/score.ttf") format('truetype');
+      src: url("./assets/${theme}/fonts/score.woff2") format('woff2');
     }
   `
-  document.head.appendChild(style);
 }
 
 function snakeControl(event) {

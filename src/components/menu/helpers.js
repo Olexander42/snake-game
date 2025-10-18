@@ -1,5 +1,5 @@
 import { board } from "../board/board.js";
-import { menuButtons, sizeSlider, outlines } from "./elements.js";
+import { menuButtons, sizeSlider } from "./elements.js";
 import { html } from "../../common/elements.js";
 
  
@@ -9,7 +9,7 @@ class Slider {
     this.curValue = Number(this.range.value);
   }
 
-  thumbTransition() {
+  moveThumb() {
     this.targetValue = Number(this.range.value);
     this.range.value = this.curValue;
     this.range.step = 2;
@@ -38,17 +38,50 @@ class Slider {
 
   _updateGradient() {
     this.gradientCutoffVal = (this.range.value - this.range.min) / (this.range.max - this.range.min) * 100;
-    this.gradient = `linear-gradient(to right, black, black ${this.gradientCutoffVal}%, transparent ${this.gradientCutoffVal}%, transparent)`;
+    this.gradient = `linear-gradient(to right, black, black ${this.gradientCutoffVal}%, transfieldsetId ${this.gradientCutoffVal}%, transfieldsetId)`;
     this.range.style.setProperty("--responsive-gradient", this.gradient);
   }
 }
 
-const slider = new Slider();
+class Outline {
+  constructor(fieldsetId) {
+    this.fieldset = document.querySelector(fieldsetId);
+    this.element = document.querySelector(`${fieldsetId} .outline`);
 
+    this._addListenerSwapOutline();
+  }
+
+  move(target) {
+    this.element.style.left = `${target.offsetLeft}px`;
+  }
+
+  disableCssOutline() {
+    this.fieldset.style.setProperty("--checked-outline", 'none'); 
+  }
+
+  goToChecked() {
+    const checked = document.querySelector(`#${this.fieldset.id} input:checked + span`);
+    this.move(checked);
+  } 
+
+  _addListenerSwapOutline() {
+    // the native CSS outline replaces the disappeared outline element and vice versa
+    ['transitionstart', 'transitionend'].forEach((eventName) => {
+      this.element.addEventListener(eventName, () => {
+        const opacity = eventName === 'transitionstart' ? 1 : 0;
+        this.element.style.opacity = opacity;
+
+        if (eventName === 'transitionend') {
+          this.fieldset.style.setProperty("--checked-outline", '4px solid var(--white)');
+        }
+      })
+    })
+  }
+}
 
 function flipButton(event) {
   const side = this;  
-  const button = side.parentNode;
+  const button = side.parentElement;
 
   const switchClass = () => { button.classList.contains("clicked") ? button.classList.remove("clicked") : button.classList.add("clicked") }
   
@@ -65,10 +98,13 @@ function closeButtons(event) {
   }
 }
 
-function moveOutline(box, outline) {
-  outline.style.left = box.offsetLeft + 'px';
+const slider = new Slider();
+
+const outlines = {
+  colorBox: new Outline("#color-set"),
+  themeThumbnail: new Outline("#theme-set"),
 }
 
 
-export { slider, flipButton, closeButtons, moveOutline }
+export { slider, outlines, flipButton, closeButtons }
 

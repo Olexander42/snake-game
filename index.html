@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="./src/main/main.css">
     <script type='module' src="./src/main/main.js" defer></script>
+    <style></style>
     <title>Snake Game</title>
   </head>
 
   <body> 
-    <div class="container">
-      <div class="background"></div>
-      <div class="border">
+    <div id="container">
+      <div id="background"></div>
+      <div id="border">
         <div class="menu">
-          <div class="game-menu">
+          <div class="main-menu">
             <button id="start-btn">Start</button>
             <button id="settings-btn">Settings</button>
           </div>
@@ -31,23 +32,23 @@
                   </datalist>
               </div>
             </button>
-            <button id="snake-color">
+            <button id="color-snake">
               <div class="front side">
-                <span>Snake Color<span>
+                <span>Snake Color</span>
               </div>
               <div class="rear side">
-                <fieldset>
-                  <span id="color-box-outline"></span>
+                <fieldset id="color-set">
+                  <span id="color-box-outline" class="outline"></span>
                   <label>
-                    <input type='radio' name="snakeColor" id="green" value='hsl(120, 40%, 30%)' checked>
+                    <input type='radio' name="color-snake" id="green" value='hsl(120, 40%, 30%)' checked>
                     <span class="color-box" style='background-color: hsl(120, 40%, 30%)'></span>
                   </label>
                   <label>
-                    <input type='radio' name="snakeColor" id="yellow" value='hsl(50, 80%, 50%)'>
+                    <input type='radio' name="color-snake" id="yellow" value='hsl(50, 80%, 50%)'>
                     <span class="color-box" style='background-color: hsl(50, 80%, 50%)'></span>
                   </label>
                   <label>
-                    <input type='radio' name="snakeColor" id="red" value='hsl(0, 70%, 40%)'>
+                    <input type='radio' name="color-snake" id="red" value='hsl(0, 70%, 40%)'>
                     <span class="color-box" style='background-color: hsl(0, 70%, 40%)'></span>
                   </label>
                 </fieldset>
@@ -58,8 +59,8 @@
                 <span>Theme</span>
               </div>
               <div class="rear side">
-                <fieldset>
-                  <span id="thumbnail-outline"></span>
+                <fieldset id="theme-set">
+                  <span id="thumbnail-outline" class="outline"></span>
                   <label>
                     <input type='radio' name="theme" id="street" value="street" checked>
                     <span class="thumbnail"></span>

@@ -12,7 +12,7 @@ class Snake {
     this.speed = 1;
     this.direction = {"x": 1, "y": 0};
     this.turn = 0;
-    this.color = { string: document.querySelector('input[name="snakeColor"]:checked').value };
+    this.color = { string: this._getSnakeColor() };
     this.color.hsl = splitColor(this.color.string);
 
     // body 
@@ -153,6 +153,10 @@ class Snake {
     }
 
     rescaleSection();
+  }
+
+  _getSnakeColor() {
+    return document.querySelector('input[name="color-snake"]:checked').value;
   }
 }
 

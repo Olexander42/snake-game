@@ -4,7 +4,7 @@
 }
 
 .menu,
-.game-menu {
+.main-menu {
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -52,7 +52,8 @@ fieldset {
   padding: 0;
   height: 100%;
 
-  & label {
+  & label,
+  #color-box-outline {
     font-family: "secondary";
     font-size: 0.25rem;
     width: 2.2rem;
@@ -61,33 +62,6 @@ fieldset {
   }
 }
 
-.side {
-  position: absolute;
-  inset: 0;
-  backdrop-filter: blur(3px);
-  backface-visibility: hidden;
-}
-
-.rear {
-  transform: rotateX(180deg);
-}
-
-.color-box,
-.thumbnail {
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  border-radius: 10%;
-}
-
-#color-box-outline {
-  position: absolute;
-  width: 2.2rem;
-  height: 2rem;
-  outline: 4px solid var(--white);
-  border-radius: 10%;
-  transition: left 0.25s ease-out;
-}
 
 
 #settings-menu {
@@ -98,7 +72,7 @@ fieldset {
 
   & button:not(:last-child) {
     position: relative;
-    width: 620px;
+    width: 20ch;
     height: 100px;
     backdrop-filter: unset;
     transform-style: preserve-3d;
@@ -117,6 +91,39 @@ fieldset {
       transform: rotateX(180deg);
     }
 }
+
+.side {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(3px);
+  backface-visibility: hidden;
+}
+
+.rear {
+  transform: rotateX(180deg);
+}
+
+.color-box,
+.thumbnail {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  border-radius: 10%; 
+}
+
+.outline {
+  position: absolute;
+  outline: 4px solid var(--white);
+  border-radius: 10%;
+  transition: left 0.25s ease-out;
+  opacity: 0;
+}
+
+
+input[type=radio]:checked + span {
+  outline: var(--checked-outline, 4px solid var(--white));
+}
+
 
 #size-slider {
   --responsive-gradient: linear-gradient(to right, black, black 50%, transparent 50%, transparent);
@@ -166,7 +173,6 @@ fieldset {
   #thumbnail-outline {
     width: 5rem;
     height: 1.75rem;
-    border-radius: 5px;
   }
 }
 
@@ -178,13 +184,6 @@ fieldset {
 #ocean + .thumbnail {
   background-image: url(../../../assets/ocean/images/outside.jpg);
   background-size: 150%;
-}
-
-
-#thumbnail-outline {
-  position: absolute;
-  outline: 4px solid var(--white);
-  transition: left 0.25s ease-out;
 }
 
 #back-btn {

@@ -22,7 +22,8 @@ const raf = { id: undefined };
 
 const states = { 
   gameActive: false,
-  controlsOn: false, 
+  controlsOn: false,
+  settingsVisited: false, 
 }
 
 const stats = { 

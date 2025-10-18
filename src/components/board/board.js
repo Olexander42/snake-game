@@ -7,9 +7,9 @@ class Board {
   constructor() {
     this.thick = parseInt(sizeSlider.value);
 
-    this.containerEl = document.querySelector(".container");
-    this.backgroundEl = document.querySelector(".background");
-    this.borderEl = document.querySelector(".border");
+    this.containerEl = document.getElementById("container");
+    this.backgroundEl = document.getElementById("background");
+    this.borderEl = document.getElementById("border");
 
     this.init();
     this.normalize();

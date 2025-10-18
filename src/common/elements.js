@@ -1,5 +1,5 @@
 const root = document.documentElement;
-const html = document.querySelector("html");
+const html = document.querySelector('html');
+const style = document.querySelector('style');
 
-
-export { root, html };
+export { root, html, style }

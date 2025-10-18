@@ -1,4 +1,4 @@
-const gameMenuDiv = document.querySelector(".game-menu");
+const gameMenuDiv = document.querySelector(".main-menu");
 const settingsMenuDiv = document.getElementById("settings-menu");
 
 const menuButtons = { 
@@ -14,10 +14,13 @@ const sizeSlider = document.getElementById("size-slider");
 const colorBoxes = document.querySelectorAll(".color-box");
 const thumbnails = document.querySelectorAll(".thumbnail");
 
+/*
 const outlines = {
   colorBox: document.getElementById("color-box-outline"),
   thumbnail: document.getElementById("thumbnail-outline"),
 }
+*/
 
 
-export { gameMenuDiv, settingsMenuDiv, menuButtons, buttonSides, colorBoxes, thumbnails, sizeSlider, outlines }
+
+export { gameMenuDiv, settingsMenuDiv, menuButtons, buttonSides, colorBoxes, thumbnails, sizeSlider }
