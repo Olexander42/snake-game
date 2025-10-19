@@ -2,6 +2,9 @@ import { board } from "../board/board.js";
 import { menuButtons, sizeSlider } from "./elements.js";
 import { html } from "../../common/elements.js";
 
+const DEFAULT_STEP = 10;
+const TRANSITION_STEP = 2;
+
  
 class Slider {
   constructor() {
@@ -12,7 +15,7 @@ class Slider {
   moveThumb() {
     this.targetValue = Number(this.range.value);
     this.range.value = this.curValue;
-    this.range.step = 2;
+    this.range.step = TRANSITION_STEP;
 
     const step = () => {
       this.curValue += (this.curValue > this.targetValue) ? -2 : 2;
@@ -24,7 +27,7 @@ class Slider {
       this._updateGradient();
 
       if (this.curValue === this.targetValue) {
-        this.range.step = 10;
+        this.range.step = DEFAULT_STEP;
         //this.prevValue = this.range.value;
 
         board.normalize();       

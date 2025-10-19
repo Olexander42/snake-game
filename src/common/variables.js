@@ -2,18 +2,18 @@ import { snake } from "../components/snake/snake.js";
 import { root } from "./elements.js";
 
 
-const timeUnit = 500; 
+const TIME_UNIT = 500; 
 
 const time = { 
-  gap: timeUnit,
+  gap: TIME_UNIT,
 
   updateGap() {
-    this.gap = Math.round(timeUnit / snake.speed);
+    this.gap = Math.round(TIME_UNIT / snake.speed);
     root.style.setProperty("--time-gap", `${this.gap / 1000}s`);
   },
 
   reset() { 
-    this.gap = timeUnit;
+    this.gap = TIME_UNIT;
     root.style.setProperty("--time-gap", `${this.gap / 1000}s`);
   },
 }
@@ -49,4 +49,4 @@ const shrinkCounter = {
 }
 
 
-export { time, raf, states, stats, shrinkCounter };
+export { time, raf, states, stats, shrinkCounter, TIME_UNIT };

@@ -1,11 +1,10 @@
-/ now
-- clean up the code where possible
-
 / some day 
 - background zoom in / out
 - snake realistic skin
 - make everything controllable with a keyboard
 - add 'Space' theme
+- add sound
+- video background
 
 
 

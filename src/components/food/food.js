@@ -1,6 +1,7 @@
 import { board } from "../board/board.js";
 import { snake } from "../snake/snake.js";
 import { normalize, getRandomInt, splitColor, changedColor } from "../../common/utils.js";
+import { TIME_UNIT } from "../../common/variables.js";
 
 
 class Food {
@@ -30,7 +31,7 @@ class Food {
   }
 
   fadeIn() {
-    this.element.style.setProperty("--transition", 'opacity 1s linear')
+    this.element.style.setProperty("--transition", `opacity ${TIME_UNIT / 1000}s linear`)
     requestAnimationFrame(() => food.element.style.opacity = 1);
     this.element.addEventListener('transitionend', () => this.element.style.setProperty("--transition", 'no transition')); 
   }
@@ -69,7 +70,7 @@ class Food {
         this.element.style.setProperty("--pseudo-transition", "no transition"); // immediately switch to the new color
         requestAnimationFrame(switchOpacity);
       } else {
-        this.element.style.setProperty("--pseudo-transition", "opacity 1s linear"); //  css will transition from opaque to transparent
+        this.element.style.setProperty("--pseudo-transition", `opacity ${TIME_UNIT / 1000}s linear`); //  css will transition from opaque to transparent
       }
     }
 

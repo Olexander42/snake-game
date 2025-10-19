@@ -3,7 +3,7 @@ import { snake } from "../components/snake/snake.js";
 import { food } from "../components/food/food.js";
 
 import { wait } from "./utils.js";
-import { raf, states, time, stats, shrinkCounter } from "./variables.js";
+import { raf, states, time, stats, shrinkCounter, TIME_UNIT } from "./variables.js";
 
 import { html, style } from "./elements.js";
 import { menuButtons } from "../components/menu/elements.js";
@@ -120,7 +120,7 @@ function windup() {
   const nextColor = (t, start) => {
     const timeElapsed = t - start;
 
-    if (timeElapsed >= 1000) {
+    if (timeElapsed >= TIME_UNIT) {
       food.changeColor();
       initTimer(t, nextColor); // restart the countdown to the next color change
     } else {
@@ -176,7 +176,7 @@ function gameOver() {
 
   snake.color.hsl.s *= 0.15; 
   snake.repaintBody(time.gap)
-    .then(() => wait(1000))
+    .then(() => wait(TIME_UNIT))
     .then(() => menuButtons.start.style.display = "block");
 }
 
