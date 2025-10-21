@@ -1,4 +1,4 @@
-import { board } from '../board/board.js';
+import { board } from '../board/Board.js';
 import { splitColor, changedColor, roundTo } from '../../common/utils.js';
 
 

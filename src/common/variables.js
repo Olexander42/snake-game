@@ -1,4 +1,4 @@
-import { snake } from "../components/snake/snake.js";
+import { snake } from "../components/snake/Snake.js";
 import { root } from "./elements.js";
 
 

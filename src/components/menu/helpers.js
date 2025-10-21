@@ -1,4 +1,4 @@
-import { board } from "../board/board.js";
+import { board } from "../board/Board.js";
 import { menuButtons, sizeSlider } from "./elements.js";
 import { html } from "../../common/elements.js";
 
@@ -41,7 +41,7 @@ class Slider {
 
   _updateGradient() {
     this.gradientCutoffVal = (this.range.value - this.range.min) / (this.range.max - this.range.min) * 100;
-    this.gradient = `linear-gradient(to right, black, black ${this.gradientCutoffVal}%, transfieldsetId ${this.gradientCutoffVal}%, transfieldsetId)`;
+    this.gradient = `linear-gradient(to right, black, black ${this.gradientCutoffVal}%, transparent ${this.gradientCutoffVal}%, transparent)`;
     this.range.style.setProperty("--responsive-gradient", this.gradient);
   }
 }

@@ -1,7 +1,7 @@
 // components
-import { board } from "../board/board.js";;
-import { snake } from "../snake/snake.js";
-import { food } from "../food/food.js";
+import { board } from "../board/Board.js";;
+import { snake } from "../snake/Snake.js";
+import { food } from "../food/Food.js";
 
 // common 
 import { stats, states } from "../../common/variables.js";

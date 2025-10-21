@@ -129,6 +129,7 @@ input[type=radio]:checked + span {
 #size-slider {
   --responsive-gradient: linear-gradient(to right, black, black 50%, transparent 50%, transparent);
 
+  height: 100%;
   width: 75%;
   -webkit-appearance: none;
   background: transparent;
@@ -165,10 +166,6 @@ input[type=radio]:checked + span {
 
 #theme .rear {
   padding-bottom: 0.25rem;
-
-  & fieldset {
-    justify-content: space-around;
-  }
 
   & label, 
   #thumbnail-outline {

@@ -1,5 +1,5 @@
-import { board } from "../board/board.js";
-import { snake } from "../snake/snake.js";
+import { board } from "../board/Board.js";
+import { snake } from "../snake/Snake.js";
 import { normalize, getRandomInt, splitColor, changedColor } from "../../common/utils.js";
 import { TIME_UNIT } from "../../common/variables.js";
 

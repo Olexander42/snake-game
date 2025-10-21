@@ -1,6 +1,6 @@
-import { board } from "../components/board/board.js";
-import { snake } from "../components/snake/snake.js";
-import { food } from "../components/food/food.js";
+import { board } from "../components/board/Board.js";
+import { snake } from "../components/snake/Snake.js";
+import { food } from "../components/food/Food.js";
 
 import { wait } from "./utils.js";
 import { raf, states, time, stats, shrinkCounter, TIME_UNIT } from "./variables.js";

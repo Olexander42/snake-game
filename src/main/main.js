@@ -1,4 +1,4 @@
-import { board } from "../components/board/board.js";
+import { board } from "../components/board/Board.js";
 import { menuButtons } from "../components/menu/elements.js";
 import { menuHandlers } from "../components/menu/menu.js";
 import { setTheme } from "../common/helpers.js";
