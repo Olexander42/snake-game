@@ -46,6 +46,8 @@ class Slider {
   }
 }
 
+const slider = new Slider();
+
 class Outline {
   constructor(fieldsetId) {
     this.fieldset = document.querySelector(fieldsetId);
@@ -82,16 +84,19 @@ class Outline {
   }
 }
 
+const outlines = {
+  colorBox: new Outline("#color-set"),
+  themeThumbnail: new Outline("#theme-set"),
+}
+
 function flipButton(event) {
   const side = this;  
   const button = side.parentElement;
-
-  const switchClass = () => { button.classList.contains("clicked") ? button.classList.remove("clicked") : button.classList.add("clicked") }
   
   if (
     (!(side.classList.contains("rear") && event.target !== this)) 
     || [...document.querySelectorAll('fieldset')].includes(event.target)
-  ) switchClass();  // don't react to .rear.side children events, but react to the empty space in <fieldset>
+  )  button.classList.toggle("clicked");  // don't react to .rear.side children events, but react to the empty space in <fieldset>
 }
 
 function closeButtons(event) {
@@ -99,13 +104,6 @@ function closeButtons(event) {
   if (event.target === this || document.getElementById("settings-menu") === event.target ) { 
     [...document.querySelectorAll(".clicked")].forEach((clickedButton) => clickedButton.classList.remove("clicked"));
   }
-}
-
-const slider = new Slider();
-
-const outlines = {
-  colorBox: new Outline("#color-set"),
-  themeThumbnail: new Outline("#theme-set"),
 }
 
 

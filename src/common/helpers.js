@@ -7,10 +7,14 @@ import { raf, states, time, stats, shrinkCounter, TIME_UNIT } from "./variables.
 
 import { html, style } from "./elements.js";
 import { menuButtons } from "../components/menu/elements.js";
+import { soundLibrary } from "./Sound.js";
 
 
 function setTheme() {
   const theme = document.querySelector('input[name="theme"]:checked').value;
+
+  soundLibrary.init(theme);
+  console.log(soundLibrary);
 
   html.style.setProperty('background-image', `url(./assets/${theme}/images/outside.jpg)`);
   board.borderEl.style.setProperty('border-image-source', `url(./assets/${theme}/images/border.jpg`);
