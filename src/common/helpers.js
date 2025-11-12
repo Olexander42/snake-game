@@ -7,14 +7,14 @@ import { raf, states, time, stats, shrinkCounter, TIME_UNIT } from "./variables.
 
 import { html, style } from "./elements.js";
 import { menuButtons } from "../components/menu/elements.js";
-import { soundLibrary } from "./Sound.js";
+import { sound } from "./Sound.js";
 
 
 function setTheme() {
   const theme = document.querySelector('input[name="theme"]:checked').value;
 
-  soundLibrary.init(theme);
-  console.log(soundLibrary);
+  if (sound.library.bgMusic) sound.library.bgMusic.pause()
+  sound.init(theme);
 
   html.style.setProperty('background-image', `url(./assets/${theme}/images/outside.jpg)`);
   board.borderEl.style.setProperty('border-image-source', `url(./assets/${theme}/images/border.jpg`);
@@ -124,7 +124,7 @@ function windup() {
   const nextColor = (t, start) => {
     const timeElapsed = t - start;
 
-    if (timeElapsed >= TIME_UNIT) {
+    if (timeElapsed >= TIME_UNIT * 2) {
       food.changeColor();
       initTimer(t, nextColor); // restart the countdown to the next color change
     } else {
@@ -143,7 +143,12 @@ function action() {
   if (snake.collision()) gameOver();
   else {
     snake.bodyFollows();
-    if (snakeAteFood()) levelUp();   
+
+    if (snakeAteFood()) {
+      sound.library.bite.play();
+
+      levelUp();   
+    }
   }
 }
 
@@ -172,6 +177,9 @@ function levelUp() {
 }
 
 function gameOver() {
+  sound.library.bgMusic.pause();
+  sound.library.gameOver.play();
+
   raf.id = "game over";
   
   // withdraw head from collision

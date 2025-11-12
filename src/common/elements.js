@@ -1,6 +1,6 @@
 const root = document.documentElement;
 const html = document.querySelector('html');
 const style = document.querySelector('style');
-const soundToggle = document.getElementById("sound-toggle");
+const soundIcon = document.getElementById("sound-toggle");
 
-export { root, html, style, soundToggle }
+export { root, html, style, soundIcon }

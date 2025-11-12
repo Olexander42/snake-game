@@ -70,7 +70,7 @@ class Food {
         this.element.style.setProperty("--pseudo-transition", "no transition"); // immediately switch to the new color
         requestAnimationFrame(switchOpacity);
       } else {
-        this.element.style.setProperty("--pseudo-transition", `opacity ${TIME_UNIT / 1000}s linear`); //  css will transition from opaque to transparent
+        this.element.style.setProperty("--pseudo-transition", `opacity ${TIME_UNIT / 500}s linear`); //  css will transition from opaque to transparent
       }
     }
 

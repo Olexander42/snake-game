@@ -6,6 +6,7 @@ import { food } from "../food/Food.js";
 // common 
 import { stats, states } from "../../common/variables.js";
 import { windup, reset, setTheme } from "../../common/helpers.js";
+import { sound } from "../../common/Sound.js";
 
 // menu
 import { gameMenuDiv, settingsMenuDiv, buttonSides, sizeSlider, menuButtons, colorBoxes, thumbnails } from "./elements.js";
@@ -21,6 +22,7 @@ const menuHandlers = {
       }
 
       reset();
+      sound.library.bgMusic.play()
     }
 
     if (menuButtons.start.innerText === "Start") menuButtons.start.innerText = "Start Again";
