@@ -1,65 +1,71 @@
-import { sizeSlider } from "../menu/elements.js";
-import { root } from "../../common/elements.js";
-import { normalize } from '../../common/utils.js';
-
+import { normalize, calcCenter } from "../../common/utils.js";
+import { root, background, border, container } from "../../common/elements.js";
 
 class Board {
-  constructor() {
-    this.thick = parseInt(sizeSlider.value);
-
-    this.containerEl = document.getElementById("container");
-    this.backgroundEl = document.getElementById("background");
-    this.borderEl = document.getElementById("border");
-
-    this.init();
-    this.normalize();
+  #updateSizeUnits(size_step) {
+    this.sizeStep = size_step;
+    this.bgClip = size_step / 2;
   }
 
-  init() {
-    this.clip = this.thick;
-    this.step = this.thick / 2;
+  constructor(size_step) {
+    this.#updateSizeUnits(size_step);
+    this.resize(size_step);
 
-    root.style.setProperty("--size", `${this.thick}px`);
+    this.shrinkCounter = ( () => { 
+      let outer = 1;
+      let inner = 0;
+
+      return {
+        addOuter: () => { outer++ },
+        addInner: () => { inner++ },
+        reset: () => {
+          outer = 1;
+          inner = 0; 
+        },
+      }
+    })(); 
   }
 
-  normalize() {
-    this.container = { 
-      width: normalize(this.containerEl.clientWidth, this.step),
-      height: normalize(this.containerEl.clientHeight, this.step), 
+  resize(size_step) {
+    this.#updateSizeUnits(size_step);
+
+    root.style.setProperty("--size", `${this.sizeStep}px`);
+    root.style.setProperty("--clip", `${this.bgClip}px`);
+
+    // calc normalized dimenisons
+    this.normalizedDimensions = { 
+      width: normalize(container.clientWidth, this.sizeStep),
+      height: normalize(container.clientHeight, this.sizeStep), 
     };
 
-    this.background = { width: this.container.width, height: this.container.height };
-    this.border = { width: this.container.width, height: this.container.height };
-
-    this.container.center = {
-      x: normalize(Math.round(this.container.width / 2), this.step),
-      y: normalize(Math.round(this.container.height / 2), this.step),
-    }
-    
-    this._applyNewDimensions("container");
-    this._applyNewDimensions("background");
-    this._applyNewDimensions("border");
+    // apply normalized dimensions
+    [background, border, container].forEach(element => {
+      element.style.width = this.normalizedDimensions.width + 'px';
+      element.style.height = this.normalizedDimensions.height + 'px';
+    })
   }
+
 
   shrink() {
-    this.border.width = this.borderEl.clientWidth - this.thick;
-    this.border.height = this.borderEl.clientHeight - this.thick;
-    this._applyNewDimensions("border");
+    const newBorderWidth = border.clientWidth - this.sizeStep;
+    const newBorderHeght = border.clientHeight - this.sizeStep;
 
-    this.clip += this.step;
-    this.backgroundEl.style.clipPath = `inset(${this.clip - 1}px)`;
-  }
+    border.style.width = newBorderWidth + 'px';
+    border.style.height = newBorderHeght + 'px';
 
-  _applyNewDimensions(name) {
-    this[`${name}El`].style.width = this[`${name}`].width + "px";
-    this[`${name}El`].style.height = this[`${name}`].height + "px";
+    this.bgClip += this.sizeStep / 2;
+    root.style.setProperty("--clip", `${this.bgClip}px`);
   }
 }
 
-const board = new Board();
+
+export default Board;
 
 
-export { board };
+
+
+
+
 
 
 

@@ -1,24 +1,14 @@
-import { board } from "../components/board/Board.js";
-import { snake } from "../components/snake/Snake.js";
-import { food } from "../components/food/Food.js";
-
-import { wait } from "./utils.js";
-import { raf, states, time, stats, shrinkCounter, TIME_UNIT } from "./variables.js";
-
-import { html, style } from "./elements.js";
-import { menuButtons } from "../components/menu/elements.js";
+import { background, border, container, html, style } from "./elements.js";
 import { sound } from "./Sound.js";
 
 
-function setTheme() {
-  const theme = document.querySelector('input[name="theme"]:checked').value;
-
-  if (sound.library.bgMusic) sound.library.bgMusic.pause()
+function setTheme(theme) {
+  if (sound.library.bgMusic) sound.library.bgMusic.pause() // allow bgMusic to change 
   sound.init(theme);
 
   html.style.setProperty('background-image', `url(./assets/${theme}/images/outside.jpg)`);
-  board.borderEl.style.setProperty('border-image-source', `url(./assets/${theme}/images/border.jpg`);
-  board.backgroundEl.style.setProperty('background-image', `url(./assets/${theme}/images/inside.jpg`);
+  border.style.setProperty('border-image-source', `url(./assets/${theme}/images/border.jpg)`);
+  background.style.setProperty('background-image', `url(./assets/${theme}/images/inside.jpg)`);
 
   style.innerHTML = `
     @font-face {
@@ -98,45 +88,7 @@ function snakeControl(event) {
   }
 }
 
-function windup() {
-  const initTimer = (t, f) => {
-    let start = t;
-    f(t, start);
-  }
 
-  const nextStep = (t, start) => {
-    const timeElapsed = t - start;
-    if (timeElapsed >= time.gap) { // time for a move
-      // update states
-      if (!states.gameActive) states.gameActive = true;
-      if (!states.controlsOn) {
-        html.addEventListener('keydown', snakeControl);
-        states.controlsOn = true;
-      }
-
-      action();    
-      if (raf.id !== "game over") initTimer(t, nextStep); // restart the countdown to the next move
-    } else {
-      raf.id = requestAnimationFrame((t) => nextStep(t, start)); 
-    }
-  }
-
-  const nextColor = (t, start) => {
-    const timeElapsed = t - start;
-
-    if (timeElapsed >= TIME_UNIT * 2) {
-      food.changeColor();
-      initTimer(t, nextColor); // restart the countdown to the next color change
-    } else {
-      requestAnimationFrame((t) => nextColor(t, start));
-    }
-  }
-
-  requestAnimationFrame((timestamp) => {
-    initTimer(timestamp, nextColor);
-    initTimer(timestamp, nextStep);
-  });
-}
 
 function action() {
   snake.moveHead();
@@ -156,7 +108,7 @@ function snakeAteFood() {
   return (food.element.style.left === snake.head.style.left && food.element.style.top === snake.head.style.top);
 }
 
-function levelUp() {
+function levelUp(snake,food, board) {
   snake.lengthen();
   snake.speed++;
 
@@ -172,8 +124,9 @@ function levelUp() {
     shrinkCounter.outer++;
   }
 
+  food.generateRandomCoords(snake.bodyData);
   food.teleport();
-  time.updateGap();
+  time.updateGap(snake.speed);
 }
 
 function gameOver() {
@@ -241,5 +194,13 @@ function offsetShrink() {
   }
 }
 
+function isCoordsInsideArray(x, y, array) {
+  return array.some((section, i) => (i !== 0 && (x === section.x && y === section.y)));
+}
 
-export { setTheme, windup, action, levelUp, reset };
+function getThemeValue() {
+  return document.querySelector('input[name="theme"]:checked').value;
+}
+
+
+export { setTheme, getThemeValue };

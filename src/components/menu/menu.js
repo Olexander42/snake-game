@@ -1,7 +1,3 @@
-// components
-import { board } from "../board/Board.js";;
-import { snake } from "../snake/Snake.js";
-import { food } from "../food/Food.js";
 
 // common 
 import { stats, states } from "../../common/variables.js";
@@ -16,6 +12,7 @@ import { slider, outlines, flipButton, closeButtons } from "./helpers.js";
 const menuHandlers = { 
   startHandler() {
     if (menuButtons.start.innerText === "Start Again") { // not first game?
+      if (game.isNewRecord) game.updateRecord
       if (stats.score.value > stats.record.value) { 
         stats.record.value = stats.score.value;
         stats.record.element.innerText = "Record: " + stats.record.value;
@@ -30,6 +27,7 @@ const menuHandlers = {
 
     snake.init();
 
+    food.generateRandomCoords(snake.bodyData);
     food.teleport();
     food.fadeIn();
 

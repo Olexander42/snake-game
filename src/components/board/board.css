@@ -1,7 +1,7 @@
 
 #background {
   background-repeat: repeat;
-  clip-path: inset(var(--size));
+  clip-path: inset(var(--clip));
   transition: clip-path var(--time-gap) linear;
 }
 

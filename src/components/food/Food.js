@@ -1,14 +1,14 @@
-import { board } from "../board/Board.js";
-import { snake } from "../snake/Snake.js";
 import { normalize, getRandomInt, splitColor, changedColor } from "../../common/utils.js";
-import { TIME_UNIT } from "../../common/variables.js";
+import { TIME_UNIT, center } from "../../common/variables.js";
+import { isCoordsInsideArray } from "../../common/helpers.js";
+import { container } from "../../common/elements.js";
 
 
 class Food {
   constructor() {
     this.element = document.createElement('span');
     this.element.id = "food";
-    board.containerEl.appendChild(this.element);
+    board.containerEl.append(this.element);
 
     this.color = { string: 'hsl(0, 0%, 0%)' };
     this.color.hsl = splitColor(this.color.string);
@@ -17,7 +17,7 @@ class Food {
   }
 
   teleport() {
-    this._generateRandomCoords();
+    this.generateRandomCoords();
     this.element.style.left = this.x + "px";
     this.element.style.top = this.y + "px";
   }
@@ -37,17 +37,18 @@ class Food {
   }
 
 
-  _generateRandomCoords() {
+  generateRandomCoords(snakeBodyData) {
+    const clip = parseInt(root.getPropertyValue("--clip"));
     while (true) {
       const [x, y] = [
-        normalize(getRandomInt(board.clip, board.container.width - board.clip - board.step * 2), board.step),
-        normalize(getRandomInt(board.clip, board.container.height - board.clip - board.step * 2), board.step),
+        normalize(getRandomInt(clip, container.clientWidth - clip - size_unit.value * 2), size_unit.value),
+        normalize(getRandomInt(clip, container.clientHeight - clip - size_unit.value * 2), size_unit.value),
       ]; 
 
       if (
-        snake.isCoordsInsideBody(x, y) 
+        isCoordsInsideArray(x, y, snakeBodyData) 
         || (x === this.x && y === this.y) 
-        || (x === board.container.center.x && y === board.container.center.y)
+        || (x === center.x && y === center.y)
       ) continue;
       else {
         this.x = x;
@@ -78,7 +79,5 @@ class Food {
   }
 }
 
-const food = new Food();
 
-
-export { food }
+export default Food;

@@ -1,10 +1,14 @@
-import { board } from '../board/Board.js';
 import { splitColor, changedColor, roundTo } from '../../common/utils.js';
+import { root, container } from "../../common/elements.js";
+import { center, size_unit.value } from "../../common/variables.js";
+import { isCoordInsideArray } from "../../common/variables.js";
 
 
 class Snake {
-  constructor() {
-    this.div = document.getElementById("snake");
+  constructor(board) {
+    this.div = document.createElement('div');
+    this.div.id = "snake";
+    document.container.append(this.div);
   }
 
   init() {
@@ -16,8 +20,8 @@ class Snake {
     this.color.hsl = splitColor(this.color.string);
 
     // body 
-    this._createSection(board.container.center.x, board.container.center.y, changedColor(this.color.hsl , {l: -2}), "head") ; 
-    this._createSection(board.container.center.x - board.step ,board.container.center.y, this.color.string, "neck"); 
+    this._createSection(center.x, center.y, changedColor(this.color.hsl , {l: -2}), "head") ; 
+    this._createSection(center.x - size_unit.value, center.y, this.color.string, "neck"); 
     this.head = document.getElementById("head");
     this.neck = document.getElementById("neck");
     this.head.style.scale = `${1}`;
@@ -29,84 +33,74 @@ class Snake {
   moveHead() {   
     this._snapshot();
 
-    this.head.style.left = `${parseInt(this.head.style.left) + this.direction.x * board.step}px`;
-    this.head.style.top = `${parseInt(this.head.style.top) + this.direction.y * board.step}px`;
+    const head = this.body[0];
+    const x = head.x + this.direction.x * size_unit.value;
+    const y = head.y + this.direction.y * size_unit.value;
+
+    this.head.style.left = x + 'px';
+    this.head.style.top = y + 'px';
     this.head.style.rotate = `${this.turn}turn`;
   }
 
   bodyFollows() {
-    let i = 1; // because this.snakeBody[0] is head
+    let i = 1; // because this.body[0] is head
 
-    const moveToNextPosition = (i) => {
-      const prevEl = this.snakeBodyData[i - 1];
-      const currEl = this.snakeBody[i];
+    const moveToNextSection = (i) => {
+      const nextSection = this.bodyData[i - 1];
+      const currentSection = this.body[i];
 
-      const [nextLeft, nextTop, nextRotate] = [prevEl.left, prevEl.top, prevEl.rotate];
+      currentSection.style.left = nextSection.x + 'px';
+      currentSection.style.top = nextSection.y + 'px';
+      currentSection.style.rotate = nextSection.rotate;
 
-      currEl.style.left = nextLeft;
-      currEl.style.top = nextTop;
-      currEl.style.rotate = nextRotate;
-
-      if (i < this.snakeBody.length - 1) moveToNextPosition(i + 1);
+      if (i < this.body.length - 1) moveToNextSection(i + 1);
     }
 
-    moveToNextPosition(i);
+    moveToNextSection(i);
   }
 
-  repaintBody(ms=0) {
-    return new Promise((resolve) => {
-      let i = ms === 0 ? 1 : 0; // only go to head upon death
+  repaintBody() { // under construction to work with RAF
+    /*
+    let i = 0;
+    const repaintSection = (i) => {
+      const lighterColor = changedColor(this.color.hsl, {l: i});
+      const section = this.body[i];
 
-      const repaintSection = () => {
-        setTimeout(() => {
-          const lighterColor = changedColor(this.color.hsl, {l: i});
-          const s = this.snakeBody[i];
+      section.style.backgroundColor = lighterColor;
 
-          s.style.backgroundColor = lighterColor;
-
-          i++;
-          if (i < this.snakeBody.length) repaintSection();  
-          else {
-            resolve(true);
-          }
-        }, ms);
-      };
-
-      repaintSection(i);
-    })
+      i++;
+    */
   }
 
   lengthen() {
     this._snapshot(); // test without it
 
-    const oldTail = this.snakeBody[this.snakeBody.length - 1];
+    const oldTail = this.body[this.body.length - 1];
     if (oldTail.id === "tail") oldTail.id = "";
 
     this.tail = oldTail.cloneNode(false);
     this.tail.id = "tail";
-    this.tail.style.zIndex = `-${this.snakeBody.length}`
-    this.div.appendChild(this.tail);
+    this.tail.style.zIndex = `-${this.body.length}`
+    this.div.append(this.tail);
 
     this._rescaleBody();
     this._repaintTail();
   }
 
   collision() {
+    const head = this.body[0];
+    const clip = parseInt(root.getPropertyValue("--clip"));
+
     return (
-      parseInt(this.head.style.left) < board.clip // left border
-      || parseInt(this.head.style.left) > board.container.width - board.clip - board.thick // right border
-      || parseInt(this.head.style.top) < board.clip // top border
-      || parseInt(this.head.style.top) > board.container.height - board.clip - board.thick // bottom border
-      || this.isCoordsInsideBody(this.head.style.left, this.head.style.top)
+      head.x < clip // left border
+      || head.x > container.clientWidth - clip - size_unit.value // right border
+      || head.y < clip // top border
+      || head.y > container.clientHeight - clip - size_unit.value // bottom border
+      || isCoordsInsideArray(head.x, head.y, this.bodyData);
     ) 
   }
 
-  isCoordsInsideBody(x, y) {
-    if (typeof x === 'number') [x, y] = [x + 'px', y + 'px'];
-    return this.snakeBody.some((coord, i) => (i !== 0 && (x === coord.style.left && y === coord.style.top))); // head is excluded
-  }
-
-  _createSection(x, y, col, id="") {
+  _createSection(x, y, color, id="") {
     const element  = document.createElement('span');
 
     element.classList.add("block");
@@ -115,30 +109,30 @@ class Snake {
 
     element.style.left = `${x}px`;
     element.style.top = `${y}px`;
-    element.style.backgroundColor = col;
+    element.style.backgroundColor = color;
 
-    this.div.appendChild(element);
+    this.div.append(element);
   }
 
   _snapshot() {
-    this.snakeBody = [...document.querySelectorAll(".snake-body")];
-    this.snakeBodyData = [];
-    this.snakeBody.forEach((el) => {
-      const [left, top, rotate] = [el.style.left, el.style.top, el.style.rotate];
-      const data = {left, top, rotate};
-      this.snakeBodyData.push(data);
+    this.body = [...document.querySelectorAll(".snake-body")];
+    this.bodyData = [];
+    this.body.forEach((el) => {
+      const [x, y, rotate] = [parseInt(el.style.left), parseInt(el.style.top), el.style.rotate];
+      const data = {x, y, rotate};
+      this.bodyData.push(data);
     })
   }
 
   _repaintTail() {
-    const lighterColor = changedColor(this.color.hsl , {l: this.snakeBody.length});
+    const lighterColor = changedColor(this.color.hsl , {l: this.body.length});
     this.tail.style.backgroundColor = lighterColor;
   }
 
   _rescaleBody() {
     this._snapshot(); // try move it outside
 
-    const length = this.snakeBody.length;
+    const length = this.body.length;
     let i = length - 1;
     let j = 1; 
     let scale = 0;
@@ -146,7 +140,7 @@ class Snake {
     const rescaleSection = () => { 
       // rescale from tail to neck
       scale += 1 / (2 ** j); 
-      snake.snakeBody[i].style.scale = `${roundTo(scale, 2)}`;
+      snake.body[i].style.scale = `${roundTo(scale, 2)}`;
       i--;
       j++;
       if (i > 0) rescaleSection();  
@@ -156,7 +150,5 @@ class Snake {
   }
 }
 
-const snake = new Snake();
 
-
-export { snake };
+export default Snake;
