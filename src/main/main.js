@@ -1,13 +1,22 @@
-import Board from "../components/board/Board.js";
+import MainMenu from "../components/Menu.js";
+import Board from "../components/Board.js";
+import Game from "./Game.js";
 import { getThemeValue, setTheme } from "../common/helpers.js";
-import { sizeSlider } from "../components/menu/elements.js";
 
 
+const size_unit = 40;
 const theme = getThemeValue();
-setTheme(theme);
 
-const size_unit = parseInt(sizeSlider.value);
 const board = new Board(size_unit);
+setTheme(theme, board);
+
+const snake = undefined;
+const food = undefined;
+const game = new Game(board, snake, food);
+const menu = new MainMenu();
+menu.startBtn.addEventListener('click', () => { menu.startHandler(game) });
+
+
 
 
 

@@ -1,10 +1,10 @@
-@import url("../components/board/board.css");
+@import url("../components/styles/board.css");
 
-@import url("../components/menu/menu.css");
+@import url("../components/styles/menu.css");
 
-@import url("../components/snake/snake.css");
+@import url("../components/styles/snake.css");
 
-@import url("../components/food/food.css");
+@import url("../components/styles/food.css");
 
 
 :root {

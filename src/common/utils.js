@@ -28,22 +28,7 @@ function roundTo(value, decimals) {
   return Math.round(value * factor) / factor;
 }
 
-function calcCenter(width, height, rounder=1 ) {
-  try {
-    const center = {
-      x: normalize(Math.round(width) / 2, rounder),
-      y: normalize(Math.round(height) / 2, rounder)
-    }
 
-  return center;
-  }
-
-  catch(err) {
-    console.log(err);
-  }
-}
-
-
-export { normalize, getRandomInt, wait, splitColor, changedColor, roundTo, calcCenter };
+export { normalize, getRandomInt, wait, splitColor, changedColor, roundTo };
 
 
