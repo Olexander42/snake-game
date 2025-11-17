@@ -238,9 +238,4 @@ function isCoordsInsideArray(x, y, array) {
 }
 */
 
-function getThemeValue() {
-  return document.querySelector('input[name="theme"]:checked').value;
-}
-
-
-export { setTheme, getThemeValue };
+export { setTheme };

@@ -1,46 +1,39 @@
-class MainMenu {
+class Menu {
   constructor() {
     this.div = document.getElementById("main-menu");
     this.settingsDiv = document.getElementById("settings-menu");
     this.startBtn = document.getElementById("start-btn");
     this.settingsBtn = document.getElementById("settings-btn");
 
+    this.settings = new Settings();
+
     this.firstStart = true;
+    this.settingsVisited = false;
   }
 
-  startHandler(game) {
-    if (this.firstStart) {
-      this.startBtn.innerText = "Start Again";
-      this.firstStart = false;
-    }
+  handleFirstStart() {
+    this.startBtn.innerText = "Start Again";
+    this.firstStart = false;
+  }
 
-    else {
-      game.reset();
-    }
-
+  hide() {
     this.startBtn.style.display = 'none';
     this.settingsBtn.style.display = 'none';
-
-    game.begin();
   }
 }
 
 /*
-    food.generateRandomCoords(snake.bodyData);
-    food.teleport();
-    food.fadeIn();
-
-    windup();
 
 
   },
   }
 }
+*/
 
-class SettingsMenu {
+class Settings {
   constructor() {
-    this.buttonsSides = document.querySelectorAll(".side");
     this.sizeSlider = document.getElementById("size-slider");
+    this.buttonsSides = document.querySelectorAll(".side");
     this.colorOptions = document.querySelectorAll(".color-box");
     this.themeThumbnails = document.querySelectorAll(".thumbnail");
     this.back = document.getElementById("back-btn");
@@ -49,32 +42,8 @@ class SettingsMenu {
   }
 }
 
-
+/*
 const menuHandlers = { 
-  startHandler() {
-    if (menuButtons.start.innerText === "Start Again") { // not first game?
-      if (game.isNewRecord) game.updateRecord
-      if (stats.score.value > stats.record.value) { 
-        stats.record.value = stats.score.value;
-        stats.record.element.innerText = "Record: " + stats.record.value;
-      }
-
-      reset();
-      sound.library.bgMusic.play()
-    }
-
-    if (menuButtons.start.innerText === "Start") menuButtons.start.innerText = "Start Again";
-    Object.values(menuButtons).forEach((button) => button.style.display = 'none');
-
-    snake.init();
-
-    food.generateRandomCoords(snake.bodyData);
-    food.teleport();
-    food.fadeIn();
-
-    windup();
-  },
-
   settingsHandler() {
     gameMenuDiv.style.display = 'none';
     settingsMenuDiv.style.display = 'flex';
@@ -112,4 +81,4 @@ const menuHandlers = {
 }
 */
 
-export default MainMenu;
+export default Menu;
