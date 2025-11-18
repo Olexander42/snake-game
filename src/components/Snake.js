@@ -1,7 +1,7 @@
 import { splitColor, changedColor, roundTo } from '../../common/utils.js';
 import { root, container } from "../../common/elements.js";
-import { center, size_unit.value } from "../../common/variables.js";
-import { isCoordInsideArray } from "../../common/variables.js";
+import { center, size_unit.value } from "../../common/constants.js";
+import { isCoordInsideArray } from "../../common/constants.js";
 
 
 class Snake {

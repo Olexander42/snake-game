@@ -1,60 +1,72 @@
+import { setTheme } from "../common/helpers.js";
+
 class Menu {
-  constructor() {
-    // main menu 
+  constructor(game) {
+    this.game = game;
+
     this.mainMenuDiv = document.getElementById("main-menu");
     this.settingsDiv = document.getElementById("settings-menu");
-    this.startBtn = document.getElementById("start-btn");
-    this.settingsBtn = document.getElementById("settings-btn");
-
-    // settings
-    this.buttonsSides = document.querySelectorAll(".side");
     this.sizeInput = document.getElementById("size-slider");
-    this.colorOptions = document.querySelectorAll(".color-box");
-    this.themeThumbnails = document.querySelectorAll(".thumbnail");
-    this.back = document.getElementById("back-btn");
 
     this.firstStart = true;
     this.settingsVisited = false;
+
+    this._attachStartListener();
+    this._attachSettingsListener();
   }
 
-  attachListeners(game) {
-    this.startBtn.addEventListener('click', () => { 
+  _attachStartListener() {  
+    const startBtn = document.getElementById("start-btn");
+    
+    startBtn.addEventListener('click', () => { 
       if (this.firstStart) {
-        game.board.normalize(this.sizeInput.value);
+        this.game.board.normalize(this.sizeInput.value);
 
-        this.startBtn.innerText = "Start Again";
+        startBtn.innerText = "Start Again";
         this.firstStart = false;  
       }
-
       else {
-        game.reset();
+        this.game.reset();
       }
 
-      // hide menu
-      this.startBtn.style.display = 'none';
-      this.settingsBtn.style.display = 'none';
+      this.mainMenuDiv.style.display = 'none';
 
-      game.begin();
+      this.game.begin();
     })
+  }
 
-    this.settingsBtn.addEventListener('click', () => {
-      if (!this.settingsVisited) {
-        this.buttonFlipper = new ButtonFlipper(); 
-        this.buttonFlipper.attach(this.buttonsSides);
+  _attachSettingsListener() {
+    const settingsBtn = document.getElementById("settings-btn");
 
-        this.sizeSlider = new Slider(this.sizeInput, 2, (value) => game.board.normalize(value));
-        this.sizeSlider.attach();
-
-        this.colorOptionOutline = new Outline("#color-set");
-        this.colorOptionOutline.attach(this.colorOptions);
-
-        this.themeThumbnailOutline = new Outline("#theme-set");
-        this.themeThumbnailOutline.attach(this.themeThumbnails);
-      }
-
+    settingsBtn.addEventListener('click', () => {
       // show settings
       this.mainMenuDiv.style.display = 'none';
       this.settingsDiv.style.display = 'flex';
+
+      if (!this.settingsVisited) {
+        const buttonsSides = document.querySelectorAll(".side");
+        const colorOptions = document.querySelectorAll("input[name='color']");
+        const themeOptions = document.querySelectorAll("input[name='theme']");
+        const backBtn = document.getElementById("back-btn");
+
+        const buttonFlipper = new ButtonFlipper(); 
+        const sizeSlider = new Slider(this.sizeInput, 2, (value) => this.game.board.normalize(value));
+        const colorOptionOutline = new Outline("#color-set");
+        const themeThumbnailOutline = new Outline("#theme-set", (value) => setTheme(value));
+
+        buttonFlipper.attach(buttonsSides);
+        sizeSlider.attach();
+        colorOptionOutline.attach(colorOptions);
+        themeThumbnailOutline.attach(themeOptions);
+
+        backBtn.addEventListener('click', () => { 
+          // hide settings   
+          this.settingsDiv.style.display = 'none';
+          this.mainMenuDiv.style.display = 'flex';
+        })
+
+        this.settingsVisited = true;
+      } 
     })
   }
 }
@@ -89,7 +101,7 @@ class ButtonFlipper {
 
 
 class Slider {
-  constructor(input, speed, recipient=undefined) {
+  constructor(input, speed, recipient) {
     this.input = input;
     this.STEP_DEFAULT = this.input.step;
     this.STEP_TRANSITION = speed;
@@ -118,7 +130,7 @@ class Slider {
       if (this.currentValue === this.targetValue) { // finished transitioning
         this.input.step = this.STEP_DEFAULT;
 
-        if (this.recipient) this.recipient(this.input.value);
+        this.recipient(this.input.value);
 
       } else {
         requestAnimationFrame(() => this._step()); 
@@ -139,11 +151,12 @@ class Slider {
 
 
 class Outline {
-  constructor(fieldsetId) {
+  constructor(fieldsetId, recipient=undefined) {
     this.fieldset = document.querySelector(fieldsetId);
     this.element = document.querySelector(`${fieldsetId} .outline`);
+    this.recipient = recipient;
 
-    this._attachInternalTransitionListener();
+    this._attachInternalTransitionListeners();
     this._moveToChecked();
   }
 
@@ -155,50 +168,29 @@ class Outline {
     })
   }
 
-  _attachInternalTransitionListener() {
+  _attachInternalTransitionListeners() {
     // native CSS outline replaces disappeared outline element and vice versa 
     // because of possible layout shifts
     this.element.addEventListener('transitionstart', () => {
       this.element.style.opacity = 1;
     })
 
-    this.element.addEventListener('transitionsend', () => {
+    this.element.addEventListener('transitionend', () => {
       this.element.style.opacity = 0;
       this.fieldset.style.setProperty("--checked-outline", '4px solid var(--white)') 
     })
   }
 
   attach(elements) {
-    [...elements].forEach((element) => element.addEventListener('click', () => { 
+    [...elements].forEach((element) => element.addEventListener('click', (event) => { 
       this.fieldset.style.setProperty("--checked-outline", 'none'); // hide CSS outline asap to avoid flashes
       this._moveToChecked();
+
+      if (this.recipient) this.recipient(event.currentTarget.value);
     }));
   }
 }
 
-/*     
 
-      
-
-
-      
-      [...thumbnails].forEach((thumbnail) => thumbnail.addEventListener('click', (e) => {
-        outlines.themeThumbnail.disableCssOutline();
-        outlines.themeThumbnail.move(e.currentTarget)
-        outlines.themeThumbnail.element.addEventListener('transitionend', () => setTheme());
-      }))
-
-      menuButtons.back.addEventListener('click', menuHandlers.backHandler);
-    }
-
-    states.settingsVisited = true;
-  },
-
-  backHandler() {
-    settingsMenuDiv.style.display = 'none';
-    gameMenuDiv.style.display = 'flex';
-  }
-}
-*/
 
 export default Menu;
