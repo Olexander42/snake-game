@@ -1,5 +1,5 @@
 import { normalize, getRandomInt, splitColor, changedColor } from "../../common/utils.js";
-import { TIME_UNIT, center } from "../../common/variables.js";
+import { TIME_UNIT, center } from "../../common/constants.js";
 import { isCoordsInsideArray } from "../../common/helpers.js";
 import { container } from "../../common/elements.js";
 

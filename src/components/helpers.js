@@ -2,49 +2,10 @@ import { board } from "../board/Board.js";
 import { menuButtons, sizeSlider } from "./elements.js";
 import { html } from "../../common/elements.js";
 
-const DEFAULT_STEP = 10;
-const TRANSITION_STEP = 2;
+
 
  
-class Slider {
-  constructor() {
-    this.range = sizeSlider;
-    this.curValue = Number(this.range.value);
-  }
 
-  moveThumb() {
-    this.targetValue = Number(this.range.value);
-    this.range.value = this.curValue;
-    this.range.step = TRANSITION_STEP;
-
-    const step = () => {
-      this.curValue += (this.curValue > this.targetValue) ? -2 : 2;
-      this.range.value = this.curValue;
-
-      board.thick = this.curValue; 
-      board.init();
-  
-      this._updateGradient();
-
-      if (this.curValue === this.targetValue) {
-        this.range.step = DEFAULT_STEP;
-        //this.prevValue = this.range.value;
-
-        board.normalize();       
-      } else {
-        requestAnimationFrame(step);
-      }
-    }
-
-    requestAnimationFrame(step);
-  }
-
-  _updateGradient() {
-    this.gradientCutoffVal = (this.range.value - this.range.min) / (this.range.max - this.range.min) * 100;
-    this.gradient = `linear-gradient(to right, black, black ${this.gradientCutoffVal}%, transparent ${this.gradientCutoffVal}%, transparent)`;
-    this.range.style.setProperty("--responsive-gradient", this.gradient);
-  }
-}
 
 const slider = new Slider();
 
@@ -89,22 +50,7 @@ const outlines = {
   themeThumbnail: new Outline("#theme-set"),
 }
 
-function flipButton(event) {
-  const side = this;  
-  const button = side.parentElement;
-  
-  if (
-    (!(side.classList.contains("rear") && event.target !== this)) 
-    || [...document.querySelectorAll('fieldset')].includes(event.target)
-  )  button.classList.toggle("clicked");  // don't react to .rear.side children events, but react to the empty space in <fieldset>
-}
 
-function closeButtons(event) {
-  // close buttons if clicked anywhere outside the buttons
-  if (event.target === this || document.getElementById("settings-menu") === event.target ) { 
-    [...document.querySelectorAll(".clicked")].forEach((clickedButton) => clickedButton.classList.remove("clicked"));
-  }
-}
 
 
 export { slider, outlines, flipButton, closeButtons }

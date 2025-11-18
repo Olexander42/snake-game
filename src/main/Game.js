@@ -1,4 +1,4 @@
-import { TIME_UNIT } from "../common/variables.js";
+import { TIME_UNIT } from "../common/constants.js";
 import { root } from "../common/elements.js";
 
 
