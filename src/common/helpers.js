@@ -1,11 +1,10 @@
-import { html, style } from "./elements.js";
+import { background, border, html, style } from "../common/elements.js";
 
 
-function setTheme(theme, board) {
-
+function setTheme(theme) {
   html.style.setProperty('background-image', `url(./assets/${theme}/images/outside.jpg)`);
-  board.border.style.setProperty('border-image-source', `url(./assets/${theme}/images/border.jpg)`);
-  board.background.style.setProperty('background-image', `url(./assets/${theme}/images/inside.jpg)`);
+  border.style.setProperty('border-image-source', `url(./assets/${theme}/images/border.jpg)`);
+  background.style.setProperty('background-image', `url(./assets/${theme}/images/inside.jpg)`);
 
   style.innerHTML = `
     @font-face {

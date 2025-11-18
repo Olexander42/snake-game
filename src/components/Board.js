@@ -1,11 +1,11 @@
 import { normalize } from "../common/utils.js";
-import { root } from "../common/elements.js";
+import { root, container, background, border } from "../common/elements.js";
 
 class Board {
   constructor() {
-    this.container = document.getElementById("container");
-    this.background = document.getElementById("background");
-    this.border = document.getElementById("border");
+    this.container = container;
+    this.background = background;
+    this.border = border;
   }
 
   normalize(size_step) {

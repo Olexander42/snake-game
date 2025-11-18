@@ -3,17 +3,29 @@
   --white: hsl(57, 100%, 95%);
 }
 
-#menu,
-#main-menu {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+#menu {
+  position: fixed;
   width: max-content;
   height: max-content;
   inset: 50%;
   transform: translate(-50%, -50%);
   z-index: 3;
+}
+
+#main-menu,
+#settings-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#main-menu {
+  gap: 1rem;
+}
+
+#settings-menu {
+  perspective: 1000px;
+  display: none;
 }
 
 button {
@@ -64,12 +76,8 @@ fieldset {
 
 
 
-#settings-menu {
-  display: flex;
-  flex-direction: column;
-  perspective: 1000px;
-  display: none;
 
+#settings-menu {
   & button:not(:last-child) {
     position: relative;
     width: 20ch;
