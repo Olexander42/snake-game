@@ -101,7 +101,7 @@ class ButtonFlipper {
 
 
 class Slider {
-  constructor(input, speed, recipient) {
+  constructor(input, speed, recipient=undefined) {
     this.input = input;
     this.STEP_DEFAULT = this.input.step;
     this.STEP_TRANSITION = speed;
@@ -130,7 +130,7 @@ class Slider {
       if (this.currentValue === this.targetValue) { // finished transitioning
         this.input.step = this.STEP_DEFAULT;
 
-        this.recipient(this.input.value);
+        if (this.recipient) this.recipient(this.input.value);
 
       } else {
         requestAnimationFrame(() => this._step()); 

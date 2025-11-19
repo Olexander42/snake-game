@@ -62,6 +62,8 @@ class Board {
       right: this.bounds.width - this.borderThick,
       top: 0,
       bottom: this.bounds.height - this.borderThick,
+      center: this.center,
+      step: this.borderThick / 2,
     }
   }
 }

@@ -1,46 +1,84 @@
-import { splitColor, changedColor, roundTo } from '../../common/utils.js';
-import { root, container } from "../../common/elements.js";
-import { center, size_unit.value } from "../../common/constants.js";
-import { isCoordInsideArray } from "../../common/constants.js";
+import { roundTo } from '../common/utils.js';
+import { root, container } from "../common/elements.js";
 
 
 class Snake {
-  constructor(board) {
+  constructor() {
     this.div = document.createElement('div');
     this.div.id = "snake";
-    document.container.append(this.div);
+    container.append(this.div);
   }
 
-  init() {
+  spawn(bounds, color) {
+    this.bounds = bounds;
+    
     // parameters
     this.speed = 1;
     this.direction = {"x": 1, "y": 0};
     this.turn = 0;
-    this.color = { string: document.querySelector('input[name="color-snake"]:checked').value };
-    this.color.hsl = splitColor(this.color.string);
+    this.color = new Color(color);
 
     // body 
-    this._createSection(center.x, center.y, changedColor(this.color.hsl , {l: -2}), "head") ; 
-    this._createSection(center.x - size_unit.value, center.y, this.color.string, "neck"); 
+    this._createSection(this.bounds.center.x, this.bounds.center.y, this.color.changedColor({l: -2}), "head") ; 
+    this._createSection(this.bounds.center.x - this.bounds.step, this.bounds.center.y, this.color.string, "neck"); 
+
     this.head = document.getElementById("head");
     this.neck = document.getElementById("neck");
+
     this.head.style.scale = `${1}`;
     this.neck.style.scale = `${0.75}`;
 
     this._snapshot();
+    this.moveHead();
+  }
+
+  _createSection(x, y, color, id="") {
+    const element  = document.createElement('span');
+
+    element.classList.add("block");
+    element.classList.add(`${"snake-body"}`);
+    element.id = id;
+
+    element.style.left = `${x}px`;
+    element.style.top = `${y}px`;
+    element.style.backgroundColor = color;
+
+    this.div.append(element);
+  }
+
+  _snapshot() {
+    this.body = [...document.querySelectorAll(".snake-body")];
+    this.bodyData = [];
+
+    this.body.forEach((section) => {
+      const [x, y, rotate] = [parseInt(section.style.left), parseInt(section.style.top), section.style.rotate];
+      const data = {x, y, rotate};
+
+      this.bodyData.push(data);
+    })
   }
 
   moveHead() {   
     this._snapshot();
 
-    const head = this.body[0];
-    const x = head.x + this.direction.x * size_unit.value;
-    const y = head.y + this.direction.y * size_unit.value;
+    const head = this.bodyData[0]; 
 
-    this.head.style.left = x + 'px';
-    this.head.style.top = y + 'px';
+    const [currentX, currentY] = [head.x, head.y]
+
+    const stepX = Math.sign(this.direction.x) * this.bounds.step;
+    const stepY = Math.sign(this.direction.y) * this.bounds.step;
+
+    const newX = currentX + stepX;
+    const newY = currentY + stepY;
+
+    this.head.style.left = newX + 'px';
+    this.head.style.top = newY + 'px';
     this.head.style.rotate = `${this.turn}turn`;
   }
+}
+/*
+
+
 
   bodyFollows() {
     let i = 1; // because this.body[0] is head
@@ -69,7 +107,6 @@ class Snake {
       section.style.backgroundColor = lighterColor;
 
       i++;
-    */
   }
 
   lengthen() {
@@ -93,35 +130,11 @@ class Snake {
 
     return (
       head.x < clip // left border
-      || head.x > container.clientWidth - clip - size_unit.value // right border
+      || head.x > container.clientWidth - clip - this.bounds.step // right border
       || head.y < clip // top border
-      || head.y > container.clientHeight - clip - size_unit.value // bottom border
+      || head.y > container.clientHeight - clip - this.bounds.step // bottom border
       || isCoordsInsideArray(head.x, head.y, this.bodyData);
     ) 
-  }
-
-  _createSection(x, y, color, id="") {
-    const element  = document.createElement('span');
-
-    element.classList.add("block");
-    element.classList.add(`${"snake-body"}`);
-    element.id = id;
-
-    element.style.left = `${x}px`;
-    element.style.top = `${y}px`;
-    element.style.backgroundColor = color;
-
-    this.div.append(element);
-  }
-
-  _snapshot() {
-    this.body = [...document.querySelectorAll(".snake-body")];
-    this.bodyData = [];
-    this.body.forEach((el) => {
-      const [x, y, rotate] = [parseInt(el.style.left), parseInt(el.style.top), el.style.rotate];
-      const data = {x, y, rotate};
-      this.bodyData.push(data);
-    })
   }
 
   _repaintTail() {
@@ -149,6 +162,32 @@ class Snake {
     rescaleSection();
   }
 }
+*/
+
+class Color { // only works with hsl
+  constructor(color) { 
+    this.string = color;
+    this.hslComponents = this._colorComponents();
+  }
+
+  _colorComponents() { 
+    const hslValues = this.string.match(/\d+/g).map(Number);
+    const hslComponents = {h: hslValues[0], s: hslValues[1], l: hslValues[2]};
+
+    return hslComponents;
+  }
+
+  changedColor({changeH = 0, changeS = 0, changeL = 0} = {}) {
+    const h = this.hslComponents.h + changeH;
+    const s = this.hslComponents.s + changeS;
+    const l = this.hslComponents.l + changeL;
+
+    const newColor = `hsl(${h}, ${s}%, ${l}%)`
+
+    return newColor;
+  }
+}
+
 
 
 export default Snake;

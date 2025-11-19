@@ -19,8 +19,10 @@ class Game {
   }
 
   begin() {
+    const bounds = this.board.getBounds();
+    const snakeColor = document.querySelector('input[name="color"]:checked').value;
+    this.snake.spawn(bounds, snakeColor);
     /*
-    snake.spawn()
     food.generateRandomCoords(snake.bodyData);
     food.teleport();
     food.fadeIn();
