@@ -15,7 +15,7 @@ class Snake {
     // parameters
     this.speed = 1;
     this.direction = {"x": 1, "y": 0};
-    this.turn = 0;
+    this.headRotation = 0;
     this.color = new Color(color);
 
     // body 
@@ -51,8 +51,8 @@ class Snake {
     this.bodyData = [];
 
     this.body.forEach((section) => {
-      const [x, y, rotate] = [parseInt(section.style.left), parseInt(section.style.top), section.style.rotate];
-      const data = {x, y, rotate};
+      const [x, y, rotation] = [parseInt(section.style.left), parseInt(section.style.top), section.style.rotate];
+      const data = {x, y, rotation};
 
       this.bodyData.push(data);
     })
@@ -73,29 +73,30 @@ class Snake {
 
     this.head.style.left = newX + 'px';
     this.head.style.top = newY + 'px';
-    this.head.style.rotate = `${this.turn}turn`;
+    this.head.style.rotate = `${this.headRotation}turn`;
   }
-}
-/*
-
-
 
   bodyFollows() {
     let i = 1; // because this.body[0] is head
 
     const moveToNextSection = (i) => {
-      const nextSection = this.bodyData[i - 1];
       const currentSection = this.body[i];
+      const nextSection = this.bodyData[i - 1];
 
-      currentSection.style.left = nextSection.x + 'px';
-      currentSection.style.top = nextSection.y + 'px';
-      currentSection.style.rotate = nextSection.rotate;
+      const [newX, newY, newRotation] = [nextSection.x, nextSection.y, nextSection.rotation];
+  
+      currentSection.style.left = newX + 'px';
+      currentSection.style.top = newY + 'px';
+      currentSection.style.rotate = newRotation;
 
       if (i < this.body.length - 1) moveToNextSection(i + 1);
     }
 
     moveToNextSection(i);
   }
+}
+
+/*
 
   repaintBody() { // under construction to work with RAF
     /*

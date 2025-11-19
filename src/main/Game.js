@@ -1,5 +1,7 @@
+import SnakeControl from "./SnakeControl.js";
 import { TIME_UNIT } from "../common/constants.js";
-import { root } from "../common/elements.js";
+import { root, html } from "../common/elements.js";
+
 
 
 class Game {
@@ -11,11 +13,7 @@ class Game {
     this.stats = new Stats();
     this.timer = new Timer();
     this.shrinkCounter = new ShrinkCounter();
-
-    this.states = { 
-      gameActive: true,
-      controlsOn: false, 
-    }
+    this.controls = new SnakeControl(snake);
   }
 
   begin() {
@@ -29,6 +27,7 @@ class Game {
 
     windup();
     */
+    this.controls.attach();
   }
 
   reset() {

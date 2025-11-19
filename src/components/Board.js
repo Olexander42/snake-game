@@ -58,10 +58,10 @@ class Board {
 
   getBounds() {
     return {
-      left: 0,
+      left: this.bgClip,
       right: this.bounds.width - this.borderThick,
-      top: 0,
-      bottom: this.bounds.height - this.borderThick,
+      top: this.bgClip,
+      bottom: this.bounds.height - this.bgClip - this.borderThick,
       center: this.center,
       step: this.borderThick / 2,
     }
