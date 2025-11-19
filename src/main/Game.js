@@ -24,16 +24,72 @@ class Game {
     food.generateRandomCoords(snake.bodyData);
     food.teleport();
     food.fadeIn();
-
-    windup();
     */
-    this.controls.attach();
+    this._windup();
+    
+    // turn on controls
+    html.addEventListener('keydown', (event) => { 
+      this.controls.manager(event);
+      this._togglePause(); 
+    })
+    this.controls.isOn = true;
   }
+
+  _windup() {
+    let reqAnimFrameId = null;
+
+    const initTimer = (timestamp, callback) => {
+      let start = timestamp;
+
+      callback(timestamp, start);
+    }
+
+    const nextStep = (timestamp, start) => {
+      const timeElapsed = timestamp - start;
+    
+      if (timeElapsed >= this.timer.gap) { // time to move
+        if (!this.isPaused) {
+          this.snake.moveHead();    
+          initTimer(timestamp, nextStep);
+        }
+      } else {
+        reqAnimFrameId = requestAnimationFrame((timestamp) => nextStep(timestamp, start)); 
+      }
+    }
+
+    /*
+    const nextColor = (t, start) => {
+      const timeElapsed = t - start;
+
+      if (timeElapsed >= TIME_UNIT * 2) {
+        food.changeColor();
+        initTimer(t, nextColor); // restart the countdown to the next color change
+      } else {
+        requestAnimationFrame((t) => nextColor(t, start));
+      }
+    }
+    */
+
+    requestAnimationFrame((timestamp) => {
+      //initTimer(timestamp, nextColor);
+      initTimer(timestamp, nextStep);
+    });
+  }
+
 
   reset() {
     if (this.stats.isNewRecord()) this.stats.updateRecord();
     this.stats.resetScore();
     // to be continued
+  }
+
+  _togglePause() {
+    if (this.isPaused) {
+      this.isPaused = false;
+      this._windup();
+    } else {
+      this.isPaused = true;
+    }
   }
 }
 

@@ -23,7 +23,6 @@ function setTheme(theme) {
     }
   `
 }
-/*
 
 function snakeControl(event) {
   const keydownHandlers = {
@@ -84,6 +83,8 @@ function snakeControl(event) {
     }
   }
 }
+
+/*
 
 
 windup() {
