@@ -26,13 +26,7 @@ class Game {
     food.fadeIn();
     */
     this._windup();
-    
-    // turn on controls
-    html.addEventListener('keydown', (event) => { 
-      this.controls.manager(event);
-      this._togglePause(); 
-    })
-    this.controls.isOn = true;
+    this._attachControls();
   }
 
   _windup() {
@@ -44,16 +38,16 @@ class Game {
       callback(timestamp, start);
     }
 
-    const nextStep = (timestamp, start) => {
+    const nextTick = (timestamp, start) => {
       const timeElapsed = timestamp - start;
     
-      if (timeElapsed >= this.timer.gap) { // time to move
-        if (!this.isPaused) {
-          this.snake.moveHead();    
-          initTimer(timestamp, nextStep);
-        }
+      if (timeElapsed >= this.timer.gap && !this.isPaused) { // time to make step
+        if (!this.controls.isON) this.controls.isON = true;
+    
+        this.snake.moveHead();    
+        initTimer(timestamp, nextTick);
       } else {
-        reqAnimFrameId = requestAnimationFrame((timestamp) => nextStep(timestamp, start)); 
+        reqAnimFrameId = requestAnimationFrame((timestamp) => nextTick(timestamp, start)); 
       }
     }
 
@@ -72,7 +66,7 @@ class Game {
 
     requestAnimationFrame((timestamp) => {
       //initTimer(timestamp, nextColor);
-      initTimer(timestamp, nextStep);
+      initTimer(timestamp, nextTick);
     });
   }
 
@@ -83,12 +77,26 @@ class Game {
     // to be continued
   }
 
+  _attachControls() {
+    html.addEventListener('keydown', (event) => { 
+      if (event.code === 'Space') this._togglePause();
+      else {
+        this.controls.manager(event);
+      }
+    })
+
+    this.controls.isOn = true;
+  }
+
   _togglePause() {
     if (this.isPaused) {
       this.isPaused = false;
+      this.controls.isOn = true;
+
       this._windup();
     } else {
       this.isPaused = true;
+      this.controls.isOn = false;
     }
   }
 }
