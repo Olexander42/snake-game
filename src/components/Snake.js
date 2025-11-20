@@ -11,12 +11,13 @@ class Snake {
 
   spawn(bounds, color) {
     this.bounds = bounds;
-    
+    this.color = new Color(color);
+    console.log(this.bounds);
     // parameters
     this.speed = 1;
     this.direction = {"x": 1, "y": 0};
     this.headRotation = 0;
-    this.color = new Color(color);
+    this.headThick = this.bounds.step * 2; // because bounds.step is half of size_unit
 
     // body 
     this._createSection(this.bounds.center.x, this.bounds.center.y, this.color.changedColor({l: -2}), "head") ; 
@@ -28,8 +29,7 @@ class Snake {
     this.head.style.scale = `${1}`;
     this.neck.style.scale = `${0.75}`;
 
-    this._snapshot();
-    this.moveHead();
+    this.snapshot();
   }
 
   _createSection(x, y, color, id="") {
@@ -46,7 +46,7 @@ class Snake {
     this.div.append(element);
   }
 
-  _snapshot() {
+  snapshot() {
     this.body = [...document.querySelectorAll(".snake-body")];
     this.bodyData = [];
 
@@ -59,8 +59,6 @@ class Snake {
   }
 
   moveHead() {   
-    this._snapshot();
-
     const head = this.bodyData[0]; 
 
     const [currentX, currentY] = [head.x, head.y]
@@ -93,6 +91,20 @@ class Snake {
     }
 
     moveToNextSection(i);
+
+    this.snapshot();
+  }
+
+  isCollision() {
+    const head = this.bodyData[0];
+  
+    return (
+      head.x < this.bounds.left
+      || head.x >= this.bounds.right 
+      || head.y < this.bounds.top 
+      || head.y > this.bounds.bottom
+      //|| isCoordsInsideArray(head.x, head.y, this.bodyData);
+    ) 
   }
 }
 
@@ -125,18 +137,6 @@ class Snake {
     this._repaintTail();
   }
 
-  collision() {
-    const head = this.body[0];
-    const clip = parseInt(root.getPropertyValue("--clip"));
-
-    return (
-      head.x < clip // left border
-      || head.x > container.clientWidth - clip - this.bounds.step // right border
-      || head.y < clip // top border
-      || head.y > container.clientHeight - clip - this.bounds.step // bottom border
-      || isCoordsInsideArray(head.x, head.y, this.bodyData);
-    ) 
-  }
 
   _repaintTail() {
     const lighterColor = changedColor(this.color.hsl , {l: this.body.length});

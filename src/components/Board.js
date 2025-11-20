@@ -40,8 +40,9 @@ class Board {
   }
 
   _updateSizeUnits(size_step) {
-    this.borderThick = size_step;
-    this.bgClip = size_step / 2;
+    this.borderThick = Number(size_step);
+    this.bgClip = this.borderThick;
+    console.log("borderThick:", this.borderThick, "bgClip:", this.bgClip);
   }
 
   _calcCenter() {
@@ -59,9 +60,9 @@ class Board {
   getBounds() {
     return {
       left: this.bgClip,
-      right: this.bounds.width - this.borderThick,
+      right: this.bounds.width - this.bgClip,
       top: this.bgClip,
-      bottom: this.bounds.height - this.bgClip - this.borderThick,
+      bottom: this.bounds.height - this.bgClip - this.borderThick, // borderThick to offest distance to snake's head
       center: this.center,
       step: this.borderThick / 2,
     }

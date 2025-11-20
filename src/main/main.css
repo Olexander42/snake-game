@@ -8,7 +8,7 @@
 
 
 :root {
-  --size: 40px;
+  --size: 40px; /* hardcoded value? not cool */
   --time-gap: 1s;
 }
 

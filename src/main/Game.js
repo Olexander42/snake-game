@@ -14,6 +14,9 @@ class Game {
     this.timer = new Timer();
     this.shrinkCounter = new ShrinkCounter();
     this.controls = new SnakeControl(snake);
+
+    this.rafId = null;
+    this.isPaused = false;
   }
 
   begin() {
@@ -30,24 +33,21 @@ class Game {
   }
 
   _windup() {
-    let reqAnimFrameId = null;
-
     const initTimer = (timestamp, callback) => {
       let start = timestamp;
-
       callback(timestamp, start);
     }
 
     const nextTick = (timestamp, start) => {
       const timeElapsed = timestamp - start;
-    
-      if (timeElapsed >= this.timer.gap && !this.isPaused) { // time to make step
-        if (!this.controls.isON) this.controls.isON = true;
-    
-        this.snake.moveHead();    
+      if (timeElapsed >= this.timer.gap) { // time to make step
+        if (!this.controls.isOn) this.controls.isOn = true;
+        this.snake.moveHead();
+        this.snake.bodyFollows();
+        
         initTimer(timestamp, nextTick);
       } else {
-        reqAnimFrameId = requestAnimationFrame((timestamp) => nextTick(timestamp, start)); 
+        this.rafId = requestAnimationFrame((timestamp) => nextTick(timestamp, start)); 
       }
     }
 
@@ -95,6 +95,8 @@ class Game {
 
       this._windup();
     } else {
+      cancelAnimationFrame(this.rafId);
+
       this.isPaused = true;
       this.controls.isOn = false;
     }
