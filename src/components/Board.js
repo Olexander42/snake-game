@@ -9,12 +9,14 @@ class Board {
   }
 
   normalize(size_step) {
-    this._updateSizeUnits(size_step);
+    // update units
+    this.borderThick = Number(size_step);
+    this.bgClip = this.borderThick;
 
     root.style.setProperty("--size", `${this.borderThick}px`);
     root.style.setProperty("--clip", `${this.bgClip}px`);
 
-    // calc 
+    // calculate
     this.bounds = {
       width: normalize(this.container.clientWidth, this.borderThick),
       height: normalize(this.container.clientHeight, this.borderThick),
@@ -25,45 +27,37 @@ class Board {
       element.style.width = this.bounds.width + 'px';
       element.style.height = this.bounds.height + 'px';
     })
-
-    this._calcCenter();
   }
   
   shrink() {
+    // border
     this.bounds.width -= this.borderThick;
     this.bounds.height -= this.borderThick;
 
     this.border.style.width = this.bounds.width + 'px';
     this.border.style.height = this.bounds.height + 'px';
 
-    this._updateBackgroundClip();
-  }
-
-  _updateSizeUnits(size_step) {
-    this.borderThick = Number(size_step);
-    this.bgClip = this.borderThick;
-    console.log("borderThick:", this.borderThick, "bgClip:", this.bgClip);
-  }
-
-  _calcCenter() {
-    this.center = {
-      x: normalize(Math.round(this.bounds.width) / 2, this.borderThick),
-      y: normalize(Math.round(this.bounds.height) / 2, this.borderThick)
-    }
-  }
-
-  _updateBackgroundClip() {
+    // background
     this.bgClip += this.borderThick / 2;
     root.style.setProperty("--clip", `${this.bgClip}px`);
   }
 
   getBounds() {
+    const calculateCenter = () => {
+      const center = {
+        x: normalize(Math.round(this.bounds.width) / 2, this.borderThick),
+        y: normalize(Math.round(this.bounds.height) / 2, this.borderThick)
+      }
+
+      return center
+    }
+
     return {
       left: this.bgClip,
-      right: this.bounds.width - this.bgClip,
+      right: this.bounds.width - this.bgClip - this.borderThick, // - borderThick to offest distance to head.left
       top: this.bgClip,
-      bottom: this.bounds.height - this.bgClip - this.borderThick, // borderThick to offest distance to snake's head
-      center: this.center,
+      bottom: this.bounds.height - this.bgClip - this.borderThick, // - borderThick to offest distance to head.top
+      center: calculateCenter(),
       step: this.borderThick / 2,
     }
   }

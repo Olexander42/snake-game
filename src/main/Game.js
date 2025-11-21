@@ -1,7 +1,5 @@
-import SnakeControl from "./SnakeControl.js";
 import { TIME_UNIT } from "../common/constants.js";
-import { root, html } from "../common/elements.js";
-
+import { root, html, startBtn } from "../common/elements.js";
 
 
 class Game {
@@ -13,7 +11,6 @@ class Game {
     this.stats = new Stats();
     this.timer = new Timer();
     this.shrinkCounter = new ShrinkCounter();
-    this.controls = new SnakeControl(snake);
 
     this.rafId = null;
     this.isPaused = false;
@@ -29,22 +26,22 @@ class Game {
     food.fadeIn();
     */
     this._windup();
-    this._attachControls();
   }
 
   _windup() {
     const initTimer = (timestamp, callback) => {
       let start = timestamp;
+
       callback(timestamp, start);
     }
 
     const nextTick = (timestamp, start) => {
       const timeElapsed = timestamp - start;
-      if (timeElapsed >= this.timer.gap) { // time to make step
-        if (!this.controls.isOn) this.controls.isOn = true;
-        this.snake.moveHead();
-        this.snake.bodyFollows();
-        
+    
+      if (timeElapsed >= this.timer.gap) { // time to make step   
+        if (!this.snake.controlsOn) this.snake.controlsOn = true;
+        this._action();      
+
         initTimer(timestamp, nextTick);
       } else {
         this.rafId = requestAnimationFrame((timestamp) => nextTick(timestamp, start)); 
@@ -70,6 +67,15 @@ class Game {
     });
   }
 
+  _action() {
+    this.snake.makeStep();
+    if (!this.snake.alive) this._gameOver()
+  }
+
+  _gameOver() {
+    cancelAnimationFrame(this.rafId);
+    startBtn.style.display = 'flex';
+  }
 
   reset() {
     if (this.stats.isNewRecord()) this.stats.updateRecord();
@@ -77,32 +83,50 @@ class Game {
     // to be continued
   }
 
-  _attachControls() {
+  attachControls() {
     html.addEventListener('keydown', (event) => { 
-      if (event.code === 'Space') this._togglePause();
-      else {
-        this.controls.manager(event);
-      }
+      const buttonPressed = event.code;
+  
+      if (buttonPressed === 'Space') this._togglePause();
+      else if (buttonPressed.slice(0, 5) === 'Arrow' && this.snake.controlsOn) { this.snake.handleControls(buttonPressed) } 
     })
-
-    this.controls.isOn = true;
   }
 
   _togglePause() {
     if (this.isPaused) {
       this.isPaused = false;
-      this.controls.isOn = true;
+      this.snake.controlsOn = true;
 
       this._windup();
     } else {
       cancelAnimationFrame(this.rafId);
-
       this.isPaused = true;
-      this.controls.isOn = false;
+      this.snake.controlsOn = false;
     }
   }
 }
 
+// helpers
+class Timer {
+  constructor() {
+    this.gap = TIME_UNIT;
+    this._updateCssVar();
+  }
+
+  updateGap(speed) {
+    this.gap = Math.round(TIME_UNIT / speed);
+    this._updateCssVar();
+  } 
+
+  reset() { 
+    this.gap = TIME_UNIT;
+    this._updateCssVar();
+  }
+
+  _updateCssVar() {
+    root.style.setProperty("--time-gap", `${this.gap / 1000}s`);
+  }
+}
 
 class Stats {
   constructor() {
@@ -132,32 +156,8 @@ class Stats {
   }
 }
 
-class Timer {
-  constructor() {
-    this.gap = TIME_UNIT;
-    this._updateCssVar();
-  }
-
-  updateGap(speed) {
-    this.gap = Math.round(TIME_UNIT / speed);
-    this._updateCssVar();
-  } 
-
-  reset() { 
-    this.gap = TIME_UNIT;
-    this._updateCssVar();
-  }
-
-  _updateCssVar() {
-    root.style.setProperty("--time-gap", `${this.gap / 1000}s`);
-  }
-}
-
 class ShrinkCounter { 
-  outer;
-  inner;
-
-  constructor() {
+   constructor() {
     this.outer = 1;
     this.inner = 0;
   }
@@ -172,11 +172,6 @@ class ShrinkCounter {
 
       return true;
     }
-  }
-
-  _incrementOuter() { 
-    this.outer++;
-    this.inner = 0;
   }
 
   reset() {

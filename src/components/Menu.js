@@ -1,4 +1,6 @@
 import { setTheme } from "../common/helpers.js";
+import { startBtn, settingsBtn } from "../common/elements.js";
+
 
 class Menu {
   constructor(game) {
@@ -16,11 +18,10 @@ class Menu {
   }
 
   _attachStartListener() {  
-    const startBtn = document.getElementById("start-btn");
-    
     startBtn.addEventListener('click', () => { 
       if (this.firstStart) {
         this.game.board.normalize(this.sizeInput.value);
+        this.game.attachControls();
 
         startBtn.innerText = "Start Again";
         this.firstStart = false;  
@@ -29,32 +30,33 @@ class Menu {
         this.game.reset();
       }
 
-      this.mainMenuDiv.style.display = 'none';
+      // hide menu
+      startBtn.style.display = 'none';
+      settingsBtn.style.display = 'none';
 
       this.game.begin();
     })
   }
 
   _attachSettingsListener() {
-    const settingsBtn = document.getElementById("settings-btn");
-
     settingsBtn.addEventListener('click', () => {
       // show settings
       this.mainMenuDiv.style.display = 'none';
       this.settingsDiv.style.display = 'flex';
 
-      if (!this.settingsVisited) {
+      // do it only on the first visit
+      if (!this.settingsVisited) { 
         const buttonsSides = document.querySelectorAll(".side");
         const colorOptions = document.querySelectorAll("input[name='color']");
         const themeOptions = document.querySelectorAll("input[name='theme']");
         const backBtn = document.getElementById("back-btn");
 
-        const buttonFlipper = new ButtonFlipper(); 
-        const sizeSlider = new Slider(this.sizeInput, 2, (value) => this.game.board.normalize(value));
+        const buttonFlipper = new ButtonFlipper(buttonsSides); 
+        const sizeSlider = new Slider(this.sizeInput, 3, (value) => this.game.board.normalize(value));
         const colorOptionOutline = new Outline("#color-set");
         const themeThumbnailOutline = new Outline("#theme-set", (value) => setTheme(value));
 
-        buttonFlipper.attach(buttonsSides);
+        buttonFlipper.attach();
         sizeSlider.attach();
         colorOptionOutline.attach(colorOptions);
         themeThumbnailOutline.attach(themeOptions);
@@ -71,7 +73,11 @@ class Menu {
   }
 }
 
-class ButtonFlipper {
+// helpers
+class ButtonFlipper { 
+  constructor(buttonsSides) {
+    this.buttonsSides = buttonsSides;
+  }
   _flipButton(event) {
     const side = event.currentTarget;  
     const button = side.parentElement;
@@ -93,8 +99,8 @@ class ButtonFlipper {
     }
   }
 
-  attach(elements) {
-    [...elements].forEach((element) => element.addEventListener('click', (event) => this._flipButton(event)));
+  attach() {
+    [...this.buttonsSides].forEach((side) => side.addEventListener('click', (event) => this._flipButton(event)));
     document.querySelector('body').addEventListener('click', (event) => this._closeButtons(event));
   }
 }
@@ -107,12 +113,13 @@ class Slider {
     this.STEP_TRANSITION = speed;
     this.recipient = recipient;
 
-    this.currentValue = parseInt(this.input.value);
-    this._step = this._step.bind(this);
+    this.requiresAdjustment = this.STEP_DEFAULT % this.STEP_TRANSITION === 0 ? false : true;
+    this.currentValue = Number(this.input.value);
+    
   }
 
   moveThumb() {
-    this.targetValue = parseInt(this.input.value);
+    this.targetValue = Number(this.input.value);
     this.input.value = this.currentValue;
     this.input.step = this.STEP_TRANSITION; 
 
@@ -124,7 +131,7 @@ class Slider {
         ? -this.STEP_TRANSITION 
         : this.STEP_TRANSITION;
       this.input.value = this.currentValue;
-  
+
       this._updateGradient();
 
       if (this.currentValue === this.targetValue) { // finished transitioning
@@ -133,6 +140,13 @@ class Slider {
         if (this.recipient) this.recipient(this.input.value);
 
       } else {
+        if (this.requiresAdjustment) {
+          const delta = (Math.abs(this.currentValue - this.targetValue));
+          if  (delta < this.STEP_TRANSITION) { // time for adjustment
+            this.STEP_TRANSITION = delta; // make sure the next currentValue === targetValue
+          }
+        }
+
         requestAnimationFrame(() => this._step()); 
       }
     }
@@ -142,7 +156,7 @@ class Slider {
     const gradient = `linear-gradient(to right, black, black ${gradientCutoffVal}%, transparent ${gradientCutoffVal}%, transparent)`;
 
     this.input.style.setProperty("--responsive-gradient", gradient);
-  }
+  } 
 
   attach() {
     this.input.addEventListener('input', (event) => this.moveThumb(event));
@@ -170,7 +184,7 @@ class Outline {
 
   _attachInternalTransitionListeners() {
     // native CSS outline replaces disappeared outline element and vice versa 
-    // because of possible layout shifts
+    // because of possible layout shifts 
     this.element.addEventListener('transitionstart', () => {
       this.element.style.opacity = 1;
     })

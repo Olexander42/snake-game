@@ -24,68 +24,9 @@ function setTheme(theme) {
   `
 }
 
-function snakeControl(event) {
-  const keydownHandlers = {
-    // snake can't hit a border while moving along it and can't turn 180°
-    ArrowUp() {
-      if (!(parseInt(snake.head.style.top) === board.clip && snake.direction.y === 0 || snake.direction.y === 1)) { 
-        snake.turn += -(0.25 * snake.direction.x);
 
-        snake.direction.x = 0;
-        snake.direction.y = -1;
-      }
-    },
-
-    ArrowDown() {
-      if (!(parseInt(snake.head.style.top) === board.container.height - board.clip - board.thick && snake.direction.y === 0 || snake.direction.y === -1)) { 
-        snake.turn +=  (0.25 * snake.direction.x);
-
-        snake.direction.x = 0;
-        snake.direction.y = 1;
-      }
-    },
-
-    ArrowLeft() {
-      if (!(parseInt(snake.head.style.left) === board.clip && snake.direction.x === 0 || snake.direction.x === 1)) {  
-        snake.turn +=  (0.25 * snake.direction.y);
-
-        snake.direction.x = -1;
-        snake.direction.y = 0;
-      }
-    },
-
-    ArrowRight() {
-      if (!(parseInt(snake.head.style.left) === board.container.width - board.clip - board.thick && snake.direction.x === 0 || snake.direction.x === -1)) {
-        snake.turn +=  -(0.25 * snake.direction.y);
-
-        snake.direction.x = 1;
-        snake.direction.y = 0;
-      }
-    },
-
-    Space() {
-      if (states.gameActive) {
-        cancelAnimationFrame(raf.id);
-        states.gameActive = false;
-      } else {
-        windup();
-      }
-    },
-  }
-
-  if (Object.keys(keydownHandlers).includes(event.code)) {
-    event.preventDefault();
-    keydownHandlers[event.code]();
-
-    if (event.code !== 'Space') {
-      html.removeEventListener('keydown', snakeControl); // only one change per frame is allowed
-      states.controlsOn = false;
-    }
-  }
-}
 
 /*
-
 
 windup() {
   const initTimer = (timestamp, f) => {
@@ -130,7 +71,7 @@ windup() {
 
 
 function action() {
-  snake.moveHead();
+  snake.makeStep();
   if (snake.collision()) gameOver();
   else {
     snake.bodyFollows();

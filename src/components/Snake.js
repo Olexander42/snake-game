@@ -7,12 +7,14 @@ class Snake {
     this.div = document.createElement('div');
     this.div.id = "snake";
     container.append(this.div);
+
+    
   }
 
   spawn(bounds, color) {
     this.bounds = bounds;
     this.color = new Color(color);
-    console.log(this.bounds);
+
     // parameters
     this.speed = 1;
     this.direction = {"x": 1, "y": 0};
@@ -20,7 +22,7 @@ class Snake {
     this.headThick = this.bounds.step * 2; // because bounds.step is half of size_unit
 
     // body 
-    this._createSection(this.bounds.center.x, this.bounds.center.y, this.color.changedColor({l: -2}), "head") ; 
+    this._createSection(this.bounds.center.x, this.bounds.center.y, this.color.changedColor({changeL: -2}), "head") ; 
     this._createSection(this.bounds.center.x - this.bounds.step, this.bounds.center.y, this.color.string, "neck"); 
 
     this.head = document.getElementById("head");
@@ -29,7 +31,10 @@ class Snake {
     this.head.style.scale = `${1}`;
     this.neck.style.scale = `${0.75}`;
 
-    this.snapshot();
+    this.alive = true;
+    this.controlsOn = true;
+
+    this._snapshot();
   }
 
   _createSection(x, y, color, id="") {
@@ -46,7 +51,7 @@ class Snake {
     this.div.append(element);
   }
 
-  snapshot() {
+  _snapshot() {
     this.body = [...document.querySelectorAll(".snake-body")];
     this.bodyData = [];
 
@@ -56,12 +61,13 @@ class Snake {
 
       this.bodyData.push(data);
     })
+
+    this.headData = this.bodyData[0];
   }
 
-  moveHead() {   
-    const head = this.bodyData[0]; 
-
-    const [currentX, currentY] = [head.x, head.y]
+  makeStep() {    
+    // move head 
+    const [currentX, currentY] = [this.headData.x, this.headData.y]
 
     const stepX = Math.sign(this.direction.x) * this.bounds.step;
     const stepY = Math.sign(this.direction.y) * this.bounds.step;
@@ -69,42 +75,89 @@ class Snake {
     const newX = currentX + stepX;
     const newY = currentY + stepY;
 
-    this.head.style.left = newX + 'px';
-    this.head.style.top = newY + 'px';
-    this.head.style.rotate = `${this.headRotation}turn`;
-  }
-
-  bodyFollows() {
-    let i = 1; // because this.body[0] is head
-
-    const moveToNextSection = (i) => {
-      const currentSection = this.body[i];
-      const nextSection = this.bodyData[i - 1];
-
-      const [newX, newY, newRotation] = [nextSection.x, nextSection.y, nextSection.rotation];
-  
-      currentSection.style.left = newX + 'px';
-      currentSection.style.top = newY + 'px';
-      currentSection.style.rotate = newRotation;
-
-      if (i < this.body.length - 1) moveToNextSection(i + 1);
+    const collisionDetected = (headX, headY) => {
+      if (
+        headX < this.bounds.left 
+        || headX > this.bounds.right
+        || headY < this.bounds.top
+        || headY > this.bounds.bottom
+      ) return true;
+      else {
+        return false;
+      }
     }
 
-    moveToNextSection(i);
+    if (!collisionDetected(newX, newY)) { 
+      this.head.style.left = newX + 'px';
+      this.head.style.top = newY + 'px';
+      this.head.style.rotate = `${this.headRotation}turn`;
 
-    this.snapshot();
+      // body follows
+      let i = 1; 
+      const moveToNextSection = (i) => {
+        const currentSection = this.body[i];
+        const nextSection = this.bodyData[i - 1];
+
+        const [newX, newY, newRotation] = [nextSection.x, nextSection.y, nextSection.rotation];
+    
+        currentSection.style.left = newX + 'px';
+        currentSection.style.top = newY + 'px';
+        currentSection.style.rotate = newRotation;
+
+        if (i < this.body.length - 1) moveToNextSection(i + 1);
+      }
+      moveToNextSection(i);
+
+      this._snapshot();
+    } else {
+      this.alive = false;
+    }
   }
 
-  isCollision() {
-    const head = this.bodyData[0];
-  
-    return (
-      head.x < this.bounds.left
-      || head.x >= this.bounds.right 
-      || head.y < this.bounds.top 
-      || head.y > this.bounds.bottom
-      //|| isCoordsInsideArray(head.x, head.y, this.bodyData);
-    ) 
+  handleControls(arrowKey) { 
+    // define
+    const turnConfig = {
+      Up: { direction: { x: 0, y: -1 }, axis: 'x', cww: true, border: "top" },
+      Down: { direction: { x: 0, y: 1 }, axis: 'x', cww: false, border: "bottom" },
+      Left: { direction: { x: -1, y: 0 }, axis: 'y', cww: false, border: "left" },
+      Right: { direction: { x: 1, y: 0 }, axis: 'y', cww: true, border: "right" },
+    }
+
+    const changeRotation = (axis, counterClockwise) => { 
+      let clockwiseCorrection = counterClockwise === true ? -1 : 1;
+      const newRotation =  (Math.sign(this.direction[axis]) * 0.25) * clockwiseCorrection; 
+
+      this.headRotation += newRotation;
+    }
+
+    const isAllowTurn = (axis, border) => {
+      const oppositeAxis = axis === 'x' ? 'y' : 'x'; 
+      
+      if (
+        !(this.headData[oppositeAxis] === this.bounds[border]) // snake doesn't move along top border
+        && this.direction[oppositeAxis] === 0 // prevent 180° turn
+      ) return true
+      else {
+        return false;
+      }
+    }
+
+    const makeTurn = (direction) => {
+      this.direction.x = direction.x;
+      this.direction.y = direction.y 
+    }
+
+    // init
+    const turnKey = arrowKey.slice(5, arrowKey.length); 
+    const config = turnConfig[turnKey];
+
+    // execute
+    if (isAllowTurn(config.axis, config.border)) {
+      changeRotation(config.axis, config.cww);
+      makeTurn(config.direction);
+
+      this.controlsOn = false; // prevent multiple turns in one step
+    }
   }
 }
 
@@ -165,6 +218,7 @@ class Snake {
 }
 */
 
+// helpers
 class Color { // only works with hsl
   constructor(color) { 
     this.string = color;
