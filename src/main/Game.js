@@ -37,12 +37,13 @@ class Game {
 
     const nextTick = (timestamp, start) => {
       const timeElapsed = timestamp - start;
-    
       if (timeElapsed >= this.timer.gap) { // time to make step   
         if (!this.snake.controlsOn) this.snake.controlsOn = true;
-        this._action();      
 
-        initTimer(timestamp, nextTick);
+        this._action();      
+        if (this.snake.alive) initTimer(timestamp, nextTick);
+        else this._gameOver();
+
       } else {
         this.rafId = requestAnimationFrame((timestamp) => nextTick(timestamp, start)); 
       }
@@ -69,18 +70,37 @@ class Game {
 
   _action() {
     this.snake.makeStep();
-    if (!this.snake.alive) this._gameOver()
   }
 
   _gameOver() {
-    cancelAnimationFrame(this.rafId);
+    this.snake.controlsOn = false;
     startBtn.style.display = 'flex';
   }
 
   reset() {
+    // components
+    this.snake.delete();
+
+    // stats
     if (this.stats.isNewRecord()) this.stats.updateRecord();
     this.stats.resetScore();
-    // to be continued
+  /*  
+  snake.div.replaceChildren(); // delete snake
+  food.element.style.opacity = 0; // hide food till the next game begins
+
+  time.reset();
+
+  // back to initial size
+  board.borderEl.style.width = board.container.width + "px";
+  board.borderEl.style.height = board.container.height + "px";
+  board.backgroundEl.style.clipPath = "";
+  board.clip = board.thick;
+
+  shrinkCounter.reset();
+
+  stats.score.value = 0;
+  stats.score.element.innerText = "Score: 0";  
+  */
   }
 
   attachControls() {
@@ -149,8 +169,9 @@ class Stats {
   updateRecord() { 
     this.recordVal = this.scoreVal;
     this.recordEl.innerText = `Record:${this.recordVal}`;
+  }
 
-    // reset score
+  resetScore() {
     this.scoreVal = 0; 
     this.scoreEl.innerText = `Score:${this.scoreVal}`;
   }

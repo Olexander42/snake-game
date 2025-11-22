@@ -159,6 +159,10 @@ class Snake {
       this.controlsOn = false; // prevent multiple turns in one step
     }
   }
+
+  delete() {
+    this.div.replaceChildren();
+  }
 }
 
 /*

@@ -29,7 +29,7 @@ function setTheme(theme) {
 /*
 
 windup() {
-  const initTimer = (timestamp, f) => {
+  initTimer = (timestamp, f) => {
     let start = timestamp;
     f(timestamp, start);
   }
