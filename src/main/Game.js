@@ -1,5 +1,6 @@
 import { TIME_UNIT } from "../common/constants.js";
-import { root, html, startBtn } from "../common/elements.js";
+import { root, html, startBtn, settingsBtn, sizeInput } from "../common/elements.js";
+import { wait } from "../common/utils.js";
 
 
 class Game {
@@ -17,9 +18,12 @@ class Game {
   }
 
   begin() {
-    const bounds = this.board.getBounds();
+    this.board.normalize(sizeInput.value);
+
+    // snake
+    const boardData = this.board.getData();
     const snakeColor = document.querySelector('input[name="color"]:checked').value;
-    this.snake.spawn(bounds, snakeColor);
+    this.snake.spawn(boardData, snakeColor);
     /*
     food.generateRandomCoords(snake.bodyData);
     food.teleport();
@@ -74,7 +78,10 @@ class Game {
 
   _gameOver() {
     this.snake.controlsOn = false;
-    startBtn.style.display = 'flex';
+
+    wait(1000).then(() => {
+      startBtn.style.display = 'flex';
+    });
   }
 
   reset() {
@@ -84,6 +91,8 @@ class Game {
     // stats
     if (this.stats.isNewRecord()) this.stats.updateRecord();
     this.stats.resetScore();
+
+
   /*  
   snake.div.replaceChildren(); // delete snake
   food.element.style.opacity = 0; // hide food till the next game begins

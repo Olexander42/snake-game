@@ -27,6 +27,11 @@ class Board {
       element.style.width = this.bounds.width + 'px';
       element.style.height = this.bounds.height + 'px';
     })
+
+    this.center = {
+      x: normalize(Math.round(this.bounds.width) / 2, this.borderThick),
+      y: normalize(Math.round(this.bounds.height) / 2, this.borderThick),
+    }
   }
   
   shrink() {
@@ -34,6 +39,7 @@ class Board {
     this.bounds.width -= this.borderThick;
     this.bounds.height -= this.borderThick;
 
+    // we don't resize container to avoid snake shift
     this.border.style.width = this.bounds.width + 'px';
     this.border.style.height = this.bounds.height + 'px';
 
@@ -42,24 +48,19 @@ class Board {
     root.style.setProperty("--clip", `${this.bgClip}px`);
   }
 
-  getBounds() {
-    const calculateCenter = () => {
-      const center = {
-        x: normalize(Math.round(this.bounds.width) / 2, this.borderThick),
-        y: normalize(Math.round(this.bounds.height) / 2, this.borderThick)
-      }
-
-      return center
-    }
-
-    return {
-      left: this.bgClip,
-      right: this.bounds.width - this.bgClip - this.borderThick, // - borderThick to offest distance to head.left
-      top: this.bgClip,
-      bottom: this.bounds.height - this.bgClip - this.borderThick, // - borderThick to offest distance to head.top
-      center: calculateCenter(),
+  getData() {
+    const data = {
+      bounds: {
+        left: this.bgClip,
+        right: this.container.clientWidth - this.bgClip - this.borderThick, // - borderThick to offest distance to head.left
+        top: this.bgClip,
+        bottom: this.container.clientHeight - this.bgClip - this.borderThick, // - borderThick to offest distance to head.top 
+      },
+      center: this.center,
       step: this.borderThick / 2,
     }
+
+    return data
   }
 }
 

@@ -7,23 +7,21 @@ class Snake {
     this.div = document.createElement('div');
     this.div.id = "snake";
     container.append(this.div);
-
-    
   }
 
-  spawn(bounds, color) {
-    this.bounds = bounds;
+  spawn(data, color) {
+    this.getBoardData(data);
     this.color = new Color(color);
 
     // parameters
     this.speed = 1;
     this.direction = {"x": 1, "y": 0};
     this.headRotation = 0;
-    this.headThick = this.bounds.step * 2; // because bounds.step is half of size_unit
+    this.headThick = this.step * 2; // because step is half of size_unit
 
     // body 
-    this._createSection(this.bounds.center.x, this.bounds.center.y, this.color.changedColor({changeL: -2}), "head") ; 
-    this._createSection(this.bounds.center.x - this.bounds.step, this.bounds.center.y, this.color.string, "neck"); 
+    this._createSection(this.boundsCenter.x, this.boundsCenter.y, this.color.changedColor({changeL: -2}), "head") ; 
+    this._createSection(this.boundsCenter.x - this.step, this.boundsCenter.y, this.color.string, "neck"); 
 
     this.head = document.getElementById("head");
     this.neck = document.getElementById("neck");
@@ -69,8 +67,8 @@ class Snake {
     // move head 
     const [currentX, currentY] = [this.headData.x, this.headData.y]
 
-    const stepX = Math.sign(this.direction.x) * this.bounds.step;
-    const stepY = Math.sign(this.direction.y) * this.bounds.step;
+    const stepX = Math.sign(this.direction.x) * this.step;
+    const stepY = Math.sign(this.direction.y) * this.step;
 
     const newX = currentX + stepX;
     const newY = currentY + stepY;
@@ -158,6 +156,12 @@ class Snake {
 
       this.controlsOn = false; // prevent multiple turns in one step
     }
+  }
+
+  getBoardData(data) {
+    this.bounds = data.bounds;
+    this.step = data.step;
+    this.boundsCenter = data.center;
   }
 
   delete() {

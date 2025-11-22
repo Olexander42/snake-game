@@ -1,5 +1,5 @@
 import { setTheme } from "../common/helpers.js";
-import { startBtn, settingsBtn } from "../common/elements.js";
+import { startBtn, settingsBtn, sizeInput } from "../common/elements.js";
 
 
 class Menu {
@@ -8,7 +8,6 @@ class Menu {
 
     this.mainMenuDiv = document.getElementById("main-menu");
     this.settingsDiv = document.getElementById("settings-menu");
-    this.sizeInput = document.getElementById("size-slider");
 
     this.firstStart = true;
     this.settingsVisited = false;
@@ -20,7 +19,6 @@ class Menu {
   _attachStartListener() {  
     startBtn.addEventListener('click', () => { 
       if (this.firstStart) {
-        this.game.board.normalize(this.sizeInput.value);
         this.game.attachControls();
 
         startBtn.innerText = "Start Again";
@@ -52,7 +50,7 @@ class Menu {
         const backBtn = document.getElementById("back-btn");
 
         const buttonFlipper = new ButtonFlipper(buttonsSides); 
-        const sizeSlider = new Slider(this.sizeInput, 3, (value) => this.game.board.normalize(value));
+        const sizeSlider = new Slider(sizeInput, 3, (value) => this.game.board.normalize(value));
         const colorOptionOutline = new Outline("#color-set");
         const themeThumbnailOutline = new Outline("#theme-set", (value) => setTheme(value));
 
