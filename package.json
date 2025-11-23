@@ -1,0 +1,25 @@
+{
+  "name": "snake-game",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Olexander42/snake-game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Olexander42/snake-game/issues"
+  },
+  "homepage": "https://github.com/Olexander42/snake-game#readme",
+  "description": "",
+  "type": "module",
+  "devDependencies": {
+    "jsdom": "^27.2.0",
+    "vitest": "^4.0.13"
+  }
+}

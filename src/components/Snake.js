@@ -1,16 +1,17 @@
-import { roundTo } from '../common/utils.js';
-import { root, container } from "../common/elements.js";
+import Color from "../common/Color.js";
+import { roundTo } from "../common/utils.js";
+import getElement from "../common/elements.js";
 
 
 class Snake {
   constructor() {
     this.div = document.createElement('div');
     this.div.id = "snake";
-    container.append(this.div);
+    getElement.container().append(this.div);
   }
 
-  spawn(data, color) {
-    this.getBoardData(data);
+  spawn(boardData, color) {
+    this.getBoardData(boardData);
     this.color = new Color(color);
 
     // parameters
@@ -61,6 +62,7 @@ class Snake {
     })
 
     this.headData = this.bodyData[0];
+    //console.log(JSON.stringify(this.bodyData, null, 2));
   }
 
   makeStep() {    
@@ -227,29 +229,6 @@ class Snake {
 */
 
 // helpers
-class Color { // only works with hsl
-  constructor(color) { 
-    this.string = color;
-    this.hslComponents = this._colorComponents();
-  }
-
-  _colorComponents() { 
-    const hslValues = this.string.match(/\d+/g).map(Number);
-    const hslComponents = {h: hslValues[0], s: hslValues[1], l: hslValues[2]};
-
-    return hslComponents;
-  }
-
-  changedColor({changeH = 0, changeS = 0, changeL = 0} = {}) {
-    const h = this.hslComponents.h + changeH;
-    const s = this.hslComponents.s + changeS;
-    const l = this.hslComponents.l + changeL;
-
-    const newColor = `hsl(${h}, ${s}%, ${l}%)`
-
-    return newColor;
-  }
-}
 
 
 

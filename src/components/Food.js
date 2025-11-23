@@ -1,27 +1,54 @@
-import { normalize, getRandomInt, splitColor, changedColor } from "../../common/utils.js";
-import { TIME_UNIT, center } from "../../common/constants.js";
-import { isCoordsInsideArray } from "../../common/helpers.js";
-import { container } from "../../common/elements.js";
+import Color from "../common/Color.js";
+import getElement from "../common/elements.js";
+import { normalize, getRandomInt } from "../common/utils.js";
+import { TIME_UNIT, MILISECONDS_IN_SECOND } from "../common/constants.js";
 
 
 class Food {
-  constructor() {
+  constructor() { // invisible food element is created off board 
     this.element = document.createElement('span');
     this.element.id = "food";
-    board.containerEl.append(this.element);
+    this.element.style.opacity = 0;
+    getElement.container().append(this.element);
 
-    this.color = { string: 'hsl(0, 0%, 0%)' };
-    this.color.hsl = splitColor(this.color.string);
-    this.color.string = changedColor(this.color.hsl, { h: getRandomInt(0, 360), s: getRandomInt(50, 100), l: getRandomInt(25, 75)});
-    this.element.style.setProperty('--color', this.color.string); // have to set color from the get-go for the fade-in to work
+    this.color = new Color();
+    this.element.style.setProperty( // have to set color from the get-go for the fade-in to work
+      '--color',
+      this.color.changedColor(
+        { 
+          changeH: getRandomInt(0, 360),
+          changeS: getRandomInt(50, 100),
+          changeL: getRandomInt(25, 75),
+        }
+      )
+    ) 
   }
 
-  teleport() {
-    this.generateRandomCoords();
-    this.element.style.left = this.x + "px";
-    this.element.style.top = this.y + "px";
+  teleport(boardData, snakeData) {
+    // generate random coords
+    const bounds = boardData.bounds;
+    const step = boardData.step;
+    const coords = {}
+
+    while (true) {
+      coords.x = normalize(getRandomInt(bounds.left, bounds.right), step);
+      coords.y = normalize(getRandomInt(bounds.top, bounds.bottom), step);
+
+      if (!snakeData.includes(coords)) break;
+    }
+
+    // apply
+    this.element.style.left = `${coords.x}px`;
+    this.element.style.top = `${coords.y}px`;
   }
 
+  fadeIn() {
+    this.element.style.setProperty("--transition", `opacity ${TIME_UNIT / MILISECONDS_IN_SECOND }s linear`)
+    this.element.addEventListener('transitionend', () => this.element.style.setProperty("--transition", 'no transition'));
+    requestAnimationFrame(() => this.element.style.opacity = 1); 
+  }
+
+  /*
   changeColor() {
     this.element.style.setProperty("--prev-color", this.color.string);
     this.color.string = changedColor(this.color.hsl, { h: getRandomInt(0, 360), s: getRandomInt(50, 100), l: getRandomInt(25, 75)});
@@ -30,32 +57,10 @@ class Food {
     requestAnimationFrame(() => this.element.style.setProperty("--color", this.color.string));  // then change color of #food
   }
 
-  fadeIn() {
-    this.element.style.setProperty("--transition", `opacity ${TIME_UNIT / 1000}s linear`)
-    requestAnimationFrame(() => food.element.style.opacity = 1);
-    this.element.addEventListener('transitionend', () => this.element.style.setProperty("--transition", 'no transition')); 
-  }
 
 
-  generateRandomCoords(snakeBodyData) {
-    const clip = parseInt(root.getPropertyValue("--clip"));
-    while (true) {
-      const [x, y] = [
-        normalize(getRandomInt(clip, container.clientWidth - clip - size_unit.value * 2), size_unit.value),
-        normalize(getRandomInt(clip, container.clientHeight - clip - size_unit.value * 2), size_unit.value),
-      ]; 
 
-      if (
-        isCoordsInsideArray(x, y, snakeBodyData) 
-        || (x === this.x && y === this.y) 
-        || (x === center.x && y === center.y)
-      ) continue;
-      else {
-        this.x = x;
-        this.y = y;
 
-        break;
-      }
     }
   }
 
@@ -77,6 +82,7 @@ class Food {
 
    switchOpacity();
   }
+  */
 }
 
 

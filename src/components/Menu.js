@@ -1,5 +1,5 @@
 import { setTheme } from "../common/helpers.js";
-import { startBtn, settingsBtn, sizeInput } from "../common/elements.js";
+import getElement from "../common/elements.js";
 
 
 class Menu {
@@ -8,6 +8,7 @@ class Menu {
 
     this.mainMenuDiv = document.getElementById("main-menu");
     this.settingsDiv = document.getElementById("settings-menu");
+    this.settingsBtn = getElement.settingsBtn();
 
     this.firstStart = true;
     this.settingsVisited = false;
@@ -17,6 +18,8 @@ class Menu {
   }
 
   _attachStartListener() {  
+    const startBtn = getElement.startBtn();
+
     startBtn.addEventListener('click', () => { 
       if (this.firstStart) {
         this.game.attachControls();
@@ -30,14 +33,16 @@ class Menu {
 
       // hide menu
       startBtn.style.display = 'none';
-      settingsBtn.style.display = 'none';
+      this.settingsBtn.style.display = 'none';
 
       this.game.begin();
     })
   }
 
   _attachSettingsListener() {
-    settingsBtn.addEventListener('click', () => {
+    const sizeInput = getElement.sizeInput();
+
+    this.settingsBtn.addEventListener('click', () => {
       // show settings
       this.mainMenuDiv.style.display = 'none';
       this.settingsDiv.style.display = 'flex';

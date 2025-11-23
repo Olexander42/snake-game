@@ -9,7 +9,6 @@
 #food {
   scale: 0.5;
   background-color: var(--color);
-  opacity: 0;
   transition: var(--transition);
 }
 

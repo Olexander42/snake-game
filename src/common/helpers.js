@@ -1,7 +1,12 @@
-import { background, border, html, style } from "../common/elements.js";
+import getElement from "../common/elements.js";
 
 
 function setTheme(theme) {
+  const html = getElement.html();
+  const border = getElement.border();
+  const background = getElement.background();
+  const style = getElement.style();
+
   html.style.setProperty('background-image', `url(./assets/${theme}/images/outside.jpg)`);
   border.style.setProperty('border-image-source', `url(./assets/${theme}/images/border.jpg)`);
   background.style.setProperty('background-image', `url(./assets/${theme}/images/inside.jpg)`);
@@ -29,7 +34,7 @@ function setTheme(theme) {
 /*
 
 windup() {
-  initTimer = (timestamp, f) => {
+  const initTimer = (timestamp, f) => {
     let start = timestamp;
     f(timestamp, start);
   }

@@ -1,11 +1,13 @@
 import { normalize } from "../common/utils.js";
-import { root, container, background, border } from "../common/elements.js";
+import getElement from "../common/elements.js";
+
 
 class Board {
   constructor() {
-    this.container = container;
-    this.background = background;
-    this.border = border;
+    this.container = getElement.container();
+    this.background = getElement.background();
+    this.border = getElement.border();
+    this.root = getElement.root();
   }
 
   normalize(size_step) {
@@ -13,8 +15,8 @@ class Board {
     this.borderThick = Number(size_step);
     this.bgClip = this.borderThick;
 
-    root.style.setProperty("--size", `${this.borderThick}px`);
-    root.style.setProperty("--clip", `${this.bgClip}px`);
+    this.root.style.setProperty("--size", `${this.borderThick}px`);
+    this.root.style.setProperty("--clip", `${this.bgClip}px`);
 
     // calculate
     this.bounds = {
@@ -24,8 +26,8 @@ class Board {
   
     // apply 
     [this.container, this.background, this.border,].forEach(element => {
-      element.style.width = this.bounds.width + 'px';
-      element.style.height = this.bounds.height + 'px';
+      element.style.width = `${this.bounds.width}px`;
+      element.style.height = `${this.bounds.height}px`;
     })
 
     this.center = {
@@ -40,12 +42,12 @@ class Board {
     this.bounds.height -= this.borderThick;
 
     // we don't resize container to avoid snake shift
-    this.border.style.width = this.bounds.width + 'px';
-    this.border.style.height = this.bounds.height + 'px';
+    this.border.style.width = `${this.bounds.width}px`;
+    this.border.style.height =`${this.bounds.height}px`;
 
     // background
     this.bgClip += this.borderThick / 2;
-    root.style.setProperty("--clip", `${this.bgClip}px`);
+    this.root.style.setProperty("--clip", `${this.bgClip}px`);
   }
 
   getData() {
@@ -59,7 +61,7 @@ class Board {
       center: this.center,
       step: this.borderThick / 2,
     }
-
+  
     return data
   }
 }
