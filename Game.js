@@ -21,14 +21,14 @@ class Game {
     // board
     const sizeInput = getElement.sizeInput();
     this.board.normalize(sizeInput.value);
-    const boardData = this.board.getData();
 
     // snake
     const snakeColor = document.querySelector('input[name="color"]:checked').value;
-    this.snake.spawn(boardData, snakeColor);
+    this.snake.spawn(this.board.data, snakeColor);
+    this.timer.updateGap(this.snake.speed);
 
     // food 
-    this.food.teleport(boardData, this.snake.bodyData);
+    this.food.teleport(this.board.data, this.snake.bodyData);
     this.food.fadeIn();
   
     this._windup();
@@ -76,6 +76,23 @@ class Game {
 
   _action() {
     this.snake.makeStep();
+    if (this.snake.isAteFood(this.food.coords)) {
+      if (this.shrinkCounter.isTimeToShrink()) {
+        this.board.shrink();
+        this.snake.updateBoardData(this.board.data);
+      }
+
+      this.stats.incrementScore();
+
+      this.food.teleport(this.board.data, this.snake.bodyData);
+
+      this.snake.grow();
+      this.snake.speedUp();
+      this.timer.updateGap(this.snake.speed);
+
+      
+
+    }
   }
 
   _gameOver() {
@@ -89,7 +106,7 @@ class Game {
 
   reset() {
     // components
-    this.snake.delete();
+    this.snake.div.replaceChildren(); // delete
 
     // stats
     if (this.stats.isNewRecord()) this.stats.updateRecord();
@@ -144,7 +161,7 @@ class Game {
 class Timer {
   constructor() {
     this.gap = TIME_UNIT;
-    this._updateCssVar();
+    //this._updateCssVar();
   }
 
   updateGap(speed) {

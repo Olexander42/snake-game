@@ -1,6 +1,7 @@
 import Color from "../common/Color.js";
 import { roundTo } from "../common/utils.js";
 import getElement from "../common/elements.js";
+import { ACCELERATION } from "../common/constants.js";
 
 
 class Snake {
@@ -11,7 +12,7 @@ class Snake {
   }
 
   spawn(boardData, color) {
-    this.getBoardData(boardData);
+    this.updateBoardData(boardData);
     this.color = new Color(color);
 
     // parameters
@@ -76,15 +77,10 @@ class Snake {
     const newY = currentY + stepY;
 
     const collisionDetected = (headX, headY) => {
-      if (
-        headX < this.bounds.left 
+      return headX < this.bounds.left 
         || headX > this.bounds.right
         || headY < this.bounds.top
         || headY > this.bounds.bottom
-      ) return true;
-      else {
-        return false;
-      }
     }
 
     if (!collisionDetected(newX, newY)) { 
@@ -109,6 +105,7 @@ class Snake {
       moveToNextSection(i);
 
       this._snapshot();
+
     } else {
       this.alive = false;
     }
@@ -160,14 +157,50 @@ class Snake {
     }
   }
 
-  getBoardData(data) {
+  updateBoardData(data) {
     this.bounds = data.bounds;
     this.step = data.step;
     this.boundsCenter = data.center;
   }
 
-  delete() {
-    this.div.replaceChildren();
+  isAteFood(foodCoords) {
+    return this.headData.x === foodCoords.x && this.headData.y === foodCoords.y;
+  }
+
+  grow() {
+    const oldTail = this.body[this.body.length - 1];
+    if (oldTail.id === "tail") oldTail.id = "";
+
+    this.tail = oldTail.cloneNode(false);
+    this.tail.id = "tail";
+    this.tail.style.zIndex = `-${this.body.length}`
+    this.tail.style.backgroundColor = this.color.changedColor({ changeL: this.body.length }); 
+    this.div.append(this.tail);
+
+    this._snapshot();
+    this._rescaleBody(); // create tapering effect
+  }
+
+  _rescaleBody() { 
+    const length = this.body.length;
+    let i = length - 1; // tail
+    let j = 1; // neck
+    let scale = 0;
+
+    // each segment from tail to neck gets decreasingly smaller
+    const rescaleSection = () => { 
+      scale += 1 / (2 ** j); 
+      this.body[i].style.scale = `${roundTo(scale, 2)}`;
+
+      i--;
+      j++;
+      if (i > 0) rescaleSection();  
+    }
+    rescaleSection();
+  }
+
+  speedUp() {
+    this.speed += ACCELERATION;
   }
 }
 
@@ -185,45 +218,12 @@ class Snake {
       i++;
   }
 
-  lengthen() {
-    this._snapshot(); // test without it
-
-    const oldTail = this.body[this.body.length - 1];
-    if (oldTail.id === "tail") oldTail.id = "";
-
-    this.tail = oldTail.cloneNode(false);
-    this.tail.id = "tail";
-    this.tail.style.zIndex = `-${this.body.length}`
-    this.div.append(this.tail);
-
-    this._rescaleBody();
-    this._repaintTail();
-  }
 
 
-  _repaintTail() {
-    const lighterColor = changedColor(this.color.hsl , {l: this.body.length});
-    this.tail.style.backgroundColor = lighterColor;
-  }
 
-  _rescaleBody() {
-    this._snapshot(); // try move it outside
 
-    const length = this.body.length;
-    let i = length - 1;
-    let j = 1; 
-    let scale = 0;
 
-    const rescaleSection = () => { 
-      // rescale from tail to neck
-      scale += 1 / (2 ** j); 
-      snake.body[i].style.scale = `${roundTo(scale, 2)}`;
-      i--;
-      j++;
-      if (i > 0) rescaleSection();  
-    }
 
-    rescaleSection();
   }
 }
 */

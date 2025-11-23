@@ -116,7 +116,7 @@ class Slider {
     this.STEP_TRANSITION = speed;
     this.recipient = recipient;
 
-    this.requiresAdjustment = this.STEP_DEFAULT % this.STEP_TRANSITION === 0 ? false : true;
+    this.requiresAdjustment = this.STEP_DEFAULT % this.STEP_TRANSITION !== 0;
     this.currentValue = Number(this.input.value);
     
   }

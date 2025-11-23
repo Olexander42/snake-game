@@ -36,14 +36,10 @@ test("Food gets teleported correctly", { repeats: 10000 }, () => {
   const food = new Food();
 
   food.teleport(boardData, snakeData);
-  
-  const foodCoords = {};
-  foodCoords.x = parseInt(food.element.style.left);
-  foodCoords.y = parseInt(food.element.style.top);
 
-  expect(foodCoords).toSatisfy((foodCoords) => 
-    (boardData.bounds.left <= foodCoords.x <= boardData.bounds.right)
-    && (boardData.bounds.top <= foodCoords.y <= boardData.bounds.bottom))
+  expect(food.coords).toSatisfy((foodCoords) => 
+    (boardData.bounds.left <= food.coords.x <= boardData.bounds.right)
+    && (boardData.bounds.top <= food.coords.y <= boardData.bounds.bottom))
   }
 )
 

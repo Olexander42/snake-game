@@ -34,6 +34,8 @@ class Board {
       x: normalize(Math.round(this.bounds.width) / 2, this.borderThick),
       y: normalize(Math.round(this.bounds.height) / 2, this.borderThick),
     }
+
+    this._updateData();
   }
   
   shrink() {
@@ -48,10 +50,12 @@ class Board {
     // background
     this.bgClip += this.borderThick / 2;
     this.root.style.setProperty("--clip", `${this.bgClip}px`);
+
+    this._updateData();
   }
 
-  getData() {
-    const data = {
+  _updateData() {
+    this.data = {
       bounds: {
         left: this.bgClip,
         right: this.container.clientWidth - this.bgClip - this.borderThick, // - borderThick to offest distance to head.left
@@ -61,8 +65,6 @@ class Board {
       center: this.center,
       step: this.borderThick / 2,
     }
-  
-    return data
   }
 }
 

@@ -28,18 +28,18 @@ class Food {
     // generate random coords
     const bounds = boardData.bounds;
     const step = boardData.step;
-    const coords = {}
+    this.coords = {}
 
     while (true) {
-      coords.x = normalize(getRandomInt(bounds.left, bounds.right), step);
-      coords.y = normalize(getRandomInt(bounds.top, bounds.bottom), step);
+      this.coords.x = normalize(getRandomInt(bounds.left, bounds.right), step);
+      this.coords.y = normalize(getRandomInt(bounds.top, bounds.bottom), step);
 
-      if (!snakeData.includes(coords)) break;
+      if (!snakeData.includes(this.coords)) break;
     }
 
     // apply
-    this.element.style.left = `${coords.x}px`;
-    this.element.style.top = `${coords.y}px`;
+    this.element.style.left = `${this.coords.x}px`;
+    this.element.style.top = `${this.coords.y}px`;
   }
 
   fadeIn() {
