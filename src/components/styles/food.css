@@ -8,14 +8,12 @@
 
 #food {
   scale: 0.5;
-  background-color: var(--color);
-  transition: var(--transition);
 }
 
 #food::before {
   content: '';
   inset: 0;
-  background-color: var(--prev-color);
+  background-color: var(--pseudo-color);
   opacity: var(--pseudo-opacity);
   transition: var(--pseudo-transition);
 }

@@ -22,7 +22,7 @@ class Snake {
     this.headThick = this.step * 2; // because step is half of size_unit
 
     // body 
-    this._createSection(this.boundsCenter.x, this.boundsCenter.y, this.color.changedColor({changeL: -2}), "head") ; 
+    this._createSection(this.boundsCenter.x, this.boundsCenter.y, this.color.changeColor({changeL: -2}), "head") ; 
     this._createSection(this.boundsCenter.x - this.step, this.boundsCenter.y, this.color.string, "neck"); 
 
     this.head = document.getElementById("head");
@@ -31,7 +31,7 @@ class Snake {
     this.head.style.scale = `${1}`;
     this.neck.style.scale = `${0.75}`;
 
-    this.alive = true;
+    this.isAlive = true;
     this.controlsOn = true;
 
     this._snapshot();
@@ -107,7 +107,7 @@ class Snake {
       this._snapshot();
 
     } else {
-      this.alive = false;
+      this.isAlive = false;
     }
   }
 
@@ -174,7 +174,7 @@ class Snake {
     this.tail = oldTail.cloneNode(false);
     this.tail.id = "tail";
     this.tail.style.zIndex = `-${this.body.length}`
-    this.tail.style.backgroundColor = this.color.changedColor({ changeL: this.body.length }); 
+    this.tail.style.backgroundColor = this.color.changeColor({ changeL: this.body.length }); 
     this.div.append(this.tail);
 
     this._snapshot();
@@ -202,34 +202,19 @@ class Snake {
   speedUp() {
     this.speed += ACCELERATION;
   }
-}
 
-/*
-
-  repaintBody() { // under construction to work with RAF
-    /*
+  greyout() { // under construction to work with RAF (actually no)
     let i = 0;
     const repaintSection = (i) => {
-      const lighterColor = changedColor(this.color.hsl, {l: i});
+      const lighterColor = changeColor(this.color.hsl, {l: i});
       const section = this.body[i];
 
       section.style.backgroundColor = lighterColor;
 
       i++;
-  }
-
-
-
-
-
-
-
+    }
   }
 }
-*/
-
-// helpers
-
 
 
 export default Snake;

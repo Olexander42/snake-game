@@ -6,7 +6,7 @@ function getRandomInt(min, max) { // max excluded
   return (Math.floor(Math.random() * ((max - min)) + min));
 }
 
-function wait(ms) {
+function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(true)
@@ -20,6 +20,6 @@ function roundTo(value, decimals) {
 }
 
 
-export { normalize, getRandomInt, wait, roundTo };
+export { normalize, getRandomInt, sleep, roundTo };
 
 

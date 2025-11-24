@@ -1,6 +1,6 @@
-import { TIME_UNIT } from "./src/common/constants.js";
+import { TIME_UNIT, MS_PER_SECOND } from "./src/common/constants.js";
 import getElement from "./src/common/elements.js";
-import { wait } from "./src/common/utils.js";
+import { sleep } from "./src/common/utils.js";
 
 
 class Game {
@@ -26,12 +26,12 @@ class Game {
     const snakeColor = document.querySelector('input[name="color"]:checked').value;
     this.snake.spawn(this.board.data, snakeColor);
     this.timer.updateGap(this.snake.speed);
+    this._windupSnake(this.timer.gap);
 
     // food 
     this.food.teleport(this.board.data, this.snake.bodyData);
     this.food.fadeIn();
-  
-    this._windup();
+    this.food.transitionColors();
   }
 
   _windup() {
@@ -44,7 +44,7 @@ class Game {
     const nextTick = (timestamp, start) => {
       const timeElapsed = timestamp - start;
       if (timeElapsed >= this.timer.gap) { // time to make step   
-        if (!this.snake.controlsOn) this.snake.controlsOn = true;
+        
 
         this._action();      
         if (this.snake.alive) initTimer(timestamp, nextTick);
@@ -74,8 +74,28 @@ class Game {
     });
   }
 
+  async _windupSnake(ms) {
+    await sleep(ms);
+    if (!this.snake.controlsOn) this.snake.controlsOn = true;
+    this._action();
+  } 
+
+
+  async _windupFoodColorChange(ms) {
+    await sleep(ms);
+
+    this.food.transitionColor();
+    this._windupFoodColorChange(ms);
+  } 
+
   _action() {
     this.snake.makeStep();
+
+    if (!this.snake.isAlive) {
+      this._gameOver();
+      return;
+    }
+
     if (this.snake.isAteFood(this.food.coords)) {
       if (this.shrinkCounter.isTimeToShrink()) {
         this.board.shrink();
@@ -89,19 +109,17 @@ class Game {
       this.snake.grow();
       this.snake.speedUp();
       this.timer.updateGap(this.snake.speed);
-
-      
-
     }
+
+    this._windupSnake(this.timer.gap);
   }
 
-  _gameOver() {
+  async _gameOver() {
     const startBtn = getElement.startBtn();
     this.snake.controlsOn = false;
 
-    wait(1000).then(() => {
-      startBtn.style.display = 'flex';
-    });
+    await sleep(1000);
+    startBtn.style.display = 'flex';
   }
 
   reset() {
@@ -161,7 +179,6 @@ class Game {
 class Timer {
   constructor() {
     this.gap = TIME_UNIT;
-    //this._updateCssVar();
   }
 
   updateGap(speed) {

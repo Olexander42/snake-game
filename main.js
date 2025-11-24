@@ -5,6 +5,7 @@ import Game from "./Game.js";
 import Menu from "./src/components/Menu.js";
 import { setTheme } from "./src/common/helpers.js";
 
+
 const theme = document.querySelector('input[name="theme"]:checked').value;
 setTheme(theme);
 
@@ -13,7 +14,6 @@ const snake = new Snake();
 const food = new Food();
 const game = new Game(board, snake, food);
 const menu = new Menu(game);
-
 
 
 
