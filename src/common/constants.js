@@ -1,8 +1,7 @@
-const TIME_UNIT = 500; 
-const MS_PER_SECOND = 1000;
+const TIME_UNIT = 1000; 
 
 const ACCELERATION = 0.25;
 
 
 
-export { TIME_UNIT, MS_PER_SECOND, ACCELERATION };
+export { TIME_UNIT, ACCELERATION };

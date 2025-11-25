@@ -1,7 +1,10 @@
-import { TIME_UNIT, MS_PER_SECOND } from "./src/common/constants.js";
+import { TIME_UNIT } from "./src/common/constants.js";
 import getElement from "./src/common/elements.js";
 import { sleep } from "./src/common/utils.js";
 
+let count = 0;
+let prevStart = 0;
+let avgDrift = 0;
 
 class Game {
   constructor(board, snake, food) {
@@ -13,7 +16,6 @@ class Game {
     this.timer = new Timer();
     this.shrinkCounter = new ShrinkCounter();
 
-    this.rafId = null;
     this.isPaused = false;
   }
 
@@ -26,76 +28,23 @@ class Game {
     const snakeColor = document.querySelector('input[name="color"]:checked').value;
     this.snake.spawn(this.board.data, snakeColor);
     this.timer.updateGap(this.snake.speed);
-    this._windupSnake(this.timer.gap);
 
     // food 
     this.food.teleport(this.board.data, this.snake.bodyData);
     this.food.fadeIn();
     this.food.transitionColors();
-  }
 
-  _windup() {
-    const initTimer = (timestamp, callback) => {
-      let start = timestamp;
-
-      callback(timestamp, start);
-    }
-
-    const nextTick = (timestamp, start) => {
-      const timeElapsed = timestamp - start;
-      if (timeElapsed >= this.timer.gap) { // time to make step   
-        
-
-        this._action();      
-        if (this.snake.alive) initTimer(timestamp, nextTick);
-        else this._gameOver();
-
-      } else {
-        this.rafId = requestAnimationFrame((timestamp) => nextTick(timestamp, start)); 
-      }
-    }
-
-    /*
-    const nextColor = (t, start) => {
-      const timeElapsed = t - start;
-
-      if (timeElapsed >= TIME_UNIT * 2) {
-        food.changeColor();
-        initTimer(t, nextColor); // restart the countdown to the next color change
-      } else {
-        requestAnimationFrame((t) => nextColor(t, start));
-      }
-    }
-    */
-
-    requestAnimationFrame((timestamp) => {
-      //initTimer(timestamp, nextColor);
-      initTimer(timestamp, nextTick);
-    });
-  }
-
-  async _windupSnake(ms) {
-    await sleep(ms);
-    if (!this.snake.controlsOn) this.snake.controlsOn = true;
     this._action();
-  } 
+  }
 
+  _action() {   
+    if (!this.snake.controlsOn) this.snake.controlsOn = true;
 
-  async _windupFoodColorChange(ms) {
-    await sleep(ms);
-
-    this.food.transitionColor();
-    this._windupFoodColorChange(ms);
-  } 
-
-  _action() {
     this.snake.makeStep();
-
     if (!this.snake.isAlive) {
       this._gameOver();
       return;
     }
-
     if (this.snake.isAteFood(this.food.coords)) {
       if (this.shrinkCounter.isTimeToShrink()) {
         this.board.shrink();
@@ -111,7 +60,7 @@ class Game {
       this.timer.updateGap(this.snake.speed);
     }
 
-    this._windupSnake(this.timer.gap);
+    if (!this.isPaused) setTimeout(() => this._action(), this.timer.gap);
   }
 
   async _gameOver() {
@@ -129,25 +78,6 @@ class Game {
     // stats
     if (this.stats.isNewRecord()) this.stats.updateRecord();
     this.stats.resetScore();
-
-
-  /*  
-  snake.div.replaceChildren(); // delete snake
-  food.element.style.opacity = 0; // hide food till the next game begins
-
-  time.reset();
-
-  // back to initial size
-  board.borderEl.style.width = board.container.width + "px";
-  board.borderEl.style.height = board.container.height + "px";
-  board.backgroundEl.style.clipPath = "";
-  board.clip = board.thick;
-
-  shrinkCounter.reset();
-
-  stats.score.value = 0;
-  stats.score.element.innerText = "Score: 0";  
-  */
   }
 
   attachControls() {
@@ -166,9 +96,8 @@ class Game {
       this.isPaused = false;
       this.snake.controlsOn = true;
 
-      this._windup();
+      this._action(this.timer.gap);
     } else {
-      cancelAnimationFrame(this.rafId);
       this.isPaused = true;
       this.snake.controlsOn = false;
     }
