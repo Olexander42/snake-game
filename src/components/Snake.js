@@ -63,7 +63,7 @@ class Snake {
     })
 
     this.headData = this.bodyData[0];
-    //console.log(JSON.stringify(this.bodyData, null, 2));
+    console.log(JSON.stringify(this.bodyData, null, 2));
   }
 
   makeStep() {    
@@ -96,8 +96,8 @@ class Snake {
 
         const [newX, newY, newRotation] = [nextSection.x, nextSection.y, nextSection.rotation];
     
-        currentSection.style.left = newX + 'px';
-        currentSection.style.top = newY + 'px';
+        currentSection.style.left = `${newX}px`;
+        currentSection.style.top = `${newY}px`;
         currentSection.style.rotate = newRotation;
 
         if (i < this.body.length - 1) moveToNextSection(i + 1);

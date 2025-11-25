@@ -1,6 +1,6 @@
 import Color from "../common/Color.js";
 import getElement from "../common/elements.js";
-import { normalize, getRandomInt } from "../common/utils.js";
+import { normalize, getRandomInt, getRandomColor } from "../common/utils.js";
 import { TIME_UNIT } from "../common/constants.js";
 
 class Food {
@@ -10,9 +10,8 @@ class Food {
     this.element.style.opacity = 0;
     getElement.container().append(this.element);
 
-    this.color = new Color();
-    this.color.string = this.color.getRandomColor({ changeS: [50, 100], changeL: [25, 75] })
-    this.element.style.backgroundColor = this.color.string; 
+    this.color = getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] });
+    this.element.style.backgroundColor = this.color; 
 
     this.TRANSITION_DURATION = 2000;
   }
@@ -21,13 +20,16 @@ class Food {
     // generate random coords
     const bounds = boardData.bounds;
     const step = boardData.step;
+    const snakeCoords = snakeData.map(({ x, y }) => ({ x, y }));
+
     this.coords = {}
 
     while (true) {
       this.coords.x = normalize(getRandomInt(bounds.left, bounds.right), step);
       this.coords.y = normalize(getRandomInt(bounds.top, bounds.bottom), step);
 
-      if (!snakeData.includes(this.coords)) break;
+      if (!snakeCoords.some(({ x, y }) => this.coords.x === x && this.coords.y === y)) break;
+      console.log("INSIDE SNAKE!")
     }
 
     // apply
@@ -43,9 +45,9 @@ class Food {
 
   transitionColors(ms=this.TRANSITION_DURATION) { 
     // Due to performance issues, we transition opacity of the ::before pseudo-element, not the food element itself.
-    this.element.style.setProperty("--pseudo-color", this.color.string); // sync ::before and main element color
+    this.element.style.setProperty("--pseudo-color", this.color); // sync ::before and main element color
     
-    const newRandomColor = this.color.getRandomColor();
+    const newRandomColor = getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] });
     this.element.style.backgroundColor = newRandomColor; // Change the main element color.
 
     // The change is hidden by the fully opaque pseudo-element.
@@ -58,7 +60,7 @@ class Food {
     this.element.style.setProperty("--pseudo-transition", `opacity ${this.TRANSITION_DURATION / 1000}s linear`); 
     this.element.style.setProperty("--pseudo-opacity", 0);
 
-    this.color.string = newRandomColor; 
+    this.color = newRandomColor; 
     setTimeout(() => this.transitionColors(), this.TRANSITION_DURATION); 
   }
 }

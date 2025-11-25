@@ -5,28 +5,29 @@ beforeEach(() => {
   document.body.innerHTML = `<div id="container"></div>`;
 })
 
-const boardData = { 
-  "bounds": {
-    "left": 60,
-    "right": 660,
-    "top": 60,
-    "bottom": 540
-  },
-  "center": {
-    "x": 420,
-    "y": 360
-  },
-  "step": 30,
-}
+const boardData = 
+  {
+    "bounds": {
+      "left": 60,
+      "right": 600,
+      "top": 60,
+      "bottom": 540
+    },
+    "center": {
+      "x": 360,
+      "y": 360
+    },
+    "step": 30
+  }
 
 const snakeData = [
   {
-    "x": 420,
+    "x": 360,
     "y": 360,
     "rotation": ""
   },
   {
-    "x": 390,
+    "x": 330,
     "y": 360,
     "rotation": ""
   }
@@ -39,7 +40,9 @@ test("Food gets teleported correctly", { repeats: 10000 }, () => {
 
   expect(food.coords).toSatisfy((foodCoords) => 
     (boardData.bounds.left <= food.coords.x <= boardData.bounds.right)
-    && (boardData.bounds.top <= food.coords.y <= boardData.bounds.bottom))
+    && (boardData.bounds.top <= food.coords.y <= boardData.bounds.bottom)
+    && !([snakeData[0].x, snakeData[1].x].includes(food.coords.x)
+    && [snakeData[0].y, snakeData[1].y].includes(food.coords.y)))
   }
 )
 

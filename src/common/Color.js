@@ -24,18 +24,6 @@ class Color {
 
     return newColor;
   }
-
-  getRandomColor({ rangeH = [0, 360], rangeS = [0, 100], rangeL = [0, 100] } = {}) {
-    const randomColor = this.changeColor(
-      { 
-        changeH: getRandomInt(rangeH[0], rangeH[1]),
-        changeS: getRandomInt(rangeS[0], rangeS[1]),
-        changeL: getRandomInt(rangeL[0], rangeL[1]),
-      }
-    )
-
-    return randomColor;
-  }
 }
 
 export default Color;

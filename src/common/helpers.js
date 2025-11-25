@@ -126,7 +126,7 @@ function gameOver() {
 
   snake.color.hsl.s *= 0.15; 
   snake.repaintBody(time.gap)
-    .then(() => wait(TIME_UNIT))
+    .then(() => sleep(TIME_UNIT))
     .then(() => menuButtons.start.style.display = "block");
 }
 
@@ -178,10 +178,10 @@ function offsetShrink() {
     snake.snakeBody.forEach((el) => el.style.left = parseInt(el.style.left) - board.step + "px" );
   }
 }
-
 function isCoordsInsideArray(x, y, array) {
   return array.some((section, i) => (i !== 0 && (x === section.x && y === section.y)));
 }
+
 */
 
 export { setTheme };

@@ -7,6 +7,7 @@ class Board {
     this.container = getElement.container();
     this.background = getElement.background();
     this.border = getElement.border();
+    
     this.root = getElement.root();
   }
 
@@ -65,6 +66,8 @@ class Board {
       center: this.center,
       step: this.borderThick / 2,
     }
+
+    //console.log(JSON.stringify(this.data, null, 2));
   }
 }
 
