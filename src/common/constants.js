@@ -1,7 +1,3 @@
 const TIME_UNIT = 1000; 
 
-const ACCELERATION = 0.25;
-
-
-
-export { TIME_UNIT, ACCELERATION };
+export { TIME_UNIT };

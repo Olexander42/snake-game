@@ -29,7 +29,6 @@ class Food {
       this.coords.y = normalize(getRandomInt(bounds.top, bounds.bottom), step);
 
       if (!snakeCoords.some(({ x, y }) => this.coords.x === x && this.coords.y === y)) break;
-      console.log("INSIDE SNAKE!")
     }
 
     // apply

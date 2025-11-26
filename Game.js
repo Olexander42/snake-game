@@ -39,7 +39,11 @@ class Game {
 
   _action() {   
     if (!this.snake.controlsOn) this.snake.controlsOn = true;
-
+    // test
+    this.snake.grow()
+    this.snake.speedUp();
+    this.timer.updateGap(this.snake.speed);
+    //
     this.snake.makeStep();
     if (!this.snake.isAlive) {
       this._gameOver();
@@ -57,6 +61,7 @@ class Game {
 
       this.snake.grow();
       this.snake.speedUp();
+
       this.timer.updateGap(this.snake.speed);
     }
 
@@ -64,11 +69,13 @@ class Game {
   }
 
   async _gameOver() {
-    const startBtn = getElement.startBtn();
     this.snake.controlsOn = false;
+    
+    this.snake.greyout(TIME_UNIT);
 
-    await sleep(1000);
-    startBtn.style.display = 'flex';
+    await sleep(TIME_UNIT);
+    getElement.startBtn().style.display = 'flex';
+    console.log("startBtn appeared");
   }
 
   reset() {

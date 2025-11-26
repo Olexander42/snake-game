@@ -16,9 +16,9 @@ class Color {
   }
 
   changeColor({ changeH = 0, changeS = 0, changeL = 0 } = {}) {
-    const h = this.hslComponents.h + changeH;
-    const s = this.hslComponents.s + changeS;
-    const l = this.hslComponents.l + changeL;
+    const h = Math.min(this.hslComponents.h + changeH, 360);
+    const s = Math.min(this.hslComponents.s + changeS, 100);
+    const l = Math.min(this.hslComponents.l + changeL, 100);
 
     const newColor = `hsl(${h}, ${s}%, ${l}%)`
 

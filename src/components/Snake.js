@@ -1,10 +1,13 @@
 import Color from "../common/Color.js";
 import { roundTo } from "../common/utils.js";
 import getElement from "../common/elements.js";
-import { ACCELERATION } from "../common/constants.js";
+import { TIME_UNIT } from "../common/constants.js";
 
 
 class Snake {
+  static ACCELERATION = 0.25;
+  static DESATURATION = 0.15
+
   constructor() {
     this.div = document.createElement('div');
     this.div.id = "snake";
@@ -63,7 +66,7 @@ class Snake {
     })
 
     this.headData = this.bodyData[0];
-    console.log(JSON.stringify(this.bodyData, null, 2));
+    //console.log(JSON.stringify(this.bodyData, null, 2));
   }
 
   makeStep() {    
@@ -200,19 +203,32 @@ class Snake {
   }
 
   speedUp() {
-    this.speed += ACCELERATION;
+    this.speed += Snake.ACCELERATION;
   }
 
-  greyout() { // under construction to work with RAF (actually no)
+  greyout(duration) {
+    let timeLeft = duration;
     let i = 0;
-    const repaintSection = (i) => {
-      const lighterColor = changeColor(this.color.hsl, {l: i});
-      const section = this.body[i];
+    let j = this.body.length + 1;
 
-      section.style.backgroundColor = lighterColor;
+    this.color.hslComponents.s *= Snake.DESATURATION; 
 
-      i++;
+    const greyoutSection = (ms) => {
+      ms = timeLeft / ( 2 ** (j - i));
+      timeLeft -= ms;
+
+      // sections greyout sequentially
+      setTimeout(() => {
+        const color = this.color.changeColor({ changeL: i }); // the original lightness is preserved
+        const section = this.body[i];
+  
+        section.style.backgroundColor = color;
+
+        i++;
+        if (i < this.body.length) setTimeout(() => greyoutSection(ms), ms);  
+      }, ms)
     }
+    greyoutSection(0);
   }
 }
 
