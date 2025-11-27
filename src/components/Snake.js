@@ -1,10 +1,10 @@
 import Color from "../common/Color.js";
 import { roundTo } from "../common/utils.js";
-import getElement from "../common/elements.js";
+import getElement from "../common/getElement.js";
 import { TIME_UNIT } from "../common/constants.js";
 
 
-class Snake {
+export default class Snake {
   static ACCELERATION = 0.25;
   static DESATURATION = 0.15
 
@@ -22,10 +22,10 @@ class Snake {
     this.speed = 1;
     this.direction = {"x": 1, "y": 0};
     this.headRotation = 0;
-    this.headThick = this.step * 2; // because step is half of size_unit
+    this.headThick = this.step * 2; // because step is half of the default size unit
 
     // body 
-    this._createSection(this.boardBoundsCenter.x, this.boardBoundsCenter.y, this.color.changeColor({changeL: -2}), "head") ; 
+    this._createSection(this.boardBoundsCenter.x, this.boardBoundsCenter.y, this.color.changeColor({ changeL: -2 }), "head") ; 
     this._createSection(this.boardBoundsCenter.x - this.step, this.boardBoundsCenter.y, this.color.string, "neck"); 
 
     this.head = document.getElementById("head");
@@ -66,7 +66,6 @@ class Snake {
     })
 
     this.headData = this.bodyData[0];
-    //console.log(JSON.stringify(this.bodyData, null, 2));
   }
 
   makeStep() {    
@@ -79,7 +78,9 @@ class Snake {
     const newX = currentX + stepX;
     const newY = currentY + stepY;
 
-    if (!this._isCollisionDetected(newX, newY) || true) { 
+    const isHeadInsideBody = this.bodyData.some(({ x, y }, i) => (i !==0 && (newX === x && newY === y))); 
+
+    if (!this._getCollisionBorder(newX, newY) && !isHeadInsideBody) { 
       this.head.style.left = newX + 'px';
       this.head.style.top = newY + 'px';
       this.head.style.rotate = `${this.headRotation}turn`;
@@ -228,29 +229,40 @@ class Snake {
         const newCoord = coord + this.step * config.direction;
 
         section.style[config.side] = `${newCoord}px`;
-        this._snapshot(); // register the changes
       })
+
+      this._snapshot(); // register the changes
     }
 
-    if (this.bodyData.some(({ x }) => this._isCollisionDetected(x, undefined) )) {
-      const config = shiftConfigs[this.collisionBorder];
-      shift(config);
+    let verticalCollisionBorder =  null;
+    let horizontalCollisionBorder = null;
+
+    for (const data of this.bodyData) {
+      // shift() can be executed only once for each border
+      if (!verticalCollisionBorder) {
+        verticalCollisionBorder = this._getCollisionBorder(data.x, undefined); 
+        if (verticalCollisionBorder) shift(shiftConfigs[verticalCollisionBorder]);
+      }
+
+      if (!horizontalCollisionBorder) {
+        horizontalCollisionBorder = this._getCollisionBorder(undefined, data.y); 
+        if (horizontalCollisionBorder) shift(shiftConfigs[horizontalCollisionBorder]);
+      }
+
+      if (verticalCollisionBorder && horizontalCollisionBorder) break; // exit loop early
     }
-    if (this.bodyData.some(({ y }) => this._isCollisionDetected(undefined, y) )) {
-      const config = shiftConfigs[this.collisionBorder];
-      shift(config);
-    }
+
   }
 
-  _isCollisionDetected = (x, y) => {
-    this.collisionBorder = null;
+  _getCollisionBorder(x, y) {
+    let collisionBorder = null;
     
-    if (x < this.boardBounds.left) this.collisionBorder = 'left';
-    else if (x > this.boardBounds.right) this.collisionBorder = 'right';
-    else if (y < this.boardBounds.top) this.collisionBorder = 'top';
-    else if (y > this.boardBounds.bottom) this.collisionBorder = 'bottom';
+    if (x < this.boardBounds.left) collisionBorder = 'left';
+    else if (x > this.boardBounds.right) collisionBorder = 'right';
+    else if (y < this.boardBounds.top) collisionBorder = 'top';
+    else if (y > this.boardBounds.bottom) collisionBorder = 'bottom';
 
-    return this.collisionBorder;
+    return collisionBorder;
   }
 
   greyout(duration) {
@@ -278,6 +290,3 @@ class Snake {
     greyoutSection(0);
   }
 }
-
-
-export default Snake;

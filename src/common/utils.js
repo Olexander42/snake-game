@@ -1,12 +1,12 @@
-function normalize(value, denominator) {
+export function normalize(value, denominator) {
   return Math.round(value / denominator) * denominator;
 }
 
-function getRandomInt(min, max) { // max excluded
+export function getRandomInt(min, max) { // max excluded
   return (Math.floor(Math.random() * ((max - min)) + min));
 }
 
-function sleep(ms) {
+export function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(true)
@@ -14,23 +14,21 @@ function sleep(ms) {
   })
 }
 
-function roundTo(value, decimals) {
+export function roundTo(value, decimals) {
   const factor = 10 ** decimals;
   return Math.round(value * factor) / factor;
 }
 
-function getRandomColor({ rangeH = [0, 360], rangeS = [0, 100], rangeL = [0, 100] } = {}) {
+export function getRandomColor({ rangeH = [0, 360], rangeS = [0, 100], rangeL = [0, 100] } = {}) {
   const [h, s, l] = [
     getRandomInt(rangeH[0], rangeH[1]),
     getRandomInt(rangeS[0], rangeS[1]),
     getRandomInt(rangeL[0], rangeL[1]),
   ]
-  const randomColor = `hsl(${h}, ${s}%, ${l}%)`
 
-  return randomColor;
+  return `hsl(${h}, ${s}%, ${l}%)`;
 }
 
 
-export { normalize, getRandomInt, sleep, roundTo, getRandomColor };
 
 

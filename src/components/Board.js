@@ -1,8 +1,8 @@
 import { normalize } from "../common/utils.js";
-import getElement from "../common/elements.js";
+import getElement from "../common/getElement.js";
 
 
-class Board {
+export default class Board {
   constructor() {
     this.container = getElement.container();
     this.background = getElement.background();
@@ -66,13 +66,9 @@ class Board {
       center: this.center,
       step: this.borderThick / 2,
     }
-
-    //console.log(JSON.stringify(this.data, null, 2));
   }
 }
 
-
-export default Board;
 
 
 

@@ -1,7 +1,7 @@
 import { getRandomInt } from "./utils.js";
 
 
-class Color { 
+export default class Color { 
   // only works with hsl
   constructor(color='hsl(0, 0%, 0%)') { 
     this.string = color;
@@ -26,4 +26,3 @@ class Color {
   }
 }
 
-export default Color;

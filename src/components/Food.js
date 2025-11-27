@@ -1,10 +1,11 @@
 import Color from "../common/Color.js";
-import getElement from "../common/elements.js";
+import getElement from "../common/getElement.js";
 import { normalize, getRandomInt, getRandomColor } from "../common/utils.js";
 import { TIME_UNIT } from "../common/constants.js";
 
-class Food {
-  constructor() { // invisible food element is created off board 
+export default class Food {
+  constructor() { 
+    // invisible food element is created off board 
     this.element = document.createElement('span');
     this.element.id = "food";
     this.element.style.opacity = 0;
@@ -63,6 +64,3 @@ class Food {
     setTimeout(() => this.transitionColors(), this.TRANSITION_DURATION); 
   }
 }
-
-
-export default Food;

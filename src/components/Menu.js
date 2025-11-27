@@ -1,8 +1,8 @@
-import { setTheme } from "../common/helpers.js";
-import getElement from "../common/elements.js";
+import setTheme from "../common/setTheme.js";
+import getElement from "../common/getElement.js";
 
 
-class Menu {
+export default class Menu {
   constructor(game) {
     this.game = game;
 
@@ -209,5 +209,3 @@ class Outline {
 }
 
 
-
-export default Menu;

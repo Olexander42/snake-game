@@ -1,12 +1,9 @@
 import { TIME_UNIT } from "./src/common/constants.js";
-import getElement from "./src/common/elements.js";
+import getElement from "./src/common/getElement.js";
 import { sleep } from "./src/common/utils.js";
+import { soundLibrary } from "./src/common/sound.js";
 
-let count = 0;
-let prevStart = 0;
-let avgDrift = 0;
-
-class Game {
+export default class Game {
   constructor(board, snake, food) {
     this.board = board;
     this.snake = snake;
@@ -29,11 +26,6 @@ class Game {
     this.snake.spawn(this.board.data, snakeColor);
     this.timer.updateGap(this.snake.speed);
 
-    this.snake.grow();
-    this.snake.grow();
-    this.snake.grow();
-    this.snake.grow();
-
     // food 
     this.food.teleport(this.board.data, this.snake.bodyData);
     this.food.fadeIn();
@@ -50,11 +42,16 @@ class Game {
       this._gameOver();
       return;
     }
-    //this.snake.offsetShrink()
+ 
     if (this.snake.isAteFood(this.food.coords)) {
+      soundLibrary.bite.play();
+      this.shrinkCounter.inner++;
+
       if (this.shrinkCounter.isTimeToShrink() && !this.snake.isNearOppositeBorders()) {
         this.board.shrink();
         this.snake.offsetShrink(this.board.data);
+
+        this.shrinkCounter.incrementOuter();
       }
 
       this.stats.incrementScore();
@@ -71,20 +68,20 @@ class Game {
   }
 
   async _gameOver() {
+    soundLibrary.bgMusic.pause();
+    soundLibrary.gameOver.play();
+    
     this.snake.controlsOn = false;
     
     this.snake.greyout(TIME_UNIT);
 
     await sleep(TIME_UNIT);
     getElement.startBtn().style.display = 'flex';
-    console.log("startBtn appeared");
   }
 
   reset() {
-    // components
     this.snake.div.replaceChildren(); // delete snake
 
-    // stats
     if (this.stats.isNewRecord()) this.stats.updateRecord();
     this.stats.resetScore();
   }
@@ -92,10 +89,6 @@ class Game {
   attachControls() {
     getElement.html().addEventListener('keydown', (event) => { 
       if (event.code === 'Space') this._togglePause();
-      else if (event.code === 'KeyS') {
-        this.board.shrink()
-        this.snake.offsetShrink(this.board.data)
-      }
       else if (event.code.slice(0, 5) === 'Arrow' && this.snake.controlsOn) { 
         this.snake.handleControls(event.code); 
       } 
@@ -173,15 +166,12 @@ class ShrinkCounter {
   }
 
   isTimeToShrink() {
-    this.inner++;
+    return this.inner >= this.outer
+  }
 
-    if (this.inner < this.outer) return false; 
-    else {
-      this.inner = 0;
-      this.outer++;
-
-      return true;
-    }
+  incrementOuter() {
+    this.inner = 0;
+    this.outer++;
   }
 
   reset() {
@@ -189,7 +179,5 @@ class ShrinkCounter {
     this.inner = 0; 
   }
 }
-
-export default Game;
 
 
