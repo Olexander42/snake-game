@@ -29,6 +29,11 @@ class Game {
     this.snake.spawn(this.board.data, snakeColor);
     this.timer.updateGap(this.snake.speed);
 
+    this.snake.grow();
+    this.snake.grow();
+    this.snake.grow();
+    this.snake.grow();
+
     // food 
     this.food.teleport(this.board.data, this.snake.bodyData);
     this.food.fadeIn();
@@ -39,20 +44,17 @@ class Game {
 
   _action() {   
     if (!this.snake.controlsOn) this.snake.controlsOn = true;
-    // test
-    this.snake.grow()
-    this.snake.speedUp();
-    this.timer.updateGap(this.snake.speed);
-    //
+
     this.snake.makeStep();
     if (!this.snake.isAlive) {
       this._gameOver();
       return;
     }
+    //this.snake.offsetShrink()
     if (this.snake.isAteFood(this.food.coords)) {
-      if (this.shrinkCounter.isTimeToShrink()) {
+      if (this.shrinkCounter.isTimeToShrink() && !this.snake.isNearOppositeBorders()) {
         this.board.shrink();
-        this.snake.updateBoardData(this.board.data);
+        this.snake.offsetShrink(this.board.data);
       }
 
       this.stats.incrementScore();
@@ -80,7 +82,7 @@ class Game {
 
   reset() {
     // components
-    this.snake.div.replaceChildren(); // delete
+    this.snake.div.replaceChildren(); // delete snake
 
     // stats
     if (this.stats.isNewRecord()) this.stats.updateRecord();
@@ -88,13 +90,15 @@ class Game {
   }
 
   attachControls() {
-    const html = getElement.html();
-
-    html.addEventListener('keydown', (event) => { 
-      const buttonPressed = event.code;
-  
-      if (buttonPressed === 'Space') this._togglePause();
-      else if (buttonPressed.slice(0, 5) === 'Arrow' && this.snake.controlsOn) { this.snake.handleControls(buttonPressed) } 
+    getElement.html().addEventListener('keydown', (event) => { 
+      if (event.code === 'Space') this._togglePause();
+      else if (event.code === 'KeyS') {
+        this.board.shrink()
+        this.snake.offsetShrink(this.board.data)
+      }
+      else if (event.code.slice(0, 5) === 'Arrow' && this.snake.controlsOn) { 
+        this.snake.handleControls(event.code); 
+      } 
     })
   }
 

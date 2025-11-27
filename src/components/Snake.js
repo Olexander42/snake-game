@@ -25,8 +25,8 @@ class Snake {
     this.headThick = this.step * 2; // because step is half of size_unit
 
     // body 
-    this._createSection(this.boundsCenter.x, this.boundsCenter.y, this.color.changeColor({changeL: -2}), "head") ; 
-    this._createSection(this.boundsCenter.x - this.step, this.boundsCenter.y, this.color.string, "neck"); 
+    this._createSection(this.boardBoundsCenter.x, this.boardBoundsCenter.y, this.color.changeColor({changeL: -2}), "head") ; 
+    this._createSection(this.boardBoundsCenter.x - this.step, this.boardBoundsCenter.y, this.color.string, "neck"); 
 
     this.head = document.getElementById("head");
     this.neck = document.getElementById("neck");
@@ -79,14 +79,7 @@ class Snake {
     const newX = currentX + stepX;
     const newY = currentY + stepY;
 
-    const collisionDetected = (headX, headY) => {
-      return headX < this.bounds.left 
-        || headX > this.bounds.right
-        || headY < this.bounds.top
-        || headY > this.bounds.bottom
-    }
-
-    if (!collisionDetected(newX, newY)) { 
+    if (!this._isCollisionDetected(newX, newY) || true) { 
       this.head.style.left = newX + 'px';
       this.head.style.top = newY + 'px';
       this.head.style.rotate = `${this.headRotation}turn`;
@@ -116,7 +109,7 @@ class Snake {
 
   handleControls(arrowKey) { 
     // define
-    const turnConfig = {
+    const turnConfigs = {
       Up: { direction: { x: 0, y: -1 }, axis: 'x', cww: true, border: "top" },
       Down: { direction: { x: 0, y: 1 }, axis: 'x', cww: false, border: "bottom" },
       Left: { direction: { x: -1, y: 0 }, axis: 'y', cww: false, border: "left" },
@@ -134,7 +127,7 @@ class Snake {
       const oppositeAxis = axis === 'x' ? 'y' : 'x'; 
       
       if (
-        !(this.headData[oppositeAxis] === this.bounds[border]) // snake doesn't move along top border
+        !(this.headData[oppositeAxis] === this.boardBounds[border]) // snake doesn't move along top border
         && this.direction[oppositeAxis] === 0 // prevent 180° turn
       ) return true
       else {
@@ -149,7 +142,7 @@ class Snake {
 
     // init
     const turnKey = arrowKey.slice(5, arrowKey.length); 
-    const config = turnConfig[turnKey];
+    const config = turnConfigs[turnKey];
 
     // execute
     if (isAllowTurn(config.axis, config.border)) {
@@ -161,9 +154,9 @@ class Snake {
   }
 
   updateBoardData(data) {
-    this.bounds = data.bounds;
+    this.boardBounds = data.bounds;
     this.step = data.step;
-    this.boundsCenter = data.center;
+    this.boardBoundsCenter = data.center;
   }
 
   isAteFood(foodCoords) {
@@ -184,6 +177,10 @@ class Snake {
     this._rescaleBody(); // create tapering effect
   }
 
+  speedUp() {
+    this.speed += Snake.ACCELERATION;
+  }
+
   _rescaleBody() { 
     const length = this.body.length;
     let i = length - 1; // tail
@@ -202,8 +199,58 @@ class Snake {
     rescaleSection();
   }
 
-  speedUp() {
-    this.speed += Snake.ACCELERATION;
+  isNearOppositeBorders() {
+    return (
+      // top and bottom border
+      (this.bodyData.some(({ y }) => (y <= this.boardBounds.top + this.step) 
+      && this.bodyData.some(({ y }) => (y >= this.boardBounds.bottom- this.step)))) 
+      ||
+      // left and right border
+      ((this.bodyData.some(({ x }) => (x <= this.boardBounds.left + this.step))) 
+      && (this.bodyData.some(({ x }) => (x >= this.boardBounds.right - this.step)))) 
+    )
+  }
+
+  offsetShrink(data) {
+    this.updateBoardData(data);
+
+    const shiftConfigs = {
+      left: { axis: "x", direction: 1, side: 'left' },
+      right: { axis: "x", direction: -1, side: 'left' },
+      top: { axis: "y", direction: 1, side: 'top' },
+      bottom: { axis: "y", direction: -1, side: 'top' },
+    }
+
+    const shift = (config) => {
+      this.bodyData.forEach((data, i) => {
+        const coord = data[config.axis];
+        const section = this.body[i];
+        const newCoord = coord + this.step * config.direction;
+
+        section.style[config.side] = `${newCoord}px`;
+        this._snapshot(); // register the changes
+      })
+    }
+
+    if (this.bodyData.some(({ x }) => this._isCollisionDetected(x, undefined) )) {
+      const config = shiftConfigs[this.collisionBorder];
+      shift(config);
+    }
+    if (this.bodyData.some(({ y }) => this._isCollisionDetected(undefined, y) )) {
+      const config = shiftConfigs[this.collisionBorder];
+      shift(config);
+    }
+  }
+
+  _isCollisionDetected = (x, y) => {
+    this.collisionBorder = null;
+    
+    if (x < this.boardBounds.left) this.collisionBorder = 'left';
+    else if (x > this.boardBounds.right) this.collisionBorder = 'right';
+    else if (y < this.boardBounds.top) this.collisionBorder = 'top';
+    else if (y > this.boardBounds.bottom) this.collisionBorder = 'bottom';
+
+    return this.collisionBorder;
   }
 
   greyout(duration) {

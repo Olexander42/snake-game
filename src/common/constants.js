@@ -1,3 +1,3 @@
-const TIME_UNIT = 1000; 
+const TIME_UNIT = 500; 
 
 export { TIME_UNIT };
