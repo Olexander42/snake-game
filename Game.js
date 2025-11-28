@@ -84,6 +84,8 @@ export default class Game {
 
     if (this.stats.isNewRecord()) this.stats.updateRecord();
     this.stats.resetScore();
+
+    soundLibrary.bgMusic.play();
   }
 
   attachControls() {
