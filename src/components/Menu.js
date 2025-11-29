@@ -15,12 +15,14 @@ export default class Menu {
 
     this._attachStartListener();
     this._attachSettingsListener();
+    this._attachMainMenuKeyboardListener();
   }
 
   _attachStartListener() {  
     const startBtn = getElement.startBtn();
 
-    startBtn.addEventListener('click', () => { 
+    startBtn.addEventListener('click', (event) => { 
+      console.log("The event came from:", event.currentTarget);
       if (this.firstStart) {
         this.game.attachControls();
 
@@ -35,6 +37,7 @@ export default class Menu {
       startBtn.style.display = 'none';
       this.settingsBtn.style.display = 'none';
 
+      this.game.isActive = true;
       this.game.begin();
     })
   }
@@ -72,6 +75,44 @@ export default class Menu {
 
         this.settingsVisited = true;
       } 
+    })
+  }
+
+  async _attachMainMenuKeyboardListener() {
+    const focusibleElements = [];
+    focusibleElements.push(...document.querySelectorAll("#main-menu button"));
+    focusibleElements.push(...document.querySelectorAll("[tabindex='0']"));
+  
+    let focusedElement = null; 
+
+    const moveFocus = (direction) => {
+      const increment = direction === "Down" ? 1 : -1;
+      const focusedElementIndex = focusibleElements.indexOf(focusedElement); 
+      const newFocusedElementIndex = Math.max(Math.min(focusedElementIndex + increment, focusibleElements.length - 1) , 0)
+
+      focusedElement = focusibleElements[newFocusedElementIndex];
+      focusedElement.focus();
+    }
+
+
+    getElement.html().addEventListener('keyup', (event) => {
+      /* We use 'keyup' instead of 'keydown' to preserve 'Enter'/'Space' default behavior
+      without firing duplicate events. */
+      if (!this.game.isActive) {
+        switch (event.code) {
+          case 'ArrowDown': 
+            moveFocus("Down");
+            break;
+
+          case 'ArrowUp':
+            moveFocus("Up");
+            break;
+
+          case 'Enter':
+          case 'Space':
+            focusedElement.click();
+        }
+      }
     })
   }
 }

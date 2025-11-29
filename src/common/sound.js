@@ -25,9 +25,13 @@ soundIcon.addEventListener('click', () => {
   applyMutedState();
 
   soundLibrary.bgMusic.play();
-  
+
   if (!soundIcon.classList.replace("sound-off", "sound-on")) {
     soundIcon.classList.replace("sound-on", "sound-off");
   }
+
+  // recreate :active state on 'keydown'
+  soundIcon.firstElementChild.classList.add("active"); 
+  setTimeout(() => soundIcon.firstElementChild.classList.remove("active"), 100);
 })
 

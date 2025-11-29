@@ -13,7 +13,7 @@ export default class Game {
     this.timer = new Timer();
     this.shrinkCounter = new ShrinkCounter();
 
-    this.isPaused = false;
+    this.isActive = false;
   }
 
   begin() {
@@ -36,7 +36,7 @@ export default class Game {
 
   _action() {   
     if (!this.snake.controlsOn) this.snake.controlsOn = true;
-
+  
     this.snake.makeStep();
     if (!this.snake.isAlive) {
       this._gameOver();
@@ -64,7 +64,7 @@ export default class Game {
       this.timer.updateGap(this.snake.speed);
     }
 
-    if (!this.isPaused) setTimeout(() => this._action(), this.timer.gap);
+    if (this.isActive) setTimeout(() => this._action(), this.timer.gap);
   }
 
   async _gameOver() {
@@ -89,7 +89,7 @@ export default class Game {
   }
 
   attachControls() {
-    getElement.html().addEventListener('keydown', (event) => { 
+    getElement.html().addEventListener('keydown', (event) => {
       if (event.code === 'Space') this._togglePause();
       else if (event.code.slice(0, 5) === 'Arrow' && this.snake.controlsOn) { 
         this.snake.handleControls(event.code); 
@@ -98,13 +98,13 @@ export default class Game {
   }
 
   _togglePause() {
-    if (this.isPaused) {
-      this.isPaused = false;
+    if (!this.isActive) {
+      this.isActive = true;
       this.snake.controlsOn = true;
 
       this._action(this.timer.gap);
     } else {
-      this.isPaused = true;
+      this.isActive = false;
       this.snake.controlsOn = false;
     }
   }
