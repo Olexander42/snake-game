@@ -67,27 +67,6 @@ export default class Game {
     if (this.isActive) setTimeout(() => this._action(), this.timer.gap);
   }
 
-  async _gameOver() {
-    soundLibrary.bgMusic.pause();
-    soundLibrary.gameOver.play();
-    
-    this.snake.controlsOn = false;
-    
-    this.snake.greyout(TIME_UNIT);
-
-    await sleep(TIME_UNIT);
-    getElement.startBtn().style.display = 'flex';
-  }
-
-  reset() {
-    this.snake.div.replaceChildren(); // delete snake
-
-    if (this.stats.isNewRecord()) this.stats.updateRecord();
-    this.stats.resetScore();
-
-    soundLibrary.bgMusic.play();
-  }
-
   attachControls() {
     getElement.html().addEventListener('keydown', (event) => {
       if (event.code === 'Space') this._togglePause();
@@ -107,6 +86,27 @@ export default class Game {
       this.isActive = false;
       this.snake.controlsOn = false;
     }
+  }
+
+  async _gameOver() {
+    soundLibrary.bgMusic.pause();
+    soundLibrary.gameOver.play();
+    
+    this.snake.controlsOn = false;
+    
+    this.snake.greyout(TIME_UNIT);
+
+    await sleep(TIME_UNIT);
+    getElement.menu().style.display = 'flex';
+  }
+
+  reset() {
+    this.snake.div.replaceChildren(); // delete snake
+
+    if (this.stats.isNewRecord()) this.stats.updateRecord();
+    this.stats.resetScore();
+
+    soundLibrary.bgMusic.play();
   }
 }
 

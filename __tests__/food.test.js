@@ -1,9 +1,6 @@
-import { test, expect, beforeEach } from 'vitest';
+import { test, expect } from 'vitest';
 import Food from "../src/components/Food.js";
 
-beforeEach(() => {
-  document.body.innerHTML = `<div id="container"></div>`;
-})
 
 const boardData = 
   {
@@ -24,25 +21,21 @@ const snakeData = [
   {
     "x": 360,
     "y": 360,
-    "rotation": ""
   },
   {
     "x": 330,
     "y": 360,
-    "rotation": ""
   }
 ]
 
-test("Food gets teleported correctly", { repeats: 10000 }, () => {
-  const food = new Food();
+test("Food random coords get generated correctly", { repeats: 10000 }, () => {
+   const coords = Food.generateRandomCoords(boardData, snakeData);
 
-  food.teleport(boardData, snakeData);
-
-  expect(food.coords).toSatisfy((foodCoords) => 
-    (boardData.bounds.left <= food.coords.x <= boardData.bounds.right)
-    && (boardData.bounds.top <= food.coords.y <= boardData.bounds.bottom)
-    && !([snakeData[0].x, snakeData[1].x].includes(food.coords.x)
-    && [snakeData[0].y, snakeData[1].y].includes(food.coords.y)))
+  expect(coords).toSatisfy((foodCoords) => 
+    (boardData.bounds.left <= coords.x <= boardData.bounds.right)
+    && (boardData.bounds.top <= coords.y <= boardData.bounds.bottom)
+    && !([snakeData[0].x, snakeData[1].x].includes(coords.x)
+    && [snakeData[0].y, snakeData[1].y].includes(coords.y)))
   }
 )
 

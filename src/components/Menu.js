@@ -1,5 +1,6 @@
 import setTheme from "../common/setTheme.js";
 import getElement from "../common/getElement.js";
+import { DELAY } from "../common/constants.js";
 
 
 export default class Menu {
@@ -15,14 +16,13 @@ export default class Menu {
 
     this._attachStartListener();
     this._attachSettingsListener();
-    this._attachMainMenuKeyboardListener();
+    this._attachMenuKeyboardListener();
   }
 
   _attachStartListener() {  
     const startBtn = getElement.startBtn();
 
     startBtn.addEventListener('click', (event) => { 
-      console.log("The event came from:", event.currentTarget);
       if (this.firstStart) {
         this.game.attachControls();
 
@@ -33,12 +33,10 @@ export default class Menu {
         this.game.reset();
       }
 
-      // hide menu
-      startBtn.style.display = 'none';
-      this.settingsBtn.style.display = 'none';
-
       this.game.isActive = true;
       this.game.begin();
+
+     getElement.menu().style.display = 'none';
     })
   }
 
@@ -49,6 +47,8 @@ export default class Menu {
       // show settings
       this.mainMenuDiv.style.display = 'none';
       this.settingsDiv.style.display = 'flex';
+
+      this._updateFocusibleElements("#settings-menu");
 
       // do it only on the first visit
       if (!this.settingsVisited) { 
@@ -71,6 +71,8 @@ export default class Menu {
           // hide settings   
           this.settingsDiv.style.display = 'none';
           this.mainMenuDiv.style.display = 'flex';
+
+          this._updateFocusibleElements("#main-menu");
         })
 
         this.settingsVisited = true;
@@ -78,25 +80,21 @@ export default class Menu {
     })
   }
 
-  async _attachMainMenuKeyboardListener() {
-    const focusibleElements = [];
-    focusibleElements.push(...document.querySelectorAll("#main-menu button"));
-    focusibleElements.push(...document.querySelectorAll("[tabindex='0']"));
-  
-    let focusedElement = null; 
+  _attachMenuKeyboardListener() {
+      let focusedElement = null;
 
     const moveFocus = (direction) => {
       const increment = direction === "Down" ? 1 : -1;
-      const focusedElementIndex = focusibleElements.indexOf(focusedElement); 
-      const newFocusedElementIndex = Math.max(Math.min(focusedElementIndex + increment, focusibleElements.length - 1) , 0)
+      const focusedElementIndex = this.focusibleElements.indexOf(focusedElement); 
+      const newFocusedElementIndex = Math.max(Math.min(focusedElementIndex + increment, this.focusibleElements.length - 1) , 0)
 
-      focusedElement = focusibleElements[newFocusedElementIndex];
+      focusedElement = this.focusibleElements[newFocusedElementIndex];
       focusedElement.focus();
     }
 
-    getElement.html().addEventListener('keyup', (event) => {
-      /* We use 'keyup' instead of 'keydown' to preserve 'Enter'/'Space' default behavior
-      without firing duplicate events. */
+    this._updateFocusibleElements("#main-menu");
+
+    getElement.html().addEventListener('keydown', (event) => {
       if (!this.game.isActive) {
         switch (event.code) {
           case 'ArrowDown': 
@@ -108,11 +106,26 @@ export default class Menu {
             break;
 
           case 'Enter':
-          case 'Space':
-            focusedElement.click();
+            event.preventDefault();
+
+            // recreate :active state behavior
+            focusedElement.classList.add("active"); 
+            setTimeout(() => {
+              focusedElement.classList.remove("active");
+              focusedElement.click();
+            }, DELAY)
+            break;
         }
+      console.log(focusedElement);
       }
     })
+  }
+
+  _updateFocusibleElements(section) {
+    this.focusibleElements = [];
+    this.focusibleElements.push(...document.querySelectorAll(`${section} button`)); 
+    this.focusibleElements.push(...document.querySelectorAll("[tabindex='0']"));
+    console.log("Focusible Elements:", this.focusibleElements);
   }
 }
 
