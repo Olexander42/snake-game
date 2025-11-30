@@ -9,10 +9,7 @@ import setTheme from "./src/common/setTheme.js";
 const theme = document.querySelector('input[name="theme"]:checked').value;
 setTheme(theme);
 
-const board = new Board();
-const snake = new Snake();
-const food = new Food();
-const game = new Game(board, snake, food);
+const game = new Game(Board, Snake, Food);
 const menu = new Menu(game);
 
 

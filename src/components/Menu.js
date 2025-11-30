@@ -94,7 +94,6 @@ export default class Menu {
       focusedElement.focus();
     }
 
-
     getElement.html().addEventListener('keyup', (event) => {
       /* We use 'keyup' instead of 'keydown' to preserve 'Enter'/'Space' default behavior
       without firing duplicate events. */
@@ -159,7 +158,6 @@ class Slider {
 
     this.requiresAdjustment = this.STEP_DEFAULT % this.STEP_TRANSITION !== 0;
     this.currentValue = Number(this.input.value);
-    
   }
 
   moveThumb() {

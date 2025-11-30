@@ -4,10 +4,10 @@ import { sleep } from "./src/common/utils.js";
 import { soundLibrary } from "./src/common/sound.js";
 
 export default class Game {
-  constructor(board, snake, food) {
-    this.board = board;
-    this.snake = snake;
-    this.food = food;
+  constructor(boardClass, snakeClass, foodClass) {
+    this.board = new boardClass();
+    this.snake = new snakeClass();
+    this.food = new foodClass;
   
     this.stats = new Stats();
     this.timer = new Timer();

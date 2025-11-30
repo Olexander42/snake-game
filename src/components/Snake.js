@@ -5,7 +5,21 @@ import { TIME_UNIT } from "../common/constants.js";
 
 
 export default class Snake {
-  static ACCELERATION = 0.25;
+  static TURN_CONFIGS = {
+    Up: { direction: { x: 0, y: -1 }, axis: 'x', cww: true, border: "top" },
+    Down: { direction: { x: 0, y: 1 }, axis: 'x', cww: false, border: "bottom" },
+    Left: { direction: { x: -1, y: 0 }, axis: 'y', cww: false, border: "left" },
+    Right: { direction: { x: 1, y: 0 }, axis: 'y', cww: true, border: "right" },
+  }
+
+  static SHIFT_CONFIGS = {
+    left: { axis: "x", direction: 1, side: 'left' },
+    right: { axis: "x", direction: -1, side: 'left' },
+    top: { axis: "y", direction: 1, side: 'top' },
+    bottom: { axis: "y", direction: -1, side: 'top' },
+  }
+
+  static TURN_ROTATION = 0.25;
   static DESATURATION = 0.15
 
   constructor() {
@@ -19,6 +33,7 @@ export default class Snake {
     this.color = new Color(color);
 
     // parameters
+    this.ACCELERATION = 0.25; 
     this.speed = 1;
     this.direction = {"x": 1, "y": 0};
     this.headRotation = 0;
@@ -85,73 +100,62 @@ export default class Snake {
       this.head.style.top = newY + 'px';
       this.head.style.rotate = `${this.headRotation}turn`;
 
-      // body follows
-      let i = 1; 
-      const moveToNextSection = (i) => {
-        const currentSection = this.body[i];
-        const nextSection = this.bodyData[i - 1];
-
-        const [newX, newY, newRotation] = [nextSection.x, nextSection.y, nextSection.rotation];
-    
-        currentSection.style.left = `${newX}px`;
-        currentSection.style.top = `${newY}px`;
-        currentSection.style.rotate = newRotation;
-
-        if (i < this.body.length - 1) moveToNextSection(i + 1);
-      }
-      moveToNextSection(i);
+      this._bodyFollows();
 
       this._snapshot();
-
     } else {
       this.isAlive = false;
     }
   }
 
+  _bodyFollows(i = 1) {
+    const currentSection = this.body[i];
+    const nextSection = this.bodyData[i - 1];
+
+    const [newX, newY, newRotation] = [nextSection.x, nextSection.y, nextSection.rotation];
+
+    currentSection.style.left = `${newX}px`;
+    currentSection.style.top = `${newY}px`;
+    currentSection.style.rotate = newRotation;
+
+    if (i < this.body.length - 1) this._bodyFollows(i + 1);
+  }
+
   handleControls(arrowKey) { 
-    // define
-    const turnConfigs = {
-      Up: { direction: { x: 0, y: -1 }, axis: 'x', cww: true, border: "top" },
-      Down: { direction: { x: 0, y: 1 }, axis: 'x', cww: false, border: "bottom" },
-      Left: { direction: { x: -1, y: 0 }, axis: 'y', cww: false, border: "left" },
-      Right: { direction: { x: 1, y: 0 }, axis: 'y', cww: true, border: "right" },
-    }
-
-    const changeRotation = (axis, counterClockwise) => { 
-      let clockwiseCorrection = counterClockwise === true ? -1 : 1;
-      const newRotation =  (Math.sign(this.direction[axis]) * 0.25) * clockwiseCorrection; 
-
-      this.headRotation += newRotation;
-    }
-
-    const isAllowTurn = (axis, border) => {
-      const oppositeAxis = axis === 'x' ? 'y' : 'x'; 
-      
-      if (
-        !(this.headData[oppositeAxis] === this.boardBounds[border]) // snake doesn't move along top border
-        && this.direction[oppositeAxis] === 0 // prevent 180° turn
-      ) return true
-      else {
-        return false;
-      }
-    }
-
-    const makeTurn = (direction) => {
-      this.direction.x = direction.x;
-      this.direction.y = direction.y 
-    }
-
-    // init
     const turnKey = arrowKey.slice(5, arrowKey.length); 
-    const config = turnConfigs[turnKey];
+    const config = Snake.TURN_CONFIGS[turnKey];
 
     // execute
-    if (isAllowTurn(config.axis, config.border)) {
-      changeRotation(config.axis, config.cww);
-      makeTurn(config.direction);
+    if (this._isAllowTurn(config.axis, config.border)) {
+      this._changeRotation(config.axis, config.cww);
+      this._makeTurn(config.direction);
 
       this.controlsOn = false; // prevent multiple turns in one step
     }
+  }
+
+  _changeRotation(axis, counterClockwise) {
+    let clockwiseCorrection = counterClockwise === true ? -1 : 1;
+    const newRotation =  (Math.sign(this.direction[axis]) * Snake.TURN_ROTATION) * clockwiseCorrection; 
+
+    this.headRotation += newRotation;
+  }
+
+  _isAllowTurn(axis, border) {
+    const oppositeAxis = axis === 'x' ? 'y' : 'x'; 
+    
+    if (
+      !(this.headData[oppositeAxis] === this.boardBounds[border]) // snake doesn't move along top border
+      && this.direction[oppositeAxis] === 0 // prevent 180° turn
+    ) return true
+    else {
+      return false;
+    }
+  }
+
+  _makeTurn(direction) {
+    this.direction.x = direction.x;
+    this.direction.y = direction.y 
   }
 
   updateBoardData(data) {
@@ -179,7 +183,7 @@ export default class Snake {
   }
 
   speedUp() {
-    this.speed += Snake.ACCELERATION;
+    this.speed += this.ACCELERATION;
   }
 
   _rescaleBody() { 
@@ -215,43 +219,35 @@ export default class Snake {
   offsetShrink(data) {
     this.updateBoardData(data);
 
-    const shiftConfigs = {
-      left: { axis: "x", direction: 1, side: 'left' },
-      right: { axis: "x", direction: -1, side: 'left' },
-      top: { axis: "y", direction: 1, side: 'top' },
-      bottom: { axis: "y", direction: -1, side: 'top' },
-    }
-
-    const shift = (config) => {
-      this.bodyData.forEach((data, i) => {
-        const coord = data[config.axis];
-        const section = this.body[i];
-        const newCoord = coord + this.step * config.direction;
-
-        section.style[config.side] = `${newCoord}px`;
-      })
-
-      this._snapshot(); // register the changes
-    }
-
     let verticalCollisionBorder =  null;
     let horizontalCollisionBorder = null;
 
     for (const data of this.bodyData) {
-      // shift() can be executed only once for each border
+      // _shift() can be executed only once for each border
       if (!verticalCollisionBorder) {
         verticalCollisionBorder = this._getCollisionBorder(data.x, undefined); 
-        if (verticalCollisionBorder) shift(shiftConfigs[verticalCollisionBorder]);
+        if (verticalCollisionBorder) this._shift(Snake.SHIFT_CONFIGS[verticalCollisionBorder]);
       }
 
       if (!horizontalCollisionBorder) {
         horizontalCollisionBorder = this._getCollisionBorder(undefined, data.y); 
-        if (horizontalCollisionBorder) shift(shiftConfigs[horizontalCollisionBorder]);
+        if (horizontalCollisionBorder) this._shift(Snake.SHIFT_CONFIGS[horizontalCollisionBorder]);
       }
 
       if (verticalCollisionBorder && horizontalCollisionBorder) break; // exit loop early
     }
+  }
 
+  _shift(config) {
+    this.bodyData.forEach((data, i) => {
+      const coord = data[config.axis];
+      const section = this.body[i];
+      const newCoord = coord + this.step * config.direction;
+
+      section.style[config.side] = `${newCoord}px`;
+    })
+
+    this._snapshot(); // register the changes
   }
 
   _getCollisionBorder(x, y) {
@@ -269,13 +265,12 @@ export default class Snake {
     let timeLeft = duration;
     let i = 0;
     let j = this.body.length + 1;
-
+  
     this.color.hslComponents.s *= Snake.DESATURATION; 
 
     const greyoutSection = (ms) => {
       ms = timeLeft / ( 2 ** (j - i));
       timeLeft -= ms;
-
       // sections greyout sequentially
       setTimeout(() => {
         const color = this.color.changeColor({ changeL: i }); // the original lightness is preserved
