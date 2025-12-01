@@ -1,5 +1,5 @@
 import { normalize } from "../common/utils.js";
-import getElement from "../common/getElement.js";
+import getElement from "../common/elements.js";
 
 
 export default class Board {

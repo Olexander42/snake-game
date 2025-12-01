@@ -1,4 +1,4 @@
-import getElement from "./getElement.js";
+import getElement from "./elements.js";
 
 const soundIcon = getElement.soundIcon();
 

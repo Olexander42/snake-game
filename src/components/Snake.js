@@ -1,6 +1,6 @@
 import Color from "../common/Color.js";
 import { roundTo } from "../common/utils.js";
-import getElement from "../common/getElement.js";
+import getElement from "../common/elements.js";
 import { TIME_UNIT } from "../common/constants.js";
 
 

@@ -1,5 +1,5 @@
 import { TIME_UNIT } from "./src/common/constants.js";
-import getElement from "./src/common/getElement.js";
+import getElement from "./src/common/elements.js";
 import { sleep } from "./src/common/utils.js";
 import { soundLibrary } from "./src/common/sound.js";
 

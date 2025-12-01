@@ -206,7 +206,7 @@ input[type=radio]:checked + span {
   margin-top: 0.5rem;
 }
 
-#sound-toggle {
+#sound-icon {
   position: absolute;
   right: 0%;
   width: 50px;
@@ -220,11 +220,11 @@ input[type=radio]:checked + span {
     cursor: pointer;
     transition: scale 0.1s;
 
-    &:active,
-    &.active {
+      &:active,
+      &.active {
       scale: 1.25;
-    }
-  } 
+    } 
+  }
 }
 
 .sound-off {

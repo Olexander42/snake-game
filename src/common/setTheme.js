@@ -1,6 +1,5 @@
-import getElement from "../common/getElement.js";
 import { initSoundLibrary, soundLibrary } from "./sound.js";
-
+import getElement from "./elements.js";
 
 export default function setTheme(theme) {
   if (soundLibrary.bgMusic) soundLibrary.bgMusic.pause(); // force music switch

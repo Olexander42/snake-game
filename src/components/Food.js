@@ -1,5 +1,5 @@
 import Color from "../common/Color.js";
-import getElement from "../common/getElement.js";
+import getElement from "../common/elements.js";
 import { normalize, getRandomInt } from "../common/utils.js";
 import { TIME_UNIT } from "../common/constants.js";
 
