@@ -1,15 +1,17 @@
 import { initSoundLibrary, soundLibrary } from "./sound.js";
-import getElement from "./elements.js";
+import { html, border, background, style } from "./elements.js";
 
-export default function setTheme(theme) {
+const DEFAULT_THEME = document.querySelector('input[name="theme"]:checked').value;
+
+export default function setTheme(theme = DEFAULT_THEME) {
   if (soundLibrary.bgMusic) soundLibrary.bgMusic.pause(); // force music switch
   initSoundLibrary(theme);
   
-  getElement.html().style.setProperty('background-image', `url(./assets/${theme}/images/outside.jpg)`);
-  getElement.border().style.setProperty('border-image-source', `url(./assets/${theme}/images/border.jpg)`);
-  getElement.background().style.setProperty('background-image', `url(./assets/${theme}/images/inside.jpg)`);
+  html.style.setProperty('background-image', `url(./assets/${theme}/images/outside.jpg)`);
+  border.style.setProperty('border-image-source', `url(./assets/${theme}/images/border.jpg)`);
+  background.style.setProperty('background-image', `url(./assets/${theme}/images/inside.jpg)`);
 
-  getElement.style().innerHTML = `
+  style.innerHTML = `
     @font-face {
       font-family: "main";
       src: url("./assets/${theme}/fonts/main.woff2") format('woff2');
@@ -26,3 +28,4 @@ export default function setTheme(theme) {
     }
   `
 }
+

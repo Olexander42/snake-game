@@ -1,116 +1,137 @@
 import Color from "../common/Color.js";
 import { roundTo } from "../common/utils.js";
-import getElement from "../common/elements.js";
+import container from "../common/elements.js";
 import { TIME_UNIT } from "../common/constants.js";
 
 
-export default class Snake {
-  static TURN_CONFIGS = {
-    Up: { direction: { x: 0, y: -1 }, axis: 'x', cww: true, border: "top" },
-    Down: { direction: { x: 0, y: 1 }, axis: 'x', cww: false, border: "bottom" },
-    Left: { direction: { x: -1, y: 0 }, axis: 'y', cww: false, border: "left" },
-    Right: { direction: { x: 1, y: 0 }, axis: 'y', cww: true, border: "right" },
-  }
+let isAlive = true;
+let controlsOn = true;
 
-  static SHIFT_CONFIGS = {
-    left: { axis: "x", direction: 1, side: 'left' },
-    right: { axis: "x", direction: -1, side: 'left' },
-    top: { axis: "y", direction: 1, side: 'top' },
-    bottom: { axis: "y", direction: -1, side: 'top' },
-  }
+const TURN_CONFIGS = {
+  Up: { direction: { x: 0, y: -1 }, axis: 'x', cww: true, border: "top" },
+  Down: { direction: { x: 0, y: 1 }, axis: 'x', cww: false, border: "bottom" },
+  Left: { direction: { x: -1, y: 0 }, axis: 'y', cww: false, border: "left" },
+  Right: { direction: { x: 1, y: 0 }, axis: 'y', cww: true, border: "right" },
+}
 
-  static TURN_ROTATION = 0.25;
-  static DESATURATION = 0.15
+const SHIFT_CONFIGS = {
+  left: { axis: "x", direction: 1, side: 'left' },
+  right: { axis: "x", direction: -1, side: 'left' },
+  top: { axis: "y", direction: 1, side: 'top' },
+  bottom: { axis: "y", direction: -1, side: 'top' },
+}
 
-  constructor() {
-    this.div = document.createElement('div');
-    this.div.id = "snake";
-    getElement.container().append(this.div);
-  }
+const ACCELERATION = 0.25;
+const TURN_ROTATION = 0.25;
+const DESATURATION = 0.15;
 
-  spawn(boardData, color) {
-    this.updateBoardData(boardData);
-    this.color = new Color(color);
+const direction = {"x": 1, "y": 0};
 
-    // parameters
-    this.ACCELERATION = 0.25; 
-    this.speed = 1;
-    this.direction = {"x": 1, "y": 0};
-    this.headRotation = 0;
-    this.headThick = this.step * 2; // because step is half of the default size unit
+let speed = 1;
+let headRotation = 0;
 
-    // body 
-    this._createSection(this.boardBoundsCenter.x, this.boardBoundsCenter.y, this.color.changeColor({ changeL: -2 }), "head") ; 
-    this._createSection(this.boardBoundsCenter.x - this.step, this.boardBoundsCenter.y, this.color.string, "neck"); 
+let div = null;
+let boardBounds = null;
+let step = null;
+let boardBoundsCenter = null;
+let snakeColor = null;
+let headThick = null;
 
-    this.head = document.getElementById("head");
-    this.neck = document.getElementById("neck");
 
-    this.head.style.scale = `${1}`;
-    this.neck.style.scale = `${0.75}`;
+export function spawn(boardData) {
+  updateBoardData(boardData);
 
-    this.isAlive = true;
-    this.controlsOn = true;
+  div = document.createElement('div');
+  div.id = "snake";
+  container.append(div);
 
-    this._snapshot();
-  }
+  const snakeColor = document.querySelector('input[name="color"]:checked').value;
+  snakecolor = new Color(color);
 
-  _createSection(x, y, color, id="") {
-    const element  = document.createElement('span');
+  speed = 1;
+  headRotation = 0;
+  direction = {"x": 1, "y": 0};
 
-    element.classList.add("block");
-    element.classList.add(`${"snake-body"}`);
-    element.id = id;
+  headThick = step * 2; // because step is half of the default size unit
 
-    element.style.left = `${x}px`;
-    element.style.top = `${y}px`;
-    element.style.backgroundColor = color;
+  createSection(boardBoundsCenter.x, boardBoundsCenter.y, color.changeColor({ changeL: -2 }), "head") ; 
+  createSection(boardBoundsCenter.x - step, boardBoundsCenter.y, color.string, "neck"); 
 
-    this.div.append(element);
-  }
+  head = document.getElementById("head");
+  neck = document.getElementById("neck");
+
+  head.style.scale = `${1}`;
+  neck.style.scale = `${0.75}`;
+
+  snapshot();
+}
+
+function updateBoardData(data) {
+  boardBounds = data.bounds;
+  step = data.step;
+  boardBoundsCenter = data.center;
+}
+
+function createSection(x, y, color, id="") {
+  const element  = document.createElement('span');
+
+  element.classList.add("block");
+  element.classList.add(`${"snake-body"}`);
+  element.id = id;
+
+  element.style.left = `${x}px`;
+  element.style.top = `${y}px`;
+  element.style.backgroundColor = color;
+
+  div.append(element);
+}
+
+
+
+
 
   _snapshot() {
-    this.body = [...document.querySelectorAll(".snake-body")];
-    this.bodyData = [];
+    body = [...document.querySelectorAll(".snake-body")];
+    bodyData = [];
 
-    this.body.forEach((section) => {
+    body.forEach((section) => {
       const [x, y, rotation] = [parseInt(section.style.left), parseInt(section.style.top), section.style.rotate];
       const data = {x, y, rotation};
 
-      this.bodyData.push(data);
+      bodyData.push(data);
     })
 
-    this.headData = this.bodyData[0];
+    headData = bodyData[0];
   }
 
   makeStep() {    
     // move head 
-    const [currentX, currentY] = [this.headData.x, this.headData.y]
+    const [currentX, currentY] = [headData.x, headData.y]
 
-    const stepX = Math.sign(this.direction.x) * this.step;
-    const stepY = Math.sign(this.direction.y) * this.step;
+    const stepX = Math.sign(direction.x) * step;
+    const stepY = Math.sign(direction.y) * step;
 
     const newX = currentX + stepX;
     const newY = currentY + stepY;
 
-    const isHeadInsideBody = this.bodyData.some(({ x, y }, i) => (i !==0 && (newX === x && newY === y))); 
+    const isHeadInsideBody = bodyData.some(({ x, y }, i) => (i !==0 && (newX === x && newY === y))); 
 
-    if (!this._getCollisionBorder(newX, newY) && !isHeadInsideBody) { 
-      this.head.style.left = newX + 'px';
-      this.head.style.top = newY + 'px';
-      this.head.style.rotate = `${this.headRotation}turn`;
+    if (!_getCollisionBorder(newX, newY) && !isHeadInsideBody) { 
+      head.style.left = newX + 'px';
+      head.style.top = newY + 'px';
+      head.style.rotate = `${headRotation}turn`;
 
-      this._bodyFollows();
+      _bodyFollows();
 
-      this._snapshot();
+      _snapshot();
     } else {
-      this.isAlive = false;
+      isAlive = false;
     }
   }
 
   _bodyFollows(i = 1) {
-    const currentSection = this.body[i];
-    const nextSection = this.bodyData[i - 1];
+    const currentSection = body[i];
+    const nextSection = bodyData[i - 1];
 
     const [newX, newY, newRotation] = [nextSection.x, nextSection.y, nextSection.rotation];
 
@@ -118,7 +139,7 @@ export default class Snake {
     currentSection.style.top = `${newY}px`;
     currentSection.style.rotate = newRotation;
 
-    if (i < this.body.length - 1) this._bodyFollows(i + 1);
+    if (i < body.length - 1) _bodyFollows(i + 1);
   }
 
   handleControls(arrowKey) { 
@@ -126,27 +147,27 @@ export default class Snake {
     const config = Snake.TURN_CONFIGS[turnKey];
 
     // execute
-    if (this._isAllowTurn(config.axis, config.border)) {
-      this._changeRotation(config.axis, config.cww);
-      this._makeTurn(config.direction);
+    if (_isAllowTurn(config.axis, config.border)) {
+      _changeRotation(config.axis, config.cww);
+      _makeTurn(config.direction);
 
-      this.controlsOn = false; // prevent multiple turns in one step
+      controlsOn = false; // prevent multiple turns in one step
     }
   }
 
   _changeRotation(axis, counterClockwise) {
     let clockwiseCorrection = counterClockwise === true ? -1 : 1;
-    const newRotation =  (Math.sign(this.direction[axis]) * Snake.TURN_ROTATION) * clockwiseCorrection; 
+    const newRotation =  (Math.sign(direction[axis]) * Snake.TURN_ROTATION) * clockwiseCorrection; 
 
-    this.headRotation += newRotation;
+    headRotation += newRotation;
   }
 
   _isAllowTurn(axis, border) {
     const oppositeAxis = axis === 'x' ? 'y' : 'x'; 
     
     if (
-      !(this.headData[oppositeAxis] === this.boardBounds[border]) // snake doesn't move along top border
-      && this.direction[oppositeAxis] === 0 // prevent 180° turn
+      !(headData[oppositeAxis] === boardBounds[border]) // snake doesn't move along top border
+      && direction[oppositeAxis] === 0 // prevent 180° turn
     ) return true
     else {
       return false;
@@ -154,40 +175,36 @@ export default class Snake {
   }
 
   _makeTurn(direction) {
-    this.direction.x = direction.x;
-    this.direction.y = direction.y 
+    direction.x = direction.x;
+    direction.y = direction.y 
   }
 
-  updateBoardData(data) {
-    this.boardBounds = data.bounds;
-    this.step = data.step;
-    this.boardBoundsCenter = data.center;
-  }
+
 
   isAteFood(foodCoords) {
-    return this.headData.x === foodCoords.x && this.headData.y === foodCoords.y;
+    return headData.x === foodCoords.x && headData.y === foodCoords.y;
   }
 
   grow() {
-    const oldTail = this.body[this.body.length - 1];
+    const oldTail = body[body.length - 1];
     if (oldTail.id === "tail") oldTail.id = "";
 
-    this.tail = oldTail.cloneNode(false);
-    this.tail.id = "tail";
-    this.tail.style.zIndex = `-${this.body.length}`
-    this.tail.style.backgroundColor = this.color.changeColor({ changeL: this.body.length }); 
-    this.div.append(this.tail);
+    tail = oldTail.cloneNode(false);
+    tail.id = "tail";
+    tail.style.zIndex = `-${body.length}`
+    tail.style.backgroundColor = color.changeColor({ changeL: body.length }); 
+    div.append(tail);
 
-    this._snapshot();
-    this._rescaleBody(); // create tapering effect
+    _snapshot();
+    _rescaleBody(); // create tapering effect
   }
 
   speedUp() {
-    this.speed += this.ACCELERATION;
+    speed += ACCELERATION;
   }
 
   _rescaleBody() { 
-    const length = this.body.length;
+    const length = body.length;
     let i = length - 1; // tail
     let j = 1; // neck
     let scale = 0;
@@ -195,7 +212,7 @@ export default class Snake {
     // each segment from tail to neck gets decreasingly smaller
     const rescaleSection = () => { 
       scale += 1 / (2 ** j); 
-      this.body[i].style.scale = `${roundTo(scale, 2)}`;
+      body[i].style.scale = `${roundTo(scale, 2)}`;
 
       i--;
       j++;
@@ -207,31 +224,31 @@ export default class Snake {
   isNearOppositeBorders() {
     return (
       // top and bottom border
-      (this.bodyData.some(({ y }) => (y <= this.boardBounds.top + this.step) 
-      && this.bodyData.some(({ y }) => (y >= this.boardBounds.bottom- this.step)))) 
+      (bodyData.some(({ y }) => (y <= boardBounds.top + step) 
+      && bodyData.some(({ y }) => (y >= boardBounds.bottom- step)))) 
       ||
       // left and right border
-      ((this.bodyData.some(({ x }) => (x <= this.boardBounds.left + this.step))) 
-      && (this.bodyData.some(({ x }) => (x >= this.boardBounds.right - this.step)))) 
+      ((bodyData.some(({ x }) => (x <= boardBounds.left + step))) 
+      && (bodyData.some(({ x }) => (x >= boardBounds.right - step)))) 
     )
   }
 
   offsetShrink(data) {
-    this.updateBoardData(data);
+    updateBoardData(data);
 
     let verticalCollisionBorder =  null;
     let horizontalCollisionBorder = null;
 
-    for (const data of this.bodyData) {
+    for (const data of bodyData) {
       // _shift() can be executed only once for each border
       if (!verticalCollisionBorder) {
-        verticalCollisionBorder = this._getCollisionBorder(data.x, undefined); 
-        if (verticalCollisionBorder) this._shift(Snake.SHIFT_CONFIGS[verticalCollisionBorder]);
+        verticalCollisionBorder = _getCollisionBorder(data.x, undefined); 
+        if (verticalCollisionBorder) _shift(Snake.SHIFT_CONFIGS[verticalCollisionBorder]);
       }
 
       if (!horizontalCollisionBorder) {
-        horizontalCollisionBorder = this._getCollisionBorder(undefined, data.y); 
-        if (horizontalCollisionBorder) this._shift(Snake.SHIFT_CONFIGS[horizontalCollisionBorder]);
+        horizontalCollisionBorder = _getCollisionBorder(undefined, data.y); 
+        if (horizontalCollisionBorder) _shift(Snake.SHIFT_CONFIGS[horizontalCollisionBorder]);
       }
 
       if (verticalCollisionBorder && horizontalCollisionBorder) break; // exit loop early
@@ -239,24 +256,24 @@ export default class Snake {
   }
 
   _shift(config) {
-    this.bodyData.forEach((data, i) => {
+    bodyData.forEach((data, i) => {
       const coord = data[config.axis];
-      const section = this.body[i];
-      const newCoord = coord + this.step * config.direction;
+      const section = body[i];
+      const newCoord = coord + step * config.direction;
 
       section.style[config.side] = `${newCoord}px`;
     })
 
-    this._snapshot(); // register the changes
+    _snapshot(); // register the changes
   }
 
   _getCollisionBorder(x, y) {
     let collisionBorder = null;
     
-    if (x < this.boardBounds.left) collisionBorder = 'left';
-    else if (x > this.boardBounds.right) collisionBorder = 'right';
-    else if (y < this.boardBounds.top) collisionBorder = 'top';
-    else if (y > this.boardBounds.bottom) collisionBorder = 'bottom';
+    if (x < boardBounds.left) collisionBorder = 'left';
+    else if (x > boardBounds.right) collisionBorder = 'right';
+    else if (y < boardBounds.top) collisionBorder = 'top';
+    else if (y > boardBounds.bottom) collisionBorder = 'bottom';
 
     return collisionBorder;
   }
@@ -264,22 +281,22 @@ export default class Snake {
   greyout(duration) {
     let timeLeft = duration;
     let i = 0;
-    let j = this.body.length + 1;
+    let j = body.length + 1;
   
-    this.color.hslComponents.s *= Snake.DESATURATION; 
+    color.hslComponents.s *= Snake.DESATURATION; 
 
     const greyoutSection = (ms) => {
       ms = timeLeft / ( 2 ** (j - i));
       timeLeft -= ms;
       // sections greyout sequentially
       setTimeout(() => {
-        const color = this.color.changeColor({ changeL: i }); // the original lightness is preserved
-        const section = this.body[i];
+        const color = color.changeColor({ changeL: i }); // the original lightness is preserved
+        const section = body[i];
   
         section.style.backgroundColor = color;
 
         i++;
-        if (i < this.body.length) setTimeout(() => greyoutSection(ms), ms);  
+        if (i < body.length) setTimeout(() => greyoutSection(ms), ms);  
       }, ms)
     }
     greyoutSection(0);

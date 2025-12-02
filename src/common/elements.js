@@ -1,33 +1,30 @@
-const getElement = (() => {
-  let root =         null;
-  let html =         null;
-  let body =         null;
-  let container =    null;
-  let background =   null;
-  let border =       null;
-  let menu =         null;
-  let settingsDiv =  null;
-  let startBtn =     null;
-  let settingsBtn =  null;
-  let sizeInput =    null;
-  let style =        null;
-  let soundIcon =    null;
+const root = document.documentElement;
+const html = document.querySelector('html');
+const body = document.querySelector('body');
+const container = document.querySelector("#container");
+const background = document.querySelector("#background");
+const border = document.querySelector("#border");
+const menu = document.querySelector("#menu");
+const settingsDiv = document.querySelector("#settings-menu");
+const startBtn = document.getElementById("start-btn");
+const settingsBtn = document.getElementById("settings-btn");
+const sizeInput = document.querySelector("#size-slider");
+const style = document.querySelector('style');
+const soundIcon = document.querySelector("#sound-icon");
 
-  return {
-    root:         () => root         ||=document.documentElement,
-    html:         () => html         ||=document.querySelector('html'),
-    body:         () => body         ||=document.querySelector('body'),
-    container:    () =>  container   ||=document.querySelector("#container"),
-    background:   () => background   ||=document.querySelector("#background"),
-    border:       () => border       ||=document.querySelector("#border"),
-    menu:         () => menu         ||=document.querySelector("#menu"),
-    settingsDiv:  () => settingsDiv  ||=document.querySelector("#settings-menu"),
-    startBtn:     () => startBtn     ||=document.querySelector("#start-btn"),
-    settingsBtn:  () => settingsBtn  ||=document.querySelector("#settings-btn"),
-    sizeInput:    () => sizeInput    ||=document.querySelector("#size-slider"),
-    style:        () => style        ||=document.querySelector('style'),
-    soundIcon:    () => soundIcon    ||=document.querySelector("#sound-icon"),
-  }
-})();
 
-export default getElement;
+export { 
+  root,
+  html,
+  body,
+  container,
+  background,
+  border,
+  menu,
+  settingsDiv,
+  startBtn,
+  settingsBtn,
+  sizeInput,
+  style,
+  soundIcon
+}
