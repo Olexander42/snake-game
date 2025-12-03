@@ -6,6 +6,8 @@ let bgClip = null;
 let bounds = null;
 let center = null;
 
+export let data = null;
+
 export function normalize(size_step) {
   borderThick = Number(size_step);
   bgClip = borderThick;
@@ -23,11 +25,6 @@ export function normalize(size_step) {
     element.style.width = `${bounds.width}px`;
     element.style.height = `${bounds.height}px`;
   })
-
-  center = { 
-    x: normalizeValue(Math.round(bounds.width) / 2, borderThick),
-    y: normalizeValue(Math.round(bounds.height) / 2, borderThick), 
-  }
 
   updateData();
 }
@@ -47,23 +44,20 @@ export function shrink() {
   updateData();
 }
 
-let data = null;
-
 function updateData() {
-    data = {
-      bounds: {
-        left: bgClip,
-        right: container.clientWidth - bgClip - borderThick, // - borderThick to offest distance to head.left
-        top: bgClip,
-        bottom: container.clientHeight - bgClip - borderThick, // - borderThick to offest distance to head.top 
-      },
+  data = {
+    bounds: {
+      left: bgClip,
+      right: container.clientWidth - bgClip - borderThick, // - borderThick to offest distance to head.left
+      top: bgClip,
+      bottom: container.clientHeight - bgClip - borderThick, // - borderThick to offest distance to head.top 
+    },
 
-      center: center,
-      step: borderThick / 2,
-    }
+    step: borderThick / 2,
   }
+}
 
-export { data };
+
 
 
 

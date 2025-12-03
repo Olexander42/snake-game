@@ -1,18 +1,16 @@
 import Color from "../common/Color.js";
-import { roundTo } from "../common/utils.js";
+import { normalize, roundTo } from "../common/utils.js";
 import container from "../common/elements.js";
 import { TIME_UNIT } from "../common/constants.js";
 
+export const div = document.getElementById("snake");
 
-let isAlive = true;
-let controlsOn = true;
+export let isAlive = true;
+export let controlsOn = true;
 
-const TURN_CONFIGS = {
-  Up: { direction: { x: 0, y: -1 }, axis: 'x', cww: true, border: "top" },
-  Down: { direction: { x: 0, y: 1 }, axis: 'x', cww: false, border: "bottom" },
-  Left: { direction: { x: -1, y: 0 }, axis: 'y', cww: false, border: "left" },
-  Right: { direction: { x: 1, y: 0 }, axis: 'y', cww: true, border: "right" },
-}
+export let speed = null;
+
+
 
 const SHIFT_CONFIGS = {
   left: { axis: "x", direction: 1, side: 'left' },
@@ -22,54 +20,67 @@ const SHIFT_CONFIGS = {
 }
 
 const ACCELERATION = 0.25;
-const TURN_ROTATION = 0.25;
+
 const DESATURATION = 0.15;
 
 const direction = {"x": 1, "y": 0};
 
-let speed = 1;
-let headRotation = 0;
-
-let div = null;
+let headRotation = null;
 let boardBounds = null;
 let step = null;
-let boardBoundsCenter = null;
+let boardCenter = null;
 let snakeColor = null;
-let headThick = null;
-
 
 export function spawn(boardData) {
   updateBoardData(boardData);
 
-  div = document.createElement('div');
-  div.id = "snake";
-  container.append(div);
-
   const snakeColor = document.querySelector('input[name="color"]:checked').value;
   snakecolor = new Color(color);
 
-  speed = 1;
-  headRotation = 0;
-  direction = {"x": 1, "y": 0};
-
-  headThick = step * 2; // because step is half of the default size unit
-
-  createSection(boardBoundsCenter.x, boardBoundsCenter.y, color.changeColor({ changeL: -2 }), "head") ; 
-  createSection(boardBoundsCenter.x - step, boardBoundsCenter.y, color.string, "neck"); 
+  createSection(boardCenter.x, boardCenter.y, color.changeColor({ changeL: -2 }), "head");
+  createSection(boardCenter.x - step, boardCenter.y, color.string "neck"); // TODO: remove this step 
 
   head = document.getElementById("head");
-  neck = document.getElementById("neck");
 
-  head.style.scale = `${1}`;
-  neck.style.scale = `${0.75}`;
+  head.style.scale = `${1}`; 
+  document.getElementById("neck");.style.scale = `${0.75}`;
+
+  speed = 1;
+  headRotation = 0;
 
   snapshot();
 }
 
-function updateBoardData(data) {
+export function makeStep() {    
+  // move head 
+  const headData = bodyData[0];
+  const [currentX, currentY] = [headData.x, headData.y];
+
+  const newX = currentX + step * Math.sign(direction.x);
+  const newY = currentY + step * Math.sign(direction.y);
+
+  const isHeadInsideBody = bodyData.some(({ x, y }, i) => (i !==0 && (newX === x && newY === y))); 
+
+  if (!getCollisionBorder(newX, newY) && !isHeadInsideBody) { 
+    head.style.left = `${newX}px`;
+    head.style.top = `${newY}px`;
+    head.style.rotate = `${headRotation}turn`;
+
+    bodyFollows();
+    snapshot();
+  } else {
+    isAlive = false;
+  }
+}
+
+function updateBoardData(data) { 
   boardBounds = data.bounds;
+  boardCenter = { 
+    x: normalize(Math.round(boardBounds.width) / 2, step),
+    y: normalize(Math.round(boardBounds.height) / 2, step), 
+  }
+
   step = data.step;
-  boardBoundsCenter = data.center;
 }
 
 function createSection(x, y, color, id="") {
@@ -86,99 +97,62 @@ function createSection(x, y, color, id="") {
   div.append(element);
 }
 
+function snapshot() {
+  body = [...document.querySelectorAll(".snake-body")];
+  bodyData = [];
+
+  body.forEach((section) => {
+    const [x, y, rotation] = [parseInt(section.style.left), parseInt(section.style.top), section.style.rotate];
+    const data = {x, y, rotation};
+
+    bodyData.push(data);
+  })
+}
+
+function bodyFollows(i = 1) {
+  /* 'neck' takes position of 'head',
+  the next-after-neck section takes position of 'neck',
+  and so on. */
+  const currentSection = body[i];
+  const nextSection = bodyData[i - 1];
+
+  const [newX, newY, newRotation] = [nextSection.x, nextSection.y, nextSection.rotation];
+
+  currentSection.style.left = `${newX}px`;
+  currentSection.style.top = `${newY}px`;
+  currentSection.style.rotate = newRotation;
+
+  if (i < body.length - 1) bodyFollows(i + 1);
+}
 
 
 
-
-  _snapshot() {
-    body = [...document.querySelectorAll(".snake-body")];
-    bodyData = [];
-
-    body.forEach((section) => {
-      const [x, y, rotation] = [parseInt(section.style.left), parseInt(section.style.top), section.style.rotate];
-      const data = {x, y, rotation};
-
-      bodyData.push(data);
-    })
-
-    headData = bodyData[0];
+export function handleControls(arrowKey) { 
+  const TURN_CONFIGS = {
+    Up: { newDirection: { x: 0, y: -1 }, axis: 'x', counterClockwiseRotation: true, border: "top" },
+    Down: { newDirection: { x: 0, y: 1 }, axis: 'x', counterClockwiseRotation: false, border: "bottom" },
+    Left: { newDirection: { x: -1, y: 0 }, axis: 'y', counterClockwiseRotation: false, border: "left" },
+    Right: { newDirection: { x: 1, y: 0 }, axis: 'y', counterClockwiseRotation: true, border: "right" },
   }
 
-  makeStep() {    
-    // move head 
-    const [currentX, currentY] = [headData.x, headData.y]
+  const turnKey = arrowKey.slice(5, arrowKey.length); 
+  const config = TURN_CONFIGS[turnKey];
 
-    const stepX = Math.sign(direction.x) * step;
-    const stepY = Math.sign(direction.y) * step;
+  const oppositeAxis = config.axis === 'x' ? 'y' : 'x'; 
+  const isSnakeMovingAlongBorder = headData[oppositeAxis] === boardBounds[config.border];
 
-    const newX = currentX + stepX;
-    const newY = currentY + stepY;
+  // prevent 180° and into border turns
+  if (!isSnakeMovingAlongBorder && Math.abs(direction[config.axis]) === 1) { 
+    const TURN_ROTATION = 0.25;
+    let clockwiseCorrection = config.counterClockwiseRotation === true ? -1 : 1;
+    headRotation += (Math.sign(direction[config.axis]) * TURN_ROTATION) * clockwiseCorrection;
 
-    const isHeadInsideBody = bodyData.some(({ x, y }, i) => (i !==0 && (newX === x && newY === y))); 
+    direction.x = config.newDirection.x;
+    direction.y = config.newDirection.y 
 
-    if (!_getCollisionBorder(newX, newY) && !isHeadInsideBody) { 
-      head.style.left = newX + 'px';
-      head.style.top = newY + 'px';
-      head.style.rotate = `${headRotation}turn`;
-
-      _bodyFollows();
-
-      _snapshot();
-    } else {
-      isAlive = false;
-    }
+    controlsOn = false; // prevent multiple turns in one frame
   }
-
-  _bodyFollows(i = 1) {
-    const currentSection = body[i];
-    const nextSection = bodyData[i - 1];
-
-    const [newX, newY, newRotation] = [nextSection.x, nextSection.y, nextSection.rotation];
-
-    currentSection.style.left = `${newX}px`;
-    currentSection.style.top = `${newY}px`;
-    currentSection.style.rotate = newRotation;
-
-    if (i < body.length - 1) _bodyFollows(i + 1);
-  }
-
-  handleControls(arrowKey) { 
-    const turnKey = arrowKey.slice(5, arrowKey.length); 
-    const config = Snake.TURN_CONFIGS[turnKey];
-
-    // execute
-    if (_isAllowTurn(config.axis, config.border)) {
-      _changeRotation(config.axis, config.cww);
-      _makeTurn(config.direction);
-
-      controlsOn = false; // prevent multiple turns in one step
-    }
-  }
-
-  _changeRotation(axis, counterClockwise) {
-    let clockwiseCorrection = counterClockwise === true ? -1 : 1;
-    const newRotation =  (Math.sign(direction[axis]) * Snake.TURN_ROTATION) * clockwiseCorrection; 
-
-    headRotation += newRotation;
-  }
-
-  _isAllowTurn(axis, border) {
-    const oppositeAxis = axis === 'x' ? 'y' : 'x'; 
-    
-    if (
-      !(headData[oppositeAxis] === boardBounds[border]) // snake doesn't move along top border
-      && direction[oppositeAxis] === 0 // prevent 180° turn
-    ) return true
-    else {
-      return false;
-    }
-  }
-
-  _makeTurn(direction) {
-    direction.x = direction.x;
-    direction.y = direction.y 
-  }
-
+}
 
 
   isAteFood(foodCoords) {
@@ -302,3 +276,4 @@ function createSection(x, y, color, id="") {
     greyoutSection(0);
   }
 }
+

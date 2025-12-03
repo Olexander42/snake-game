@@ -4,3 +4,4 @@ node_modules/
 .gitignote
 .json
 vitest.*
+README.md

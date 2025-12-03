@@ -1,6 +1,7 @@
-import * as Board from "./components/Board.js";
-import * as Snake from "./components/Snake.js";
-import * as Food from "./components/Food.js";
+import * as Board from "./components/board.js";
+import * as Snake from "./components/snake.js";
+//import * as Food from "./components/Food.js";
+const Food = null; // mock
 
 import { TIME_UNIT } from "./src/common/constants.js";
 import { root, html, sizeInput, menu } from "./src/common/elements.js";
@@ -98,7 +99,7 @@ export function begin() {
 }
 
 export function reset() {
-  Snake.div.remove();
+  Snake.div.replaceChildren()
 
   if (stats.isNewRecord()) stats.updateRecord();
   stats.resetScore();
