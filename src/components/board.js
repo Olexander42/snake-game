@@ -1,5 +1,5 @@
 import { normalize as normalizeValue } from "../common/utils.js";
-import { background, border, container, root } from "../common/elements.js";
+import { background, border, container, root, sizeInput } from "../common/elements.js";
 
 let borderThick = null;
 let bgClip = null;
@@ -8,8 +8,8 @@ let center = null;
 
 export let data = null;
 
-export function normalize(size_step) {
-  borderThick = Number(size_step);
+export function normalize() {
+  borderThick = Number(sizeInput.value);
   bgClip = borderThick;
 
   root.style.setProperty("--size", `${borderThick}px`);
@@ -46,13 +46,11 @@ export function shrink() {
 
 function updateData() {
   data = {
-    bounds: {
-      left: bgClip,
-      right: container.clientWidth - bgClip - borderThick, // - borderThick to offest distance to head.left
-      top: bgClip,
-      bottom: container.clientHeight - bgClip - borderThick, // - borderThick to offest distance to head.top 
-    },
-
+    left: bgClip,
+    right: container.clientWidth - bgClip - borderThick, // - borderThick to offest distance to head.left
+    top: bgClip,
+    bottom: container.clientHeight - bgClip - borderThick, // - borderThick to offest distance to head.top 
+    
     step: borderThick / 2,
   }
 }

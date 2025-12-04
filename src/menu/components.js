@@ -6,7 +6,7 @@ export const buttonFlipper = (() => {
   const body = document.querySelector('body');
   const buttonsSides = [...document.querySelectorAll(".side")];
 
-  const flipButton = (event) => {
+  function flipButton(event) {
     const side = event.currentTarget; 
 
     const isClickedOnOption = side.classList.contains("rear") && event.target !== side;
@@ -15,7 +15,7 @@ export const buttonFlipper = (() => {
     if (!isClickedOnOption || isClickedOnFieldset) side.parentElement.classList.toggle("clicked"); 
   }
 
-  const closeAllButtons = (event) => {
+  function closeAllButtons(event) {
     const isClickedBetweenButtons = event.target === settingsDiv;
     const isClickedOnBoard = event.target === border;
     const isClickedOnBody = event.target === body;
@@ -34,7 +34,7 @@ export const buttonFlipper = (() => {
       body.addEventListener('click', closeAllButtons);
     }
   }
-})()
+})();
 
 export const sizeSlider = (() => {
   const STEP_DEFAULT = sizeInput.step;
@@ -42,9 +42,9 @@ export const sizeSlider = (() => {
   const isRequiresAdjustment = STEP_DEFAULT % STEP_TRANSITION !== 0;
 
   let currentValue = parseInt(sizeInput.value);
-  let targetValue = null;
+  let targetValue;
 
-  const moveThumb = () => {
+  function moveThumb() {
     targetValue = parseInt(sizeInput.value);
     sizeInput.value = currentValue;
     sizeInput.step = STEP_TRANSITION; 
@@ -61,10 +61,11 @@ export const sizeSlider = (() => {
       // finished transitioning
       sizeInput.step = STEP_DEFAULT;
 
-      normalizeBoard(targetValue);
+      normalizeBoard();
     } else {
       if (isRequiresAdjustment) {
         const delta = (Math.abs(currentValue - targetValue));
+        
         if (delta < STEP_TRANSITION) {
           requestAnimationFrame(() => makeStep(delta));
           return;

@@ -6,15 +6,6 @@ let focusedElement = null;
 export default function handleInput() {
   const DELAY = 200;
 
-  const moveFocus = (direction) => {
-    const increment = direction === "Down" ? 1 : -1;
-    const focusedElementIndex = focusibleElements.indexOf(focusedElement); 
-    const newFocusedElementIndex = Math.max(Math.min(focusedElementIndex + increment, focusibleElements.length - 1) , 0)
-
-    focusedElement = focusibleElements[newFocusedElementIndex];
-    focusedElement.focus();
-  }
-
   switch (event.code) {
     case 'ArrowRight':
     case 'ArrowDown': 
@@ -50,7 +41,7 @@ export default function handleInput() {
 }
 
 export function updateFocusibleElements(context) { // TODO: Pass "main menu" back after game over.
-  let selector = null;
+  let selector;
   focusibleElements = [document.querySelector("#sound-icon img")];
 
   switch(context) {
@@ -73,6 +64,15 @@ export function updateFocusibleElements(context) { // TODO: Pass "main menu" bac
 
   focusibleElements.unshift(...document.querySelectorAll(selector));  
   console.log("Focusible Elements:", focusibleElements);
+}
+
+function moveFocus(direction) {
+  const increment = direction === "Down" ? 1 : -1;
+  const focusedElementIndex = focusibleElements.indexOf(focusedElement); 
+  const newFocusedElementIndex = Math.max(Math.min(focusedElementIndex + increment, focusibleElements.length - 1) , 0); 
+
+  focusedElement = focusibleElements[newFocusedElementIndex];
+  focusedElement.focus();
 }
 
 

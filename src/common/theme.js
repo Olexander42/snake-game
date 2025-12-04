@@ -1,9 +1,10 @@
 import { initSoundLibrary, soundLibrary } from "./sound.js";
 import { html, border, background } from "./elements.js";
 
-const defaultTheme = document.querySelector('input[name="theme"]:checked').value;
 
-export default function setTheme(theme = defaultTheme) {
+export default function setTheme() {
+  const theme = document.querySelector('input[name="theme"]:checked').value;
+
   if (soundLibrary.bgMusic) soundLibrary.bgMusic.pause(); // force music switch
   initSoundLibrary(theme);
   

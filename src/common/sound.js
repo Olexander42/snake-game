@@ -13,9 +13,11 @@ export function initSoundLibrary(theme) {
 
 export function toggleMute() {
   isMuted = isMute === false ? true : false;
-
   applyMutedState();
-  toggleSoundIcon();
+
+  // Toggle sound icon.
+  if (isMute) soundIcon.classList.replace("sound-on", "sound-off");
+  else soundIcon.classList.replace("sound-off", "sound-on");
 }
 
 function applyMutedState() {
@@ -23,10 +25,9 @@ function applyMutedState() {
   if (!isMute) soundLibrary.bgMusic.play();
 }
 
-function toggleSoundIcon() {
-  if (isMute) soundIcon.classList.replace("sound-on", "sound-off");
-  else soundIcon.classList.replace("sound-off", "sound-on");
-}
+
+
+
 
 
 
