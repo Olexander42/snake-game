@@ -12,7 +12,7 @@ const TURN_CONFIGS = {
   Right: { newDirection: { x: 1, y: 0 }, axis: 'y', counterClockwise: true, border: "right" },
 }
 
-export function handleControls(arrowKey) {
+export function handleKeydown(arrowKey) {
   const turnKey = arrowKey.slice(5, arrowKey.length); 
   const { newDirection, axis, counterClockwise, border } = TURN_CONFIGS[turnKey];
 

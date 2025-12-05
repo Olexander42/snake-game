@@ -8,23 +8,19 @@
   bottom: { axis: "y", direction: -1, side: 'top' },
 }
 
-export function getCollisionBorder(headCoords) {
-  let collisionBorder = null;
-  
-  if (headCoords.x < boardData.left) collisionBorder = 'left';
-  else if (headCoords.x > boardData.right) collisionBorder = 'right';
-  else if (headCoords.y < boardData.top) collisionBorder = 'top';
-  else if (headCoords.y > boardData.bottom) collisionBorder = 'bottom';
-
-  return collisionBorder;
+export function getCollisionBorder(coords) {
+  if (coords.x < boardData.left) return 'left';
+  if (coords.x > boardData.right) return 'right';
+  if (coords.y < boardData.top) return 'top';
+  if (coords.y > boardData.bottom) return 'bottom';
 }
 
-export function isHeadInsideBody(headCoords) {
-  return bodyData.some(({ x, y }, i) => (i !==0 && (headCoords.x === x && headCoords.y === y)));
+export function isHeadInsideBody(coords) {
+  return bodyData.some(({ x, y }, i) => (i !==0 && (coords.x === x && coords.y === y)));
 } 
 
-export function isCollision(headCoords) {
-  return getCollisionBorder(headCoords) && isHeadInsideBody(headCoords);
+export function isCollision(coords) {
+  return getCollisionBorder(coords) && isHeadInsideBody(coords);
 }
 
 export function isSnakeNearOppositeBorders() {
@@ -40,10 +36,8 @@ export function isSnakeNearOppositeBorders() {
 }
 
 export function offsetShrink(data) {
-  updateBoardData(data);
-
-  let verticalCollisionBorder =  null;
-  let horizontalCollisionBorder = null;
+  let verticalCollisionBorder;
+  let horizontalCollisionBorder;
 
   for (const data of bodyData) {
     // _shift() can be executed only once for each border
@@ -57,11 +51,11 @@ export function offsetShrink(data) {
       if (horizontalCollisionBorder) _shift(Snake.SHIFT_CONFIGS[horizontalCollisionBorder]);
     }
 
-    if (verticalCollisionBorder && horizontalCollisionBorder) break; // exit loop early
+    if (verticalCollisionBorder && horizontalCollisionBorder) break; 
   }
 }
 
-  _shift(config) {
+function shift(config) {
     bodyData.forEach((data, i) => {
       const coord = data[config.axis];
       const section = body[i];

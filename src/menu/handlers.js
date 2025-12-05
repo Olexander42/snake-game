@@ -13,9 +13,9 @@ export function handleStartBtn() {
     firstStart = false;
     startBtn.innerText = "Start Again"; 
 
-    //Game.attachControls();
+    Game.attachControls();
   } else {
-    //Game.reset();
+    Game.reset();
   }
 
   menu.style.display = 'none';

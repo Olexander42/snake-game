@@ -41,8 +41,8 @@ function createSection(x, y, color, id="") {
 }
 
 let body;
-let bodyData;
-let headData;
+export let bodyData;
+export let headData;
 
 function snapshot() {
   body = [...document.querySelectorAll(".snake-section")];
@@ -58,15 +58,15 @@ function snapshot() {
   headData = bodyData[0];
 }
 
-const direction = {"x": 1, "y": 0};
+export const direction = {"x": 1, "y": 0};
 
-export function calcHeadNewCoords() {   
-  const headNewCoords = {
+export function calcNewHeadCoords() {   
+  const newCoords = {
     x: headData.x + boardData.step * Math.sign(direction.x),
     y: headData.y + boardData.step * Math.sign(direction.y),
   } 
 
-  return headNewCoords;
+  return newCoords;
 }
 
 let headRotation = 0;
@@ -86,13 +86,13 @@ export function makeStep(coords) {
 
 function bodyFollows(i = 1) {
   const currentEl = body[i];
-  const nextSecction = bodyData[i - 1];
+  const nextSection = bodyData[i - 1]; 
 
   currentEl.style.left = `${nextSection.x}px`;
   currentEl.style.top = `${nextSection.y}px`;
-  currentEl.style.rotate = nextSection.rotation;
+  currentEl.style.rotate = `${nextSection.rotate}px`;
 
-  if (i < bodyData.length - 1) bodyFollows(i + 1); // get rif of the recursion
+  if (i < body.length - 1) bodyFollows(i + 1); // get rid of the recursion
 }
 
 export function isAteFood(foodCoords) {

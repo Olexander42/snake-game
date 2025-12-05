@@ -1,20 +1,28 @@
-const timer = (() => {
+import { TIME_UNIT } from "../common/constants.js";
+import { speed as snakeSpeed } from "../components/snake/snake.js";
+import { root } from "../common/elements.js";
+
+
+export const timer = (() => {
   let gap = TIME_UNIT;
 
   return {
-    updateGap: () => {
-      gap = Math.round(TIME_UNIT / Snake.speed);
-      root.style.setProperty("--time-gap", `${gap / 1000}s`);
-    } 
+    get gap() { return gap },
 
-    reset() { 
+    updateGap: () => {
+      gap = Math.round(TIME_UNIT / snakeSpeed);
+      root.style.setProperty("--time-gap", `${gap / 1000}s`);
+    }, 
+
+    reset: () => { 
       gap = TIME_UNIT;
       root.style.setProperty("--time-gap", `${gap / 1000}s`);
-    }
+    },
   }
 })();
 
-const stats = (() => {
+
+export const stats = (() => {
   const scoreEl =  document.getElementById("score");
   const recordEl = document.getElementById("record");
 
@@ -41,7 +49,8 @@ const stats = (() => {
   }
 })();
 
-const shrinkCounter = (() => { 
+
+export const shrinkCounter = (() => { 
   let outer = 1;
   let inner = 0;
 
@@ -59,4 +68,3 @@ const shrinkCounter = (() => {
     },
   }
 })();
-  
