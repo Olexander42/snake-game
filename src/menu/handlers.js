@@ -5,8 +5,8 @@ import * as Game from "../game/game.js";
 import { updateFocusibleElements } from "./keyboardNavigation.js";
 import { buttonFlipper, sizeSlider, Outline } from "./components.js";
 
+
 let firstStart = true; 
-let settingsVisited = false;
 
 export function handleStartBtn() {  
   if (firstStart) {
@@ -22,6 +22,9 @@ export function handleStartBtn() {
   Game.begin();
 }
 
+
+let settingsVisited = false;
+
 export function handleSettingsBtn() {
   mainMenuDiv.style.display = 'none';
   settingsDiv.style.display = 'flex';
@@ -31,18 +34,18 @@ export function handleSettingsBtn() {
   if (!settingsVisited) { 
     settingsVisited = true;
 
-    const backBtn = document.getElementById("back-btn");
-
-    const colorOptionOutline = new Outline("#color-set");
-    const themeThumbnailOutline = new Outline("#theme-set", setTheme);
-
-    colorOptionOutline.attachTo([...document.querySelectorAll("input[name='color']")]);
-    themeThumbnailOutline.attachTo([...document.querySelectorAll("input[name='theme']")]);
-
     buttonFlipper.attach();
     sizeSlider.attach();
 
-    backBtn.addEventListener('click', () => {
+    const colorOptionOutline = new Outline("#color-set");
+    const colorOptions = [...document.querySelectorAll("input[name='color']")];  
+    colorOptionOutline.attachTo(colorOptions);
+
+    const themeThumbnailOutline = new Outline("#theme-set", setTheme);
+    const themeOptions = [...document.querySelectorAll("input[name='theme']")];
+    themeThumbnailOutline.attachTo(themeOptions);
+
+    document.getElementById("back-btn").addEventListener('click', () => {
       settingsDiv.style.display = 'none';
       mainMenuDiv.style.display = 'flex';
 

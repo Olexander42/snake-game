@@ -4,18 +4,10 @@ import { container } from "../../common/elements.js";
 import { TIME_UNIT } from "../../common/constants.js";
 import { data as boardData } from "../board.js";
 
-export const div = document.getElementById("snake");
-export let speed;
 
-const ACCELERATION = 0.25;
-
-const DESATURATION = 0.15;
-
-const direction = {"x": 1, "y": 0};
-
-let headEl;
-let headRotation;
 let skinColor;
+let headEl;
+export let speed;
 
 export function spawn() {
   const boardCenter = { 
@@ -23,33 +15,64 @@ export function spawn() {
     y: normalize(Math.round(container.clientHeight) / 2, boardData.step), 
   }
 
-  skinColor = new Color(document.querySelector('input[name="color"]:checked').value);
+  skinColor = new Color(document.querySelector('input[name="snake-color"]:checked').value);
 
   createSection(boardCenter.x, boardCenter.y, skinColor.changeColor({ changeL: -2 }), "head");
-  createSection(boardCenter.x - boardData.step, boardCenter.y, skinColor.string, "neck"); // ❌
+  createSection(boardCenter.x - boardData.step, boardCenter.y, skinColor.string, "neck");
 
   headEl = document.getElementById("head");
-
-  headEl.style.scale = `${1}`; 
-  document.getElementById("neck").style.scale = `${0.75}`; // ❌
-
   speed = 1;
-  headRotation = 0;
-
-  //snapshot();
+ 
+  snapshot();
 }
 
-/*
+export const div = document.getElementById("snake");
 
-export function calcHeadNewCoords() {    
-  const headData = bodyData[0];
-  const [currentX, currentY] = [headData.x, headData.y];
+function createSection(x, y, color, id="") {
+  const el = document.createElement('span');
 
-  const headNewCoords = {}
-  headNewCoords.x = currentX + boardData.step * Math.sign(direction.x);
-  headNewCoords.y = currentY + boardData.step * Math.sign(direction.y);
+  el.classList.add(`${"snake-section"}`);
+  el.id = id;
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+  el.style.backgroundColor = color;
+
+  div.append(el);
+}
+
+let body;
+let bodyData;
+let headData;
+
+function snapshot() {
+  body = [...document.querySelectorAll(".snake-section")];
+  bodyData = [];
+
+  body.forEach((el) => {
+    const [x, y, rotation] = [parseInt(el.style.left), parseInt(el.style.top), el.style.rotate];
+    const sectionData = { x, y, rotation };
+
+    bodyData.push(sectionData);
+  })
+
+  headData = bodyData[0];
+}
+
+const direction = {"x": 1, "y": 0};
+
+export function calcHeadNewCoords() {   
+  const headNewCoords = {
+    x: headData.x + boardData.step * Math.sign(direction.x),
+    y: headData.y + boardData.step * Math.sign(direction.y),
+  } 
 
   return headNewCoords;
+}
+
+let headRotation = 0;
+
+export function updateHeadRotation(rotation) { 
+  headRotation += rotation ;
 }
 
 export function makeStep(coords) {
@@ -61,122 +84,85 @@ export function makeStep(coords) {
   snapshot();
 }
 
-*/
-function createSection(x, y, color, id="") {
-  const el = document.createElement('span');
-
-  el.classList.add("block");
-  el.classList.add(`${"snake-section"}`);
-  el.id = id;
-
-  el.style.left = `${x}px`;
-  el.style.top = `${y}px`;
-  el.style.backgroundColor = color;
-
-  div.append(el);
-}
-
-function snapshot() {
-  body = [...document.querySelectorAll(".snake-section")];
-  bodyData = [];
-
-  body.forEach((el) => {
-    const [x, y, rotation] = [parseInt(el.style.left), parseInt(el.style.top), el.style.rotate];
-    const sectionData = {x, y, rotation};
-
-    bodyData.push(sectionData);
-  })
-}
-/*
-
 function bodyFollows(i = 1) {
-  /* 'Neck' takes position of 'headEl',
-  the next-after-neck section takes position of 'neck',
-  and so on. 
-  const currentSection = bodyData[i];
-  const nextSection = bodyData[i - 1];
+  const currentEl = body[i];
+  const nextSecction = bodyData[i - 1];
 
-  currentSection.style.left = `${nextSection.x}px`;
-  currentSection.style.top = `${nextSection.y}px`;
-  currentSection.style.rotate = nextSection.rotation;
+  currentEl.style.left = `${nextSection.x}px`;
+  currentEl.style.top = `${nextSection.y}px`;
+  currentEl.style.rotate = nextSection.rotation;
 
-  if (i < bodyData.length - 1) bodyFollows(i + 1);
+  if (i < bodyData.length - 1) bodyFollows(i + 1); // get rif of the recursion
 }
 
 export function isAteFood(foodCoords) {
   return headData.x === foodCoords.x && headData.y === foodCoords.y;
 }
 
+const ACCELERATION = 0.25;
+
 export function levelUp() { 
   speed += ACCELERATION;
-  grow();
-  snapshot();
-  rescaleBody();
-}
 
-function grow() {
+  // Grow. 
   const oldTailEl = body[body.length - 1];
-  if (oldTailEl.id === "tail") oldTailEl.id = "";
+  if (oldTailEl.id === "tail") oldTailEl.id = ""; // TODO: try to get rid of this or move it
 
-  tailEl = oldTailEl.cloneNode(false);
+  const tailEl = oldTailEl.cloneNode(false);
+  div.append(tailEl);
+
   tailEl.id = "tail";
   tailEl.style.zIndex = `-${body.length}`
   tailEl.style.backgroundColor = skinColor.changeColor({ changeL: body.length }); 
-  div.append(tailEl);
-}
 
-function rescaleBody() {
-  // create tapering effect
-  const length = body.length;
-  let i = length - 1; // tail
-  let j = 1; // neck
+  snapshot();
+
+  // Rescale body (tapering effect);
+  let i = 0; 
   let scale = 0;
 
-  // each segment from tail to neck gets decreasingly smaller
-  function rescaleSection() { 
-    scale += 1 / (2 ** j); 
-    body[i].style.scale = `${roundTo(scale, 2)}`;
-
-    i--;
-    j++;
-    if (i > 0) rescaleSection();  
-  }
-  rescaleSection();
+  body.forEach((el) => { 
+    scale += 1 / (2 ** i); 
+    el.style.scale = Math.min(`${roundTo(scale, 2)}`, 1); 
+  })
 }
+
+const DESATURATION = 0.15;
+
+export function greyout(duration) {
+  let timeLeft = duration;
+  let i = 0;
+  let j = body.length + 1;
+
+  skinColor.hslComponents.s *= DESATURATION; 
+
+  const greyoutSection = (ms) => {
+    ms = timeLeft / ( 2 ** (j - i));
+    timeLeft -= ms;
+    // sections greyout sequentially
+    setTimeout(() => {
+      const color = skinColor.changeColor({ changeL: i }); // The original lightness is preserved.
+      const section = body[i];
+
+      section.style.backgroundColor = color;
+
+      i++;
+      if (i < body.length) setTimeout(() => greyoutSection(ms), ms);  
+    }, ms)
+  }
+  greyoutSection(0);
+}
+
+
+
+
 
 
 
  
-  greyout(duration) {
-    let timeLeft = duration;
-    let i = 0;
-    let j = body.length + 1;
-  
-    color.hslComponents.s *= Snake.DESATURATION; 
 
-    const greyoutSection = (ms) => {
-      ms = timeLeft / ( 2 ** (j - i));
-      timeLeft -= ms;
-      // sections greyout sequentially
-      setTimeout(() => {
-        const color = color.changeColor({ changeL: i }); // the original lightness is preserved
-        const section = body[i];
-  
-        section.style.backgroundColor = color;
 
-        i++;
-        if (i < body.length) setTimeout(() => greyoutSection(ms), ms);  
-      }, ms)
-    }
-    greyoutSection(0);
-  }
-}
 
-export function updateHeadRotation(value) {
-  return headRotation += value;
-}
-
-*/
 
 
 

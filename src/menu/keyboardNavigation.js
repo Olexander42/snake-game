@@ -1,11 +1,9 @@
 import { body } from "../common/elements.js";
 
-let focusibleElements = [];
-let focusedElement = null;
+const DELAY = 200;
+let focusedElement;
 
-export default function handleInput() {
-  const DELAY = 200;
-
+export default function handleInput(event) {
   switch (event.code) {
     case 'ArrowRight':
     case 'ArrowDown': 
@@ -17,28 +15,33 @@ export default function handleInput() {
       moveFocus("Up");
       break;
 
-    case 'Enter':
+    case 'Enter': // TODO: extact this into a method, probably.
       event.preventDefault();
 
-      focusedElement.classList.add("active"); // recreate :active state behavior
-      setTimeout(() => {
-        focusedElement.classList.remove("active");
-        
-        // Listeners in settings menu attached to "sides" of the buttons
+      // Recreate :active state behavior.
+      focusedElement.classList.add("active"); 
+      setTimeout(() => focusedElement.classList.remove("active"), DELAY);
+
+        // Listeners in settings menu attached to "sides" of the buttons. 
         if (focusedElement.firstElementChild && focusedElement.firstElementChild.classList.contains("side")) {
           focusedElement.firstElementChild.click();
           updateFocusibleElements("settings button");  
         } 
-        else focusedElement.click();
-      }, DELAY);
-      break;
+        else setTimeout(() => focusedElement.click(), DELAY); // test it
+    
+        break;
 
     case 'Escape': 
-      // close all buttons
-      body.click();
+      body.click(); // close all buttons
       updateFocusibleElements("settings menu"); 
+
+    default:
+      // something
   }
 }
+
+
+let focusibleElements = [];
 
 export function updateFocusibleElements(context) { // TODO: Pass "main menu" back after game over.
   let selector;

@@ -1,6 +1,5 @@
 import * as Board from "../components/board.js";
 import * as Snake from "../components/snake/snake.js";
-//import snakeControls, { isControlsOn asisSnakeControlsOn} from "./components/snake/controls.js";
 //import { isCollision, isSnakeNearOppositeBorders } from "./components/snake/collision.js";
 //import * as Food from "./components/Food.js";
 const Food = null; // mock
@@ -16,16 +15,16 @@ let isActive = false;
 export function begin() {
   Board.normalize();
   Snake.spawn();
-}
 
   /*
   Food.teleport(Board.data, Snake.bodyData);
   Food.fadeIn();
   Food.transitionColors();
+  */
 
 
-  //timer.updateGap();
-  //action();
+  timer.updateGap();
+  action();
 }
 
 export function reset() {
@@ -41,7 +40,7 @@ export function reset() {
 export function attachControls() {
   html.addEventListener('keydown', (event) => {
     if (event.code === 'Space') togglePause();
-    else if (event.code.slice(0, 5) === 'Arrow' && isSnakeControlsOn) { 
+    else if (event.code.slice(0, 5) === 'Arrow' && true) { 
       Snake.handleControls(event.code); 
     } 
   })
@@ -49,7 +48,7 @@ export function attachControls() {
 
 
 function action() {   
-  if (!isSnakeControlsOn) isSnakeControlsOn = true; // ⚠ you can't mutate external values
+  //if (!isSnakeControlsOn) isSnakeControlsOn = true; // ⚠ you can't mutate external values
 
   const supposedHeadNewCoords = Snake.calcHeadNewCoords();
 
@@ -77,7 +76,8 @@ function action() {
       timer.updateGap();
     }
 
-  if (isActive) setTimeout(() => action(), timer.gap);
+    if (isActive) setTimeout(() => action(), timer.gap);
+  }
 }
 
 
@@ -104,7 +104,69 @@ function gameOver() {
 
   setTimeout(() => menu.style.display = 'flex', TIME_UNIT);
 }
-*/
+
+const timer = (() => {
+  let gap = TIME_UNIT;
+
+  return {
+    updateGap: () => {
+      gap = Math.round(TIME_UNIT / Snake.speed);
+      root.style.setProperty("--time-gap", `${gap / 1000}s`);
+    }, 
+
+    reset() { 
+      gap = TIME_UNIT;
+      root.style.setProperty("--time-gap", `${gap / 1000}s`);
+    },
+  }
+})();
+
+const stats = (() => {
+  const scoreEl =  document.getElementById("score");
+  const recordEl = document.getElementById("record");
+
+  let scoreVal = 0;
+  let recordVal = 0;
+
+  return {
+    isNewRecord: () => scoreVal > recordVal,
+
+    incrementScore: () => { 
+      scoreVal++;
+      scoreEl.innerText = `Score:${scoreVal}`; 
+    },
+
+    updateRecord() { 
+      recordVal = scoreVal;
+      recordEl.innerText = `Record:${recordVal}`;
+    },
+
+    resetScore() {
+      scoreVal = 0; 
+      scoreEl.innerText = `Score:${scoreVal}`;
+    },
+  }
+})();
+
+const shrinkCounter = (() => { 
+  let outer = 1;
+  let inner = 0;
+
+  return {
+    isTimeToShrink: () => inner >= outer,
+
+    incrementOuter: () => {
+      inner = 0;
+      outer++;
+    },
+
+    reset: () => {
+      outer = 1;
+      inner = 0; 
+    },
+  }
+})();
+
 
 
 

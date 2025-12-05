@@ -1,5 +1,10 @@
-import { direction, updateHeadRotation, boardData } from "./snake.js";
+import { direction, headData, updateHeadRotation } from "./snake.js";
+import { data as boardData } from "../board.js";
 
+
+export let isControlsOn = false;
+
+const TURN_ROTATION = 0.25;
 const TURN_CONFIGS = {
   Up: { newDirection: { x: 0, y: -1 }, axis: 'x', counterClockwise: true, border: "top" },
   Down: { newDirection: { x: 0, y: 1 }, axis: 'x', counterClockwise: false, border: "bottom" },
@@ -7,37 +12,28 @@ const TURN_CONFIGS = {
   Right: { newDirection: { x: 1, y: 0 }, axis: 'y', counterClockwise: true, border: "right" },
 }
 
-export let isControlsOn = false;
-
-const changeRotation = (axis, counterClockwise) => {
-  const TURN_ROTATION = 0.25;
-  let clockwiseCorrection = counterClockwise === true ? -1 : 1;
-
-  updateHeadRotation(Math.sign(Snake.direction[axis]) * TURN_ROTATION * clockwiseCorrection); 
-}
-
-const isAllowTurn = (axis, border) => {
-  const oppositeAxis = axis === 'x' ? 'y' : 'x'; 
-  const isSnakeMovingAlongBorder = headData[oppositeAxis] === boardBounds[border];
-
-  return !isSnakeMovingAlongBorder && Math.abs(direction[axis]) === 1; 
-}
-
-const makeTurn = (newDirection) => {
-  direction.x = newDirection.x;
-  direction.y = newDirection.y 
-}
-
-export default function handleInput(arrowKey) { 
+export function handleControls(arrowKey) {
   const turnKey = arrowKey.slice(5, arrowKey.length); 
-  const config = TURN_CONFIGS[turnKey];
+  const { newDirection, axis, counterClockwise, border } = TURN_CONFIGS[turnKey];
 
-  if (isAllowTurn(config.axis, config.border)) {
-    changeRotation(config.axis, config.counterClockwise);
-    makeTurn(config.direction);
+  const oppositeAxis = axis === 'x' ? 'y' : 'x'; 
+  const isSnakeMovingAlongBorder = headData[oppositeAxis] === boardData[border];
+  const isTurnAngle90Deg = Math.abs(direction[axis]) === 1;
 
-    isControlsOn = false; // prevent multiple turns in one step
+  if (!isSnakeMovingAlongBorder && isTurnAngle90Deg) {
+    const clockwiseCorrection = counterClockwise === true ? -1 : 1;
+    const newHeadRotation = TURN_ROTATION * Math.sign(direction[axis]) * clockwiseCorrection;
+    updateHeadRotation(newHeadRotation); 
+
+    direction.x = newDirection.x;
+    direction.y = newDirection.y;
+
+    isControlsOn = false; // Prevent multiple turns in one step.
   }
 }
+
+
+
+
 
 

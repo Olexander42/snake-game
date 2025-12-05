@@ -1,12 +1,12 @@
-export const soundLibrary = {};
 export const soundIcon = document.getElementById("sound-icon");
+export const soundLibrary = {};
 
 let isMute = true;
 
 export function initSoundLibrary(theme) { 
-  soundLibrary.bgMusic = new Audio(`./assets/${theme}/sounds/background.mp3`);
-  soundLibrary.bite = new Audio(`./assets/${theme}/sounds/bite.mp3`);
-  soundLibrary.gameOver = new Audio(`./assets/${theme}/sounds/game-over.mp3`);
+  soundLibrary.bgMusic = new Audio(`../assets/${theme}/sounds/background.mp3`);
+  soundLibrary.bite = new Audio(`../assets/${theme}/sounds/bite.mp3`);
+  soundLibrary.gameOver = new Audio(`../assets/${theme}/sounds/game-over.mp3`);
 
   applyMutedState();
 }

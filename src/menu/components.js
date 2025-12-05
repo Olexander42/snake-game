@@ -1,17 +1,13 @@
-import { settingsDiv, sizeInput } from "../common/elements.js";
+import { settingsDiv, sizeInput, body } from "../common/elements.js";
 import { normalize as normalizeBoard }  from "../components/board.js";
 
+
 export const buttonFlipper = (() => {
-  const fieldsets = [...document.querySelectorAll('fieldset')];
-  const body = document.querySelector('body');
-  const buttonsSides = [...document.querySelectorAll(".side")];
-
-  function flipButton(event) {
+  function flipButton(event) { // <--- maybe don't pass an entire event?
     const side = event.currentTarget; 
-
     const isClickedOnOption = side.classList.contains("rear") && event.target !== side;
-    const isClickedOnFieldset = fieldsets.includes(event.target); 
-
+    const isClickedOnFieldset = [...document.querySelectorAll('fieldset')].includes(event.target); 
+    
     if (!isClickedOnOption || isClickedOnFieldset) side.parentElement.classList.toggle("clicked"); 
   }
 
@@ -19,22 +15,24 @@ export const buttonFlipper = (() => {
     const isClickedBetweenButtons = event.target === settingsDiv;
     const isClickedOnBoard = event.target === border;
     const isClickedOnBody = event.target === body;
+    const isClickedOutsideButtons = isClickedBetweenButtons || isClickedOnBoard || isClickedOnBody;
 
-    const clickedButtons = [...document.querySelectorAll(".clicked")];
-
-    if (isClickedBetweenButtons || isClickedOnBoard || isClickedOnBody ) { 
-      // clicked anywhere outside the buttons
+    if (isClickedOutsideButtons) { 
+      const clickedButtons = [...document.querySelectorAll(".clicked")];
       clickedButtons.forEach((clickedButton) => clickedButton.classList.remove("clicked"));
     }
   }
  
   return {
     attach: () => {
-      buttonsSides.forEach((buttonSide) => buttonSide.addEventListener('click', flipButton));      
+      const buttonsSides = [...document.querySelectorAll(".side")];
+      buttonsSides.forEach((buttonSide) => buttonSide.addEventListener('click', flipButton)); 
+
       body.addEventListener('click', closeAllButtons);
     }
   }
 })();
+
 
 export const sizeSlider = (() => {
   const STEP_DEFAULT = sizeInput.step;
@@ -58,14 +56,11 @@ export const sizeSlider = (() => {
     updateGradient();
 
     if (currentValue === targetValue) { 
-      // finished transitioning
-      sizeInput.step = STEP_DEFAULT;
-
       normalizeBoard();
+      sizeInput.step = STEP_DEFAULT;
     } else {
       if (isRequiresAdjustment) {
         const delta = (Math.abs(currentValue - targetValue));
-        
         if (delta < STEP_TRANSITION) {
           requestAnimationFrame(() => makeStep(delta));
           return;
@@ -76,13 +71,12 @@ export const sizeSlider = (() => {
   }
 
   function updateGradient() {
-    const gradientCutoffValue = (sizeInput.value - sizeInput.min) / (sizeInput.max - sizeInput.min) * 100;
+    const gradientCutoffValue = (currentValue - sizeInput.min) / (sizeInput.max - sizeInput.min) * 100;
     const gradient = `linear-gradient(to right, black, black ${gradientCutoffValue}%, transparent ${gradientCutoffValue}%, transparent)`;
-
     sizeInput.style.setProperty("--responsive-gradient", gradient);
   } 
 
-  return { attach: () => sizeInput.addEventListener('input', moveThumb) }
+  return { attach: () => sizeInput.addEventListener('input', moveThumb)}
 })()
 
 
@@ -92,7 +86,7 @@ export class Outline {
     this.element = document.querySelector(`${fieldsetId} .outline`);
     this.recipient = recipient;
 
-    this._attachInternalTransitionListeners(); // Prevent shifts during theme changes.
+    this._attachInternalTransitionListeners(); // Prevent shifts during theme changes. 
     this._moveToChecked();
   }
 
@@ -104,13 +98,13 @@ export class Outline {
     })
   }
 
-  _attachInternalTransitionListeners() {
+  _attachInternalTransitionListeners() { 
     this.element.addEventListener('transitionstart', () => {
       this.element.style.opacity = 1;
     })
 
     this.element.addEventListener('transitionend', () => {
-      // native CSS outline replaces disappeared outline element
+      // Native CSS outline replaces disappeared outline element.
       this.element.style.opacity = 0;
       this.fieldset.style.setProperty("--checked-outline", '4px solid var(--white)'); 
     })
@@ -118,7 +112,7 @@ export class Outline {
 
   attachTo(elements) {
     [...elements].forEach((element) => element.addEventListener('click', (event) => { 
-      this.fieldset.style.setProperty("--checked-outline", 'none'); // hide CSS outline asap to avoid flashes
+      this.fieldset.style.setProperty("--checked-outline", 'none'); // Hide CSS outline asap to avoid flashes.
       this._moveToChecked();
 
       if (this.recipient) this.recipient(event.currentTarget.value);
