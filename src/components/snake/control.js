@@ -2,8 +2,6 @@ import { direction, headData, updateHeadRotation } from "./snake.js";
 import { data as boardData } from "../board.js";
 
 
-export let isControlsOn = false;
-
 const TURN_ROTATION = 0.25;
 const TURN_CONFIGS = {
   Up: { newDirection: { x: 0, y: -1 }, axis: 'x', counterClockwise: true, border: "top" },
@@ -12,8 +10,12 @@ const TURN_CONFIGS = {
   Right: { newDirection: { x: 1, y: 0 }, axis: 'y', counterClockwise: true, border: "right" },
 }
 
-export function handleKeydown(arrowKey) {
-  const turnKey = arrowKey.slice(5, arrowKey.length); 
+export let isOn = true;
+
+export function handleKeydown(eventCode) {
+  if (!isOn || eventCode.slice(0, 5) !== 'Arrow') return;
+
+  const turnKey = eventCode.slice(5, eventCode.length); 
   const { newDirection, axis, counterClockwise, border } = TURN_CONFIGS[turnKey];
 
   const oppositeAxis = axis === 'x' ? 'y' : 'x'; 
@@ -28,9 +30,15 @@ export function handleKeydown(arrowKey) {
     direction.x = newDirection.x;
     direction.y = newDirection.y;
 
-    isControlsOn = false; // Prevent multiple turns in one step.
+    isOn = false; // Prevent multiple turns in one step.
   }
 }
+
+export const turnOn = () => isOn = true;
+
+
+
+
 
 
 

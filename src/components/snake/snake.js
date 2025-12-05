@@ -71,9 +71,7 @@ export function calcNewHeadCoords() {
 
 let headRotation = 0;
 
-export function updateHeadRotation(rotation) { 
-  headRotation += rotation ;
-}
+export const updateHeadRotation = (rotation) => headRotation += rotation;
 
 export function makeStep(coords) {
   headEl.style.left = `${coords.x}px`;
@@ -152,6 +150,10 @@ export function greyout(duration) {
   }
   greyoutSection(0);
 }
+
+
+
+
 
 
 

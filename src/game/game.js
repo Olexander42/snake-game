@@ -13,7 +13,7 @@ import * as SnakeControl from "../components/snake/control.js";
 const Food = null; // mock
 
 
-let isActive = true;
+let isGameActive = true;
 
 export function begin() {
   Board.normalize();
@@ -31,10 +31,9 @@ export function begin() {
 }
 
 function action() {   
-  //if (!isSnakeControlsOn) isSnakeControlsOn = true; // ⚠ you can't mutate external values
+  if (!SnakeControl.isOn) SnakeControl.turnOn();
 
   const newHeadCoords = Snake.calcNewHeadCoords();
-
   if (!CollisionManager.isCollision(newHeadCoords)) {
     Snake.makeStep(newHeadCoords);
     /*
@@ -59,24 +58,20 @@ function action() {
       timer.updateGap();
     }
     */
-    if (isActive) setTimeout(() => action(), timer.gap);
+    if (isGameActive) setTimeout(() => action(), timer.gap);
   }
 }
 
 export function attachControls() {
-  html.addEventListener('keydown', (event) => {
-    if (event.code === 'Space') togglePause();
-    else if (event.code.slice(0, 5) === 'Arrow' && isActive) { 
-      SnakeControl.handleKeydown(event.code); 
-    } 
+  html.addEventListener('keydown', ({ code }) => {
+    if (code === 'Space') togglePause();
+    else if (isGameActive) SnakeControl.handleKeydown(code); 
   })
 }
 
 function togglePause() {
-  if (!isActive) {
-    isActive = true;
-    action(timer.gap);
-  } else isActive = false;
+  isGameActive = isGameActive === true ? false : true;
+  if (isGameActive) action();
 }
 
 function gameOver() {
