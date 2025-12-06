@@ -1,26 +1,28 @@
 import Color from "../../common/Color.js";
 import { normalize, roundTo } from "../../common/utils.js";
-import { container } from "../../common/elements.js";
+import { container, sizeInput } from "../../common/elements.js";
 import { TIME_UNIT } from "../../common/constants.js";
-import { data as boardData } from "../board.js";
 
 
 let skinColor;
-let headEl;
+let headElement;
+let step;
 export let speed;
 
 export function spawn() {
+  step = parseInt(sizeInput.value) / 2; // because board shrinks half sizeInput.value from each side
+
   const boardCenter = { 
-    x: normalize(Math.round(container.clientWidth) / 2, boardData.step),
-    y: normalize(Math.round(container.clientHeight) / 2, boardData.step), 
+    x: normalize(Math.round(container.clientWidth) / 2, step),
+    y: normalize(Math.round(container.clientHeight) / 2, step), 
   }
 
   skinColor = new Color(document.querySelector('input[name="snake-color"]:checked').value);
 
   createSection(boardCenter.x, boardCenter.y, skinColor.changeColor({ changeL: -2 }), "head");
-  createSection(boardCenter.x - boardData.step, boardCenter.y, skinColor.string, "neck");
+  createSection(boardCenter.x - step, boardCenter.y, skinColor.string, "neck");
 
-  headEl = document.getElementById("head");
+  headElement = document.getElementById("head");
   speed = 1;
  
   snapshot();
@@ -29,33 +31,32 @@ export function spawn() {
 const div = document.getElementById("snake");
 
 function createSection(x, y, color, id="") {
-  const el = document.createElement('span');
+  const section = document.createElement('span');
 
-  el.classList.add(`${"snake-section"}`);
-  el.id = id;
-  el.style.left = `${x}px`;
-  el.style.top = `${y}px`;
-  el.style.backgroundColor = color;
+  section.classList.add(`${"snake-section"}`);
+  section.id = id;
+  section.style.left = `${x}px`;
+  section.style.top = `${y}px`;
+  section.style.backgroundColor = color;
 
-  div.append(el);
+  div.append(section);
 }
 
-export let body;
-export let bodyData;
-export let headData;
+export let body, bodyData, headData;
 
 export function snapshot() {
   body = [...document.querySelectorAll(".snake-section")];
   bodyData = [];
 
-  body.forEach((el) => {
-    const [x, y, rotation] = [parseInt(el.style.left), parseInt(el.style.top), el.style.rotate];
+  body.forEach((section) => {
+    const [x, y, rotation] = [parseInt(section.style.left), parseInt(section.style.top), section.style.rotate];
     const sectionData = { x, y, rotation };
 
     bodyData.push(sectionData);
   })
 
   headData = bodyData[0];
+  JSON.stringify(bodyData, null, 2);
 }
 
 export const direction = {"x": 1, "y": 0};
@@ -65,26 +66,32 @@ export const newHeadData = {
   rotation: 0,
 };
 
+export function updateHeadCoords() {   
+  newHeadData.x = headData.x + step * Math.sign(direction.x);
+  newHeadData.y = headData.y + step * Math.sign(direction.y);
+}
+
 export function makeStep() {
-  headEl.style.left = `${newHeadData.x}px`;
-  headEl.style.top = `${newHeadData.y}px`;
-  headEl.style.rotate = `${newHeadData.rotation}turn`;
+  headElement.style.left = `${newHeadData.x}px`;
+  headElement.style.top = `${newHeadData.y}px`;
+  headElement.style.rotate = `${newHeadData.rotation}turn`;
 
   bodyFollows();
   snapshot();
 }
 
-
 function bodyFollows(i = 1) {
-  const currentEl = body[i];
-  const nextSection = bodyData[i - 1]; 
+  const currentSection = body[i];
+  const nextSectionData = bodyData[i - 1]; 
 
-  currentEl.style.left = `${nextSection.x}px`;
-  currentEl.style.top = `${nextSection.y}px`;
-  currentEl.style.rotate = `${nextSection.rotate}px`;
+  currentSection.style.left = `${nextSectionData.x}px`;
+  currentSection.style.top = `${nextSectionData.y}px`;
+  currentSection.style.rotate = `${nextSectionData.rotate}px`;
 
   if (i < body.length - 1) bodyFollows(i + 1); // get rid of the recursion
 }
+
+export const isAteFood = (foodCoords) => headData.x === foodCoords.x && headData.y === foodCoords.y;
 
 const ACCELERATION = 0.25;
 
@@ -140,8 +147,7 @@ export function greyout(duration) {
   greyoutSection(0);
 }
 
-export function isAteFood(foodCoords) { headData.x === foodCoords.x && headData.y === foodCoords.y };
-export function disappear() { div.replaceChildren() };
+export const disappear = () => div.replaceChildren();
 
 
 

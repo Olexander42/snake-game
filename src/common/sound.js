@@ -1,7 +1,7 @@
 export const soundIcon = document.getElementById("sound-icon");
 export const soundLibrary = {};
 
-let isMute = true;
+let isMuted = true;
 
 export function initSoundLibrary(theme) { 
   soundLibrary.bgMusic = new Audio(`../assets/${theme}/sounds/background.mp3`);
@@ -9,21 +9,21 @@ export function initSoundLibrary(theme) {
   soundLibrary.gameOver = new Audio(`../assets/${theme}/sounds/game-over.mp3`);
 
   applyMutedState();
+  if (!isMuted) soundLibrary.bgMusic.play();
 }
 
 export function toggleMute() {
-  isMuted = isMute === false ? true : false;
-  applyMutedState();
+  isMuted = isMuted === false ? true : false;
 
   // Toggle sound icon.
-  if (isMute) soundIcon.classList.replace("sound-on", "sound-off");
+  if (isMuted) soundIcon.classList.replace("sound-on", "sound-off");
   else soundIcon.classList.replace("sound-off", "sound-on");
+
+  applyMutedState(); 
+  if (!isMuted) soundLibrary.bgMusic.play();
 }
 
-function applyMutedState() {
-  Object.values(soundLibrary).forEach((sound) => sound.muted = isMute); 
-  if (!isMute) soundLibrary.bgMusic.play();
-}
+const applyMutedState = () => Object.values(soundLibrary).forEach((sound) => sound.muted = isMuted);
 
 
 

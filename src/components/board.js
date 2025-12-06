@@ -34,7 +34,7 @@ export function shrink() {
   border.style.width = `${bounds.width}px`;
   border.style.height =`${bounds.height}px`;
 
-  backgroundClip += borderThick / 2; // Divide by two because clip is applied from both sides.
+  backgroundClip += borderThick / 2; // because clip is applied from both sides.
   root.style.setProperty("--clip", `${backgroundClip}px`);
 
   updateData();
@@ -48,8 +48,9 @@ function updateData() {
     right: container.clientWidth - backgroundClip - borderThick, // - borderThick to offest distance to head.left.
     top: backgroundClip,
     bottom: container.clientHeight - backgroundClip - borderThick, // - borderThick to offest distance to head.top.
-    step: borderThick / 2,
   }
+
+  JSON.stringify(data, null, 2);
 }
 
 

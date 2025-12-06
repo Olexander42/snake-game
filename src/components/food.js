@@ -1,51 +1,52 @@
-import Color from "../common/Color.js";
-import getElement from "../common/elements.js";
+import { container, sizeInput } from "../common/elements.js";
 import { normalize, getRandomInt } from "../common/utils.js";
 import { TIME_UNIT } from "../common/constants.js";
+import Color from "../common/Color.js";
 
-export default class Food {
-  static generateRandomCoords(boardData, snakeData) {
-    const bounds = boardData.bounds;
-    const step = boardData.step;
-    const snakeCoords = snakeData.map(({ x, y }) => ({ x, y }));
-    const coords = {}
 
-    while (true) {
-      coords.x = normalize(getRandomInt(bounds.left, bounds.right), step);
-      coords.y = normalize(getRandomInt(bounds.top, bounds.bottom), step);
+const element = document.getElementById("food");
 
-      if (!snakeCoords.some(({ x, y }) => coords.x === x && coords.y === y)) break;
-    }
+const color = new Color(Color.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] }));
+element.style.backgroundColor = color.string; 
+    
+let boardData;
 
-    return coords;
+export const getBoardData = (data) => boardData = data;
+
+export function teleport(snakeData) {
+  const randomCoords = generateRandomCoords(boardData, snakeData);
+
+  element.style.left = `${randomCoords.x}px`;
+  element.style.top = `${randomCoords.y}px`;
+}
+
+const minSizeUnit = parseInt(sizeInput.value) / 2; // equals snake step
+
+function generateRandomCoords(boardData, snakeData) {
+  const { left, right, top, bottom } = boardData;
+  const snakeCoords = snakeData.map(({ x, y }) => ({ x, y }));
+  
+  const randomCoords = {}
+  while (true) {
+    randomCoords.x = normalize(getRandomInt(left, right), minSizeUnit);
+    randomCoords.y = normalize(getRandomInt(top, bottom), minSizeUnit);
+
+    if (!snakeCoords.some(({ x, y }) => randomCoords.x === x && randomCoords.y === y)) break;
   }
 
-  constructor() { 
-    // invisible food element is created off board 
-    this.element = document.createElement('span');
-    this.element.id = "food";
-    this.element.style.opacity = 0;
-    getElement.container().append(this.element);
+  return randomCoords;
+}
 
-    this.color = Color.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] });
-    this.element.style.backgroundColor = this.color; 
+const TRANSITION_DURATION = 2000;
 
-    this.TRANSITION_DURATION = 2000;
-  }
+export function fadeIn() {
+  element.style.transition = `opacity ${TRANSITION_DURATION / 1000}s linear`;
+  element.addEventListener('transitionend', () => element.style.transition = 'none');
+  requestAnimationFrame(() => element.style.opacity = 1); 
+}
 
-  teleport(boardData, snakeData) {
-    this.coords = Food.generateRandomCoords(boardData, snakeData);
 
-    this.element.style.left = `${this.coords.x}px`;
-    this.element.style.top = `${this.coords.y}px`;
-  }
-
-  fadeIn() {
-    this.element.style.transition = `opacity ${this.TRANSITION_DURATION / 1000}s linear`;
-    this.element.addEventListener('transitionend', () => this.element.style.transition = 'none');
-    requestAnimationFrame(() => this.element.style.opacity = 1); 
-  }
-
+/*
   transitionColors(ms=this.TRANSITION_DURATION) { 
     // Due to performance issues, we transition opacity of the ::before pseudo-element, not the food element itself.
     this.element.style.setProperty("--pseudo-color", this.color); // sync ::before and main element color
@@ -67,3 +68,4 @@ export default class Food {
     setTimeout(() => this.transitionColors(), this.TRANSITION_DURATION); 
   }
 }
+*/

@@ -4,28 +4,25 @@ import { soundLibrary } from "../common/sound.js";
 import { timer, stats, shrinkCounter } from "./managers.js";
 
 import * as Board from "../components/board.js";
+import * as Food from "../components/Food.js"; 
 
 import * as Snake from "../components/snake/snake.js";
 import * as CollisionManager from "../components/snake/collision.js";
 import * as SnakeControl from "../components/snake/control.js";
 
-//import * as Food from "./components/Food.js"; 
-const Food = null; // mock
-
-
 let isGameActive = true;
 
 export function begin() {
   Board.normalize();
+
   Snake.spawn();
+  CollisionManager.getBoardData(Board.data);
 
-  /*
-  Food.teleport(Board.data, Snake.bodyData);
+  Food.getBoardData(Board.data);
+  Food.teleport(Snake.bodyData);
   Food.fadeIn();
-  Food.transitionColors();
-  */
-
-
+  //Food.transitionColors();
+  
   timer.updateGap();
   action();
 }
@@ -33,6 +30,7 @@ export function begin() {
 function action() {   
   if (!SnakeControl.isOn) SnakeControl.turnOn();
 
+  Snake.updateHeadCoords();
   if (!CollisionManager.isCollision()) {
     Snake.makeStep();
     /*
@@ -63,7 +61,6 @@ function action() {
 
 export function attachControls() {
   html.addEventListener('keydown', ({ code }) => {
-    console.log(code);
     if (code === 'Space') togglePause();
     else if (isGameActive && SnakeControl.isOn && code.slice(0, 5) === "Arrow") SnakeControl.handleKeydown(code); 
   })
