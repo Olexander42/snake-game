@@ -50,7 +50,7 @@ function updateData() {
     bottom: container.clientHeight - backgroundClip - borderThick, // - borderThick to offest distance to head.top.
   }
 
-  JSON.stringify(data, null, 2);
+  console.log(JSON.stringify(data, null, 2));
 }
 
 

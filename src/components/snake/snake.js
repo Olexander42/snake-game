@@ -56,7 +56,7 @@ export function snapshot() {
   })
 
   headData = bodyData[0];
-  JSON.stringify(bodyData, null, 2);
+  console.log(JSON.stringify(bodyData, null, 2));
 }
 
 export const direction = {"x": 1, "y": 0};

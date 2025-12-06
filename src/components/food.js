@@ -1,14 +1,18 @@
-import { container, sizeInput } from "../common/elements.js";
+import { sizeInput } from "../common/elements.js";
 import { normalize, getRandomInt } from "../common/utils.js";
 import { TIME_UNIT } from "../common/constants.js";
 import Color from "../common/Color.js";
 
+let element, color, minSizeUnit;
 
-const element = document.getElementById("food");
+export function init() {
+  element = document.getElementById("food");
+  color = new Color(Color.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] }));
+  element.style.backgroundColor = color.string; 
 
-const color = new Color(Color.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] }));
-element.style.backgroundColor = color.string; 
-    
+  minSizeUnit = parseInt(sizeInput.value) / 2; // equals snake step
+}
+
 let boardData;
 
 export const getBoardData = (data) => boardData = data;
@@ -20,9 +24,7 @@ export function teleport(snakeData) {
   element.style.top = `${randomCoords.y}px`;
 }
 
-const minSizeUnit = parseInt(sizeInput.value) / 2; // equals snake step
-
-function generateRandomCoords(boardData, snakeData) {
+export function generateRandomCoords(snakeData) {
   const { left, right, top, bottom } = boardData;
   const snakeCoords = snakeData.map(({ x, y }) => ({ x, y }));
   
@@ -44,6 +46,8 @@ export function fadeIn() {
   element.addEventListener('transitionend', () => element.style.transition = 'none');
   requestAnimationFrame(() => element.style.opacity = 1); 
 }
+
+
 
 
 /*

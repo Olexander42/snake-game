@@ -1,41 +1,40 @@
-import { test, expect } from 'vitest';
-import Food from "../src/components/Food.js";
+import { vi, test, expect } from 'vitest';
+import { init, getBoardData, generateRandomCoords } from "../src/components/food.js";
 
+document.body.innerHTML = `<span id="food" style='opacity: 0'></span>`;
+vi.mock("../src/common/elements.js", () => ({ sizeInput: { value: '60' } } ));
 
-const boardData = 
-  {
-    "bounds": {
-      "left": 60,
-      "right": 600,
-      "top": 60,
-      "bottom": 540
-    },
-    "center": {
-      "x": 360,
-      "y": 360
-    },
-    "step": 30
-  }
+const boardData = {
+  "left": 60,
+  "right": 660,
+  "top": 60,
+  "bottom": 600
+}
+
+const { left, right, top, bottom } = boardData;
 
 const snakeData = [
   {
-    "x": 360,
+    "x": 390,
     "y": 360,
   },
   {
-    "x": 330,
+    "x": 360,
     "y": 360,
   }
 ]
 
-test("Food random coords get generated correctly", { repeats: 10000 }, () => {
-   const coords = Food.generateRandomCoords(boardData, snakeData);
+init();
+getBoardData(boardData);
 
-  expect(coords).toSatisfy((foodCoords) => 
-    (boardData.bounds.left <= coords.x <= boardData.bounds.right)
-    && (boardData.bounds.top <= coords.y <= boardData.bounds.bottom)
-    && !([snakeData[0].x, snakeData[1].x].includes(coords.x)
-    && [snakeData[0].y, snakeData[1].y].includes(coords.y)))
+test("Food random coords get generated correctly", { repeats: 10000 }, () => {
+  const randomCoords = generateRandomCoords(snakeData);
+
+  expect(randomCoords).toSatisfy((foodCoords) => 
+    (left <= randomCoords.x <= right)
+    && (top <= randomCoords.y <= bottom)
+    && !([snakeData[0].x, snakeData[1].x].includes(randomCoords.x)
+    && [snakeData[0].y, snakeData[1].y].includes(randomCoords.y)))
   }
 )
 
