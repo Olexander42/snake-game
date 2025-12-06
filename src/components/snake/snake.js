@@ -5,8 +5,6 @@ import { TIME_UNIT } from "../../common/constants.js";
 import { data as boardData } from "../board.js";
 
 
-export const direction = {"x": 1, "y": 0};
-
 let skinColor;
 let headEl;
 export let speed;
@@ -42,11 +40,11 @@ function createSection(x, y, color, id="") {
   div.append(el);
 }
 
-let body;
+export let body;
 export let bodyData;
 export let headData;
 
-function snapshot() {
+export function snapshot() {
   body = [...document.querySelectorAll(".snake-section")];
   bodyData = [];
 
@@ -60,6 +58,7 @@ function snapshot() {
   headData = bodyData[0];
 }
 
+export const direction = {"x": 1, "y": 0};
 export const newHeadData = {
   x: null,
   y: null,
@@ -75,6 +74,7 @@ export function makeStep() {
   snapshot();
 }
 
+
 function bodyFollows(i = 1) {
   const currentEl = body[i];
   const nextSection = bodyData[i - 1]; 
@@ -84,10 +84,6 @@ function bodyFollows(i = 1) {
   currentEl.style.rotate = `${nextSection.rotate}px`;
 
   if (i < body.length - 1) bodyFollows(i + 1); // get rid of the recursion
-}
-
-export function isAteFood(foodCoords) {
-  return headData.x === foodCoords.x && headData.y === foodCoords.y;
 }
 
 const ACCELERATION = 0.25;
@@ -144,7 +140,8 @@ export function greyout(duration) {
   greyoutSection(0);
 }
 
-export const disappear = () => div.replaceChildren();
+export function isAteFood(foodCoords) { headData.x === foodCoords.x && headData.y === foodCoords.y };
+export function disappear() { div.replaceChildren() };
 
 
 
