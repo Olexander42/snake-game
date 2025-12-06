@@ -1,5 +1,5 @@
 import { TIME_UNIT } from "../common/constants.js";
-import { root, html, sizeInput, menu } from "../common/elements.js";
+import { root, html, menu, sizeInput } from "../common/elements.js";
 import { soundLibrary } from "../common/sound.js";
 import { timer, stats, shrinkCounter } from "./managers.js";
 
@@ -33,9 +33,8 @@ export function begin() {
 function action() {   
   if (!SnakeControl.isOn) SnakeControl.turnOn();
 
-  const newHeadCoords = Snake.calcNewHeadCoords();
-  if (!CollisionManager.isCollision(newHeadCoords)) {
-    Snake.makeStep(newHeadCoords);
+  if (!CollisionManager.isCollision()) {
+    Snake.makeStep();
     /*
     if (Snake.isAteFood(Food.coords)) {
       soundLibrary.bite.play();
@@ -65,7 +64,7 @@ function action() {
 export function attachControls() {
   html.addEventListener('keydown', ({ code }) => {
     if (code === 'Space') togglePause();
-    else if (isGameActive) SnakeControl.handleKeydown(code); 
+    else if (isGameActive && SnakeControl.isOn && code.slice(0, 5) === "Arrow") SnakeControl.handleKeydown(code); 
   })
 }
 
@@ -79,15 +78,14 @@ function gameOver() {
   soundLibrary.gameOver.play();
   
   Snake.greyout(TIME_UNIT);
-
   setTimeout(() => menu.style.display = 'flex', TIME_UNIT);
 }
 
 export function reset() {
-  Snake.div.replaceChildren()
-
-  if (stats.isNewRecord()) stats.updateRecord();
+  if (stats.isNewRecord) stats.updateRecord();
   stats.resetScore();
+
+  Snake.disappear();
 
   soundLibrary.bgMusic.play();
 }

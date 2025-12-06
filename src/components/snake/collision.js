@@ -1,4 +1,4 @@
- import { bodyData } from "./snake.js";
+ import { direction, bodyData, headData, newHeadData } from "./snake.js";
  import { data as boardData } from "../board.js";
 
  const SHIFT_CONFIGS = {
@@ -8,19 +8,27 @@
   bottom: { axis: "y", direction: -1, side: "top" },
 }
 
-export function isCollision(coords) {
-  return getCollisionBorder(coords) || isHeadInsideBody(coords);
+
+function calcNewHeadCoords() {   
+  newHeadData.x = headData.x + boardData.step * Math.sign(direction.x);
+  newHeadData.y = headData.y + boardData.step * Math.sign(direction.y);
 }
 
-export function getCollisionBorder(coords) {
-  if (coords.x < boardData.left) return "left";
-  if (coords.x > boardData.right) return "right";
-  if (coords.y < boardData.top) return "top";
-  if (coords.y > boardData.bottom) return "bottom";
+export function isCollision() {
+  calcNewHeadCoords();
+  
+  return getCollisionBorder() || isHeadBodyCollision();
 }
 
-export function isHeadInsideBody(coords) {
-  return bodyData.some(({ x, y }, i) => (i !==0 && (coords.x === x && coords.y === y)));
+export function getCollisionBorder() {
+  if (newHeadData.x < boardData.left) return "left";
+  if (newHeadData.x > boardData.right) return "right";
+  if (newHeadData.y < boardData.top) return "top";
+  if (newHeadData.y > boardData.bottom) return "bottom";
+}
+
+export function isHeadBodyCollision() {
+  return bodyData.some(({ x, y }, i) => ((newHeadData.x === x && newHeadData.y === y)));
 } 
 
 export function isSnakeNearOppositeBorders() {

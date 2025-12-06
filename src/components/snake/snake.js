@@ -5,6 +5,8 @@ import { TIME_UNIT } from "../../common/constants.js";
 import { data as boardData } from "../board.js";
 
 
+export const direction = {"x": 1, "y": 0};
+
 let skinColor;
 let headEl;
 export let speed;
@@ -26,7 +28,7 @@ export function spawn() {
   snapshot();
 }
 
-export const div = document.getElementById("snake");
+const div = document.getElementById("snake");
 
 function createSection(x, y, color, id="") {
   const el = document.createElement('span');
@@ -58,25 +60,16 @@ function snapshot() {
   headData = bodyData[0];
 }
 
-export const direction = {"x": 1, "y": 0};
+export const newHeadData = {
+  x: null,
+  y: null,
+  rotation: 0,
+};
 
-export function calcNewHeadCoords() {   
-  const newCoords = {
-    x: headData.x + boardData.step * Math.sign(direction.x),
-    y: headData.y + boardData.step * Math.sign(direction.y),
-  } 
-
-  return newCoords;
-}
-
-let headRotation = 0;
-
-export const updateHeadRotation = (rotation) => headRotation += rotation;
-
-export function makeStep(coords) {
-  headEl.style.left = `${coords.x}px`;
-  headEl.style.top = `${coords.y}px`;
-  headEl.style.rotate = `${headRotation}turn`;
+export function makeStep() {
+  headEl.style.left = `${newHeadData.x}px`;
+  headEl.style.top = `${newHeadData.y}px`;
+  headEl.style.rotate = `${newHeadData.rotation}turn`;
 
   bodyFollows();
   snapshot();
@@ -150,6 +143,8 @@ export function greyout(duration) {
   }
   greyoutSection(0);
 }
+
+export const disappear = () => div.replaceChildren();
 
 
 

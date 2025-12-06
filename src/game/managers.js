@@ -9,12 +9,12 @@ export const timer = (() => {
   return {
     get gap() { return gap },
 
-    updateGap: () => {
+    updateGap() {
       gap = Math.round(TIME_UNIT / snakeSpeed);
       root.style.setProperty("--time-gap", `${gap / 1000}s`);
     }, 
 
-    reset: () => { 
+    reset() { 
       gap = TIME_UNIT;
       root.style.setProperty("--time-gap", `${gap / 1000}s`);
     },
@@ -30,9 +30,9 @@ export const stats = (() => {
   let recordVal = 0;
 
   return {
-    isNewRecord: () => scoreVal > recordVal,
+    get isNewRecord() { scoreVal > recordVal },
 
-    incrementScore: () => { 
+    incrementScore() { 
       scoreVal++;
       scoreEl.innerText = `Score:${scoreVal}`; 
     },
@@ -55,14 +55,14 @@ export const shrinkCounter = (() => {
   let inner = 0;
 
   return {
-    isTimeToShrink: () => inner >= outer,
+    get isTimeToShrink() { inner >= outer },
 
-    incrementOuter: () => {
+    incrementOuter() {
       inner = 0;
       outer++;
     },
 
-    reset: () => {
+    reset() {
       outer = 1;
       inner = 0; 
     },

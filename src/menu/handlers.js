@@ -38,11 +38,12 @@ export function handleSettingsBtn() {
     sizeSlider.attach();
 
     const colorOptionOutline = new Outline("#color-set");
-    const colorOptions = [...document.querySelectorAll("input[name='color']")];  
-    colorOptionOutline.attachTo(colorOptions);
-
     const themeThumbnailOutline = new Outline("#theme-set", setTheme);
+
+    const colorOptions = [...document.querySelectorAll("input[name='color']")]; 
     const themeOptions = [...document.querySelectorAll("input[name='theme']")];
+
+    colorOptionOutline.attachTo(colorOptions);
     themeThumbnailOutline.attachTo(themeOptions);
 
     document.getElementById("back-btn").addEventListener('click', () => {

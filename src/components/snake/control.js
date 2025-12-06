@@ -1,6 +1,8 @@
-import { direction, headData, updateHeadRotation } from "./snake.js";
+import { direction, headData, newHeadData } from "./snake.js";
 import { data as boardData } from "../board.js";
 
+
+export let isOn = true;
 
 const TURN_ROTATION = 0.25;
 const TURN_CONFIGS = {
@@ -10,22 +12,17 @@ const TURN_CONFIGS = {
   Right: { newDirection: { x: 1, y: 0 }, axis: 'y', counterClockwise: true, border: "right" },
 }
 
-export let isOn = true;
-
-export function handleKeydown(eventCode) {
-  if (!isOn || eventCode.slice(0, 5) !== 'Arrow') return;
-
-  const turnKey = eventCode.slice(5, eventCode.length); 
+export function handleKeydown(arrowKey) {
+  const turnKey = arrowKey.slice(5, arrowKey.length); 
   const { newDirection, axis, counterClockwise, border } = TURN_CONFIGS[turnKey];
-
+ 
   const oppositeAxis = axis === 'x' ? 'y' : 'x'; 
   const isSnakeMovingAlongBorder = headData[oppositeAxis] === boardData[border];
   const isTurnAngle90Deg = Math.abs(direction[axis]) === 1;
 
   if (!isSnakeMovingAlongBorder && isTurnAngle90Deg) {
     const clockwiseCorrection = counterClockwise === true ? -1 : 1;
-    const newHeadRotation = TURN_ROTATION * Math.sign(direction[axis]) * clockwiseCorrection;
-    updateHeadRotation(newHeadRotation); 
+    newHeadData.rotation += TURN_ROTATION * Math.sign(direction[axis]) * clockwiseCorrection;
 
     direction.x = newDirection.x;
     direction.y = newDirection.y;
