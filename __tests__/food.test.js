@@ -2,7 +2,7 @@ import { vi, test, expect } from 'vitest';
 import { init, getBoardData, generateRandomCoords } from "../src/components/food.js";
 
 document.body.innerHTML = `<span id="food" style='opacity: 0'></span>`;
-vi.mock("../src/common/elements.js", () => ({ sizeInput: { value: '60' } } ));
+vi.mock("../src/common/elements.js", () => ({ sizeSlider: { value: '60' } } ));
 
 const boardData = {
   "left": 60,

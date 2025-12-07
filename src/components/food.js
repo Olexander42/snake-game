@@ -1,54 +1,49 @@
-import { sizeInput } from "../common/elements.js";
-import { normalize, getRandomInt } from "../common/utils.js";
+import { food as element } from "../common/elements.js";
+import { getMinSizeUnit } from "../common/config.js";
+import { normalize, getRandomInt, Color } from "../common/utils.js";
 import { TIME_UNIT } from "../common/constants.js";
-import Color from "../common/Color.js";
+import { data as boardData } from "./board.js";
 
-let element, color, minSizeUnit;
 
-export function init() {
-  element = document.getElementById("food");
+let color, minSizeUnit;
+
+export function spawn(occupiedCoords) {
   color = new Color(Color.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] }));
   element.style.backgroundColor = color.string; 
 
-  minSizeUnit = parseInt(sizeInput.value) / 2; // equals snake step
+  teleport(occupiedCoords);
+  fadeIn()
 }
 
-let boardData;
-
-export const getBoardData = (data) => boardData = data;
-
-export function teleport(snakeData) {
-  const randomCoords = generateRandomCoords(boardData, snakeData);
+export function teleport(occupiedCoords) {
+  const randomCoords = generateRandomCoords(occupiedCoords);
 
   element.style.left = `${randomCoords.x}px`;
   element.style.top = `${randomCoords.y}px`;
 }
 
-export function generateRandomCoords(snakeData) {
+function generateRandomCoords(occupiedCoords) {
+  const minSizeUnit = getMinSizeUnit();
   const { left, right, top, bottom } = boardData;
-  const snakeCoords = snakeData.map(({ x, y }) => ({ x, y }));
-  
   const randomCoords = {}
+
   while (true) {
     randomCoords.x = normalize(getRandomInt(left, right), minSizeUnit);
     randomCoords.y = normalize(getRandomInt(top, bottom), minSizeUnit);
-
     if (!snakeCoords.some(({ x, y }) => randomCoords.x === x && randomCoords.y === y)) break;
   }
 
   return randomCoords;
 }
 
+
 const TRANSITION_DURATION = 2000;
 
-export function fadeIn() {
+function fadeIn() {
   element.style.transition = `opacity ${TRANSITION_DURATION / 1000}s linear`;
   element.addEventListener('transitionend', () => element.style.transition = 'none');
   requestAnimationFrame(() => element.style.opacity = 1); 
 }
-
-
-
 
 /*
   transitionColors(ms=this.TRANSITION_DURATION) { 
@@ -73,3 +68,5 @@ export function fadeIn() {
   }
 }
 */
+
+export { generateRandomCoords }; // used only in tests

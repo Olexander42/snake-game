@@ -2,7 +2,6 @@ import { initSoundLibrary, soundLibrary } from "./sound.js";
 import { html, border, background } from "./elements.js";
 
 
-
 export default function setTheme() {
   const theme = document.querySelector('input[name="theme"]:checked').value;
   

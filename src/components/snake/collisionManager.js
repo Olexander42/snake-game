@@ -1,15 +1,15 @@
-import { direction, body, bodyData, headData, newHeadData, snapshot } from "./snake.js";
+import { direction, newHeadData } from "./movement.js";
+import { body, bodyData, headData, snapshot } from "./init.js";
+import { data as boardData } from "../board.js";
 
-
-let boardData;
-
-export const getBoardData = (data) => boardData = data;
 
 export function isCollision() {
+  const isHeadBodyCollision = bodyData.some(({ x, y }) => newHeadData.x === x && newHeadData.y === y);
+
   return getCollisionBorder() || isHeadBodyCollision();
 }
 
-export function getCollisionBorder(x = newHeadData.x, y = newHeadData.y) {
+function getCollisionBorder(x = newHeadData.x, y = newHeadData.y) {
   const { left, right, top, bottom } = boardData;
 
   if (x < left) return "left";
@@ -17,10 +17,6 @@ export function getCollisionBorder(x = newHeadData.x, y = newHeadData.y) {
   if (y < top) return "top";
   if (y > bottom) return "bottom";
 }
-
-export function isHeadBodyCollision() {
-  return bodyData.some(({ x, y }, i) => ((newHeadData.x === x && newHeadData.y === y)));
-} 
 
 const SHIFT_CONFIGS = {
   left: { axis: "x", shiftDirection: 1, side: "left" },

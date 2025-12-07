@@ -1,26 +1,27 @@
 import { TIME_UNIT } from "../common/constants.js";
-import { root, html, menu, sizeInput } from "../common/elements.js";
+import { root, html, menu } from "../common/elements.js";
 import { soundLibrary } from "../common/sound.js";
 import { timer, stats, shrinkCounter } from "./managers.js";
 
 import * as Board from "../components/board.js";
 import * as Food from "../components/Food.js"; 
 
-import * as Snake from "../components/snake/snake.js";
+import { spawn as spawnSnake, bodyData as snakeData } from "../components/snake/init.js";
+import { calcNewHeadCoords, makeStep } from "../components/snake/movement.js";
+import { isCollision, isOn as isControlsOn, turnOn as turnOnControls } from "../components/snake/control.js";
 import * as CollisionManager from "../components/snake/collision.js";
-import * as SnakeControl from "../components/snake/control.js";
+
 
 let isGameActive = true;
 
 export function begin() {
   Board.normalize();
 
-  Snake.spawn();
-  CollisionManager.getBoardData(Board.data);
+  spawnSnake();
 
-  Food.getBoardData(Board.data);
-  Food.teleport(Snake.bodyData);
-  Food.fadeIn();
+  const snakeCoords = Snake.data.map(({ x, y }) => ({ x, y }))
+  Food.spawn(snakeCoords);
+  
   //Food.transitionColors();
   
   timer.updateGap();
@@ -28,11 +29,11 @@ export function begin() {
 }
 
 function action() {   
-  if (!SnakeControl.isOn) SnakeControl.turnOn();
+  if (!isControlsOn) turnOnControls();
 
-  Snake.updateHeadCoords();
-  if (!CollisionManager.isCollision()) {
-    Snake.makeStep();
+  calcNewHeadCoords();
+  if (!isCollision()) {
+    makeStep();
     /*
     if (Snake.isAteFood(Food.coords)) {
       soundLibrary.bite.play();

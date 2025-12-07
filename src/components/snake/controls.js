@@ -1,8 +1,9 @@
-import { direction, headData, newHeadData } from "./snake.js";
+import { direction, newHeadData } from "./movement.js";
+import { headData } from "./init.js";
 import { data as boardData } from "../board.js";
 
 
-export let isOn = true;
+export let isControlsOn = true;
 
 const TURN_ROTATION = 0.25;
 const TURN_CONFIGS = {
@@ -31,7 +32,7 @@ export function handleKeydown(arrowKey) {
   }
 }
 
-export const turnOn = () => isOn = true;
+export const turnControlsOn = () => isControlsOn = true;
 
 
 

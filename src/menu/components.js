@@ -1,4 +1,4 @@
-import { settingsDiv, sizeInput, body } from "../common/elements.js";
+import { settings, sizeSlider, body } from "../common/elements.js";
 import { normalize as normalizeBoard }  from "../components/board.js";
 
 
@@ -12,7 +12,7 @@ export const buttonFlipper = (() => {
   }
 
   function closeAllButtons(event) {
-    const isClickedBetweenButtons = event.target === settingsDiv;
+    const isClickedBetweenButtons = event.target === settings;
     const isClickedOnBoard = event.target === border;
     const isClickedOnBody = event.target === body;
     const isClickedOutsideButtons = isClickedBetweenButtons || isClickedOnBoard || isClickedOnBody;
@@ -34,30 +34,30 @@ export const buttonFlipper = (() => {
 })();
 
 
-export const sizeSlider = (() => {
-  const STEP_DEFAULT = sizeInput.step;
+export const sizeSliderMover = (() => {
+  const STEP_DEFAULT = parseInt(sizeSlider.step);
   const STEP_TRANSITION = 3;
   const isRequiresAdjustment = STEP_DEFAULT % STEP_TRANSITION !== 0;
 
-  let currentValue = parseInt(sizeInput.value);
+  let currentValue = parseInt(sizeSlider.value);
   let targetValue;
 
   function moveThumb() {
-    targetValue = parseInt(sizeInput.value);
-    sizeInput.value = currentValue;
-    sizeInput.step = STEP_TRANSITION; 
+    targetValue = parseInt(sizeSlider.value);
+    sizeSlider.value = currentValue;
+    sizeSlider.step = STEP_TRANSITION; 
 
     requestAnimationFrame(() => makeStep(STEP_TRANSITION));
   }
 
   function makeStep(step) {
     currentValue += (currentValue > targetValue) ? -step : step;
-    sizeInput.value = currentValue;
+    sizeSlider.value = currentValue;
     updateGradient();
 
     if (currentValue === targetValue) { 
       normalizeBoard();
-      sizeInput.step = STEP_DEFAULT;
+      sizeSlider.step = STEP_DEFAULT;
     } else {
       if (isRequiresAdjustment) {
         const delta = (Math.abs(currentValue - targetValue));
@@ -71,13 +71,13 @@ export const sizeSlider = (() => {
   }
 
   function updateGradient() {
-    const gradientCutoffValue = (currentValue - sizeInput.min) / (sizeInput.max - sizeInput.min) * 100;
+    const gradientCutoffValue = (currentValue - sizeSlider.min) / (sizeSlider.max - sizeSlider.min) * 100;
     const gradient = `linear-gradient(to right, black, black ${gradientCutoffValue}%, transparent ${gradientCutoffValue}%, transparent)`;
-    sizeInput.style.setProperty("--responsive-gradient", gradient);
+    sizeSlider.style.setProperty("--responsive-gradient", gradient);
   } 
 
-  return { attach: () => sizeInput.addEventListener('input', moveThumb)}
-})()
+  return { attach: () => sizeSlider.addEventListener('input', moveThumb)}
+})();
 
 
 export class Outline {
