@@ -34,30 +34,30 @@ export const buttonFlipper = (() => {
 })();
 
 
-export const sizeSliderMover = (() => {
-  const STEP_DEFAULT = parseInt(sizeSlider.step);
+export const sliderMover = ((slider, recipient) => {
+  const STEP_DEFAULT = parseInt(slider.step);
   const STEP_TRANSITION = 3;
   const isRequiresAdjustment = STEP_DEFAULT % STEP_TRANSITION !== 0;
 
-  let currentValue = parseInt(sizeSlider.value);
+  let currentValue = parseInt(slider.value);
   let targetValue;
 
   function moveThumb() {
-    targetValue = parseInt(sizeSlider.value);
-    sizeSlider.value = currentValue;
-    sizeSlider.step = STEP_TRANSITION; 
+    targetValue = parseInt(slider.value);
+    slider.value = currentValue;
+    slider.step = STEP_TRANSITION; 
 
     requestAnimationFrame(() => makeStep(STEP_TRANSITION));
   }
 
   function makeStep(step) {
     currentValue += (currentValue > targetValue) ? -step : step;
-    sizeSlider.value = currentValue;
+    slider.value = currentValue;
     updateGradient();
 
     if (currentValue === targetValue) { 
-      normalizeBoard();
-      sizeSlider.step = STEP_DEFAULT;
+      recipient();
+      slider.step = STEP_DEFAULT;
     } else {
       if (isRequiresAdjustment) {
         const delta = (Math.abs(currentValue - targetValue));
@@ -70,14 +70,18 @@ export const sizeSliderMover = (() => {
     }
   }
 
+  const min = slider.min;
+  const max = slider.max;
+  const PERCENT_100 = 100;
+
   function updateGradient() {
-    const gradientCutoffValue = (currentValue - sizeSlider.min) / (sizeSlider.max - sizeSlider.min) * 100;
+    const gradientCutoffValue = (currentValue - min) / (max - min) * PERCENT_100;
     const gradient = `linear-gradient(to right, black, black ${gradientCutoffValue}%, transparent ${gradientCutoffValue}%, transparent)`;
-    sizeSlider.style.setProperty("--responsive-gradient", gradient);
+    slider.style.setProperty("--responsive-gradient", gradient);
   } 
 
-  return { attach: () => sizeSlider.addEventListener('input', moveThumb)}
-})();
+  return { attach: () => slider.addEventListener('input', moveThumb)}
+})(sizeSlider, normalizeBoard());
 
 
 export class Outline {

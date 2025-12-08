@@ -1,22 +1,14 @@
 import { normalize as normalizeValue } from "../common/utils.js";
-import { root } from "../common/elements.js";
-import { getMinSizeUnit } from "../common/config.js";
+import {  border, background, root } from "../common/elements.js";
+import { getMinSizeUnit } from "../common/config.mjs";
 
 
-let container, background, border;
-
-export function init() {
-  container = document.getElementById("container");
-  background = document.getElementById("background");
-  border = document.getElementById("border");
-}
-
-
-let sizeUnit, backgroundClip, bounds;
+let container, bounds;
 
 export function normalize() {
   updateSizeUnits();
 
+  container ??= document.getElementById("container");
   // calculate
   bounds = {
     width: normalizeValue(container.clientWidth, sizeUnit),
@@ -49,6 +41,8 @@ export function shrink() {
 }
 
 
+let sizeUnit, backgroundClip,
+
 function updateSizeUnits() {
   sizeUnit = getMinSizeUnit() * 2; // Board shrinks half of sizeSlider.value from each side.
   backgroundClip = sizeUnit;
@@ -59,23 +53,25 @@ function updateSizeUnits() {
 }
 
 
-
 export const data = () => {
   return {
-    get left() { backgroundClip },
-    get right() clientWidth - backgroundClip - sizeUnit, // - sizeUnit to offest distance to headEl.left.
-    get top() backgroundClip,
-    get bottom() container.clientHeight - backgroundClip - sizeUnit, // - sizeUnit to offest distance to headEl.top.
+    get left() { return backgroundClip },
+    get right() { return clientWidth - backgroundClip - sizeUnit }, // - sizeUnit to offest distance to headEl.left 
+    get top() { return backgroundClip },
+    get bottom() { return container.clientHeight - backgroundClip - sizeUnit }, // - sizeUnit to offest distance to headEl.top.
   }
 }
 
 
 export const center = () => {
   return { 
-    get x() { normalizeValue(Math.round(container.clientWidth) / 2, step) },
-    get y() { normalizeValue(Math.round(container.clientHeight) / 2, step) }, 
+    get x() { return normalizeValue(Math.round(container.clientWidth) / 2, step) },
+    get y() { return normalizeValue(Math.round(container.clientHeight) / 2, step) }, 
   }
 }
+
+
+
 
 
 

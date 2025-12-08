@@ -1,12 +1,11 @@
-import { direction, newHeadData } from "./movement.js";
-import { body, bodyData, headData, snapshot } from "./init.js";
+import { body, bodyData, headData, snapshot, direction, newHeadData  } from "./init.js";
 import { data as boardData } from "../board.js";
 
 
 export function isCollision() {
   const isHeadBodyCollision = bodyData.some(({ x, y }) => newHeadData.x === x && newHeadData.y === y);
 
-  return getCollisionBorder() || isHeadBodyCollision();
+  return isHeadBodyCollision || getCollisionBorder();
 }
 
 function getCollisionBorder(x = newHeadData.x, y = newHeadData.y) {
@@ -18,23 +17,12 @@ function getCollisionBorder(x = newHeadData.x, y = newHeadData.y) {
   if (y > bottom) return "bottom";
 }
 
+
 const SHIFT_CONFIGS = {
   left: { axis: "x", shiftDirection: 1, side: "left" },
   right: { axis: "x", shiftDirection: -1, side: "left" },
   top: { axis: "y", shiftDirection: 1, side: "top" },
   bottom: { axis: "y", shiftDirection: -1, side: "top" },
-}
-
-export function isSnakeNearOppositeBorders() {
-  const { top, bottom, left, right, step } = boardData;
-
-  return (
-    (bodyData.some(({ y }) => (y <= top + step) 
-    && bodyData.some(({ y }) => (y >= bottom - step)))) 
-    ||
-    ((bodyData.some(({ x }) => (x <= left + step))) 
-    && (bodyData.some(({ x }) => (x >= right - step)))) 
-  )
 }
 
 export function offsetShrink(data) {
@@ -62,10 +50,22 @@ function shift({ axis, shiftDirection, side }) {
     const coord = data[axis];
     const el = body[i];
     const newCoord = coord + step * shiftDirection;
-
     el.style[side] = `${newCoord}px`;
   })
 
   snapshot();
+}
+
+
+export function isNearOppositeBorders() {
+  const { top, bottom, left, right, step } = boardData;
+
+  return (
+    (bodyData.some(({ y }) => (y <= top + step) 
+    && bodyData.some(({ y }) => (y >= bottom - step)))) 
+    ||
+    ((bodyData.some(({ x }) => (x <= left + step))) 
+    && (bodyData.some(({ x }) => (x >= right - step)))) 
+  )
 }
 

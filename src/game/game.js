@@ -14,7 +14,7 @@ import * as CollisionManager from "../components/snake/collision.js";
 
 let isGameActive = true;
 
-export function begin() {
+export function begin() { 
   Board.normalize();
 
   spawnSnake();
@@ -24,7 +24,7 @@ export function begin() {
   
   //Food.transitionColors();
   
-  timer.updateGap();
+  timer.updateGap(speed);
   action();
 }
 
@@ -34,25 +34,20 @@ function action() {
   calcNewHeadCoords();
   if (!isCollision()) {
     makeStep();
-    /*
     if (Snake.isAteFood(Food.coords)) {
-      soundLibrary.bite.play();
-      shrinkCounter.inner++;
-
       if (shrinkCounter.isTimeToShrink() && !isSnakeNearOppositeBorders()) {
         Board.shrink(); 
         Snake.offsetShrink();
 
         shrinkCounter.incrementOuter();
       }
-
       stats.incrementScore();
-
       Food.teleport(Board.data, Snake.bodyData);
 
       Snake.grow();
-      Snake.speedUp();
+      Snake.rescaleSections()
 
+      timer.speedUp();
       timer.updateGap();
     }
     */

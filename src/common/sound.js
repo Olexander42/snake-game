@@ -1,6 +1,3 @@
-import { soundIcon } from "./elements.js";
-
-
 let isMuted = true;
 
 export const soundLibrary = {};
@@ -16,7 +13,7 @@ export function initSoundLibrary(theme) {
 export function toggleMute() {
   isMuted = isMuted === false ? true : false;
   applyMutedState(); 
-  toggleSoundIcon();
+  toggleIcon(icon);
 }
 
 function applyMutedState() {
@@ -24,10 +21,18 @@ function applyMutedState() {
   if (!isMuted) soundLibrary.bgMusic.play();
 }
 
-function toggleSoundIcon() {
-  if (isMuted) soundIcon.classList.replace("sound-on", "sound-off");
-  else soundIcon.classList.replace("sound-off", "sound-on");
+
+function toggleIcon() {
+  if (isMuted) icon.classList.replace("sound-on", "sound-off");
+  else icon.classList.replace("sound-off", "sound-on");
 }
+
+
+const icon = () => document.getElementById("soundIcon");
+export const attachToggleMuteListener = () => icon().addEventListener('click', () => toggleMute());
+
+
+
 
 
 

@@ -4,13 +4,17 @@ import { root } from "../common/elements.js";
 
 
 export const timer = (() => {
+  const ACCELERATION = 0.25;
+  let speed = 1;
   let gap = TIME_UNIT;
 
   return {
     get gap() { return gap },
 
-    updateGap() {
-      gap = Math.round(TIME_UNIT / snakeSpeed);
+    speedUp() { speed += ACCELERATION },
+
+    updateGap(speed) {
+      gap = Math.round(TIME_UNIT / speed);
       root.style.setProperty("--time-gap", `${gap / 1000}s`);
     }, 
 

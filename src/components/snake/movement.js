@@ -1,19 +1,15 @@
-import { body, bodyData, headData, headElement, step, snapshot } from "./init.js";
-
-
-export const direction = {"x": 1, "y": 0};
-export const newHeadData = {
-  x: null,
-  y: null,
-  rotation: 0,
-};
+import { body, bodyData, headData, newHeadData, step, snapshot, direction  } from "./init.js";
 
 export function calcNewHeadCoords() {   
   newHeadData.x = headData.x + step * Math.sign(direction.x);
   newHeadData.y = headData.y + step * Math.sign(direction.y);
 }
 
+let headElement;
+
 export function makeStep() {
+  if (!headElement) headElement = document.getElementById("head");
+
   headElement.style.left = `${newHeadData.x}px`;
   headElement.style.top = `${newHeadData.y}px`;
   headElement.style.rotate = `${newHeadData.rotation}turn`;

@@ -1,9 +1,9 @@
-import { body } from "../common/elements.js";
+import { body, html } from "../common/elements.js";
 
 const DELAY = 200;
 let focusedElement;
 
-export default function handleInput(event) {
+export function handleKeydown(event) {
   switch (event.code) {
     case 'ArrowRight':
     case 'ArrowDown': 
@@ -43,7 +43,7 @@ export default function handleInput(event) {
 
 let focusibleElements = [];
 
-export function updateFocusibleElements(context) { // TODO: Pass "main menu" back after game over.
+export function updateContext(context) { // TODO: Pass "main menu" back after game over.
   let selector;
   focusibleElements = [document.querySelector("#sound-icon img")];
 
@@ -78,5 +78,10 @@ function moveFocus(direction) {
   focusedElement.focus();
 }
 
+
+export function setupKeyboardNavigation() {
+  updateContext("main menu");
+  html.addEventListener('keydown', handleKeydown);
+}
 
 

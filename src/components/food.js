@@ -1,29 +1,30 @@
-import { food as element } from "../common/elements.js";
-import { getMinSizeUnit } from "../common/config.js";
+import { getMinSizeUnit } from "../common/config.mjs";
 import { normalize, getRandomInt, Color } from "../common/utils.js";
 import { TIME_UNIT } from "../common/constants.js";
-import { data as boardData } from "./board.js";
 
 
-let color, minSizeUnit;
+const coords = {};
+let element, color, minSizeUnit;
 
-export function spawn(occupiedCoords) {
+export function spawn(boardData, snakeCoords) {
+  element ??= document.getElementById("food");
+
   color = new Color(Color.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] }));
   element.style.backgroundColor = color.string; 
 
-  teleport(occupiedCoords);
-  fadeIn()
+  teleport(boardData, snakeCoords);
+  fadeIn();
 }
 
-export function teleport(occupiedCoords) {
-  const randomCoords = generateRandomCoords(occupiedCoords);
+export function teleport(boardData, snakeCoords) {
+  coords = generateRandomCoords(boardData, snakeCoords);
 
-  element.style.left = `${randomCoords.x}px`;
-  element.style.top = `${randomCoords.y}px`;
+  element.style.left = `${coords.x}px`;
+  element.style.top = `${coords.y}px`;
 }
 
-function generateRandomCoords(occupiedCoords) {
-  const minSizeUnit = getMinSizeUnit();
+function generateRandomCoords(boardData, snakeCoords) {
+  if (!minSizeUnit) minSizeUnit = getMinSizeUnit();
   const { left, right, top, bottom } = boardData;
   const randomCoords = {}
 
@@ -35,7 +36,6 @@ function generateRandomCoords(occupiedCoords) {
 
   return randomCoords;
 }
-
 
 const TRANSITION_DURATION = 2000;
 
@@ -69,4 +69,5 @@ function fadeIn() {
 }
 */
 
-export { generateRandomCoords }; // used only in tests
+
+export { generateRandomCoords }; // only for testing

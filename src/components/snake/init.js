@@ -1,23 +1,19 @@
-import { normalize, Color } from "../../common/utils.js";
+import { normalize, Color, roundTo } from "../../common/utils.js";
 import { getMinSizeUnit } from "../../common/config.js";
-import { getCenter } from "../board.js";
+import { center as boardCenter } from "../board.js";
 
-export let color, headElement, step;
-export let speed;
+
+export let div, color, step;
 
 export function spawn() {
-  step = getMinSizeUnit() / 2; // Board shrinks half of sizeSlider.value from each side.
-
-
+  if (div && div.firstElementChild) div.replaceChildren(); // delete the previous snake
 
   color = new Color(document.querySelector('input[name="snake-color"]:checked').value);
+  step = getMinSizeUnit();
 
   createSection(boardCenter.x, boardCenter.y, color.changeColor({ changeL: -2 }), "head");
   createSection(boardCenter.x - step, boardCenter.y, color.string, "neck");
-
-  headElement = document.getElementById("head");
-  speed = 1;
- 
+  
   snapshot();
 }
 
@@ -30,8 +26,10 @@ function createSection(x, y, color, id="") {
   section.style.top = `${y}px`;
   section.style.backgroundColor = color;
 
+  if (!div) div = document.getElementById("snake");
   div.append(section);
 }
+
 
 let body, bodyData, headData;
 
@@ -49,10 +47,33 @@ export function snapshot() {
   headData = bodyData[0];
 }
 
-export const data = {
-  get body() { body },
-  get bodyData() { bodyData },
-  get headData() { headData },
+
+const DESATURATION = 0.15;
+
+export function greyout(duration) {
+  let timeLeft = duration;
+  let i = 0;
+  let j = body.length + 1;
+
+  color.hslComponents.s *= DESATURATION; 
+
+  const greyoutSection = (ms) => {
+    ms = timeLeft / ( 2 ** (j - i));
+    timeLeft -= ms;
+    // sections greyout sequentially
+    setTimeout(() => {
+      const color = color.changeColor({ changeL: i }); // The original lightness is preserved.
+      const section = body[i];
+
+      section.style.backgroundColor = color;
+
+      i++;
+      if (i < body.length) setTimeout(() => greyoutSection(ms), ms);  
+    }, ms)
+  }
+  greyoutSection(0);
 }
 
-export const speedUp = (accelar) => speed += accelar;
+
+export const direction = { "x": 1, "y": 0 };
+export const newHeadData = { "x": null, "y": null, "rotation": 0 };

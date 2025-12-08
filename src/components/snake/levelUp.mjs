@@ -1,12 +1,10 @@
-import { speedUp, div, snapshot, color, body, headData } from "./init.js";
+import { snake as div } from "../../common/elements.js";
+import { speedUp, snapshot, color, body, headData } from "./init.js";
 
 
 export const isAteFood = (foodCoords) => headData.x === foodCoords.x && headData.y === foodCoords.y;
 
-const ACCELERATION = 0.25;
-
 export function levelUp() { 
-  speedUp(ACCELERATION);
   grow();
   snapshot();
   rescaleSections();
@@ -33,3 +31,4 @@ function rescaleSections() {
     element.style.scale = Math.min(`${roundTo(scale, 2)}`, 1); 
   })
 }
+

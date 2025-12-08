@@ -1,9 +1,6 @@
-import { direction, newHeadData } from "./movement.js";
-import { headData } from "./init.js";
+import { headData, direction, newHeadData } from "./init.js";
 import { data as boardData } from "../board.js";
 
-
-export let isControlsOn = true;
 
 const TURN_ROTATION = 0.25;
 const TURN_CONFIGS = {
@@ -12,6 +9,8 @@ const TURN_CONFIGS = {
   Left: { newDirection: { x: -1, y: 0 }, axis: 'y', counterClockwise: false, border: "left" },
   Right: { newDirection: { x: 1, y: 0 }, axis: 'y', counterClockwise: true, border: "right" },
 }
+
+export let isControlsOn = true;
 
 export function handleKeydown(arrowKey) {
   const turnKey = arrowKey.slice(5, arrowKey.length); 
@@ -28,7 +27,7 @@ export function handleKeydown(arrowKey) {
     direction.x = newDirection.x;
     direction.y = newDirection.y;
 
-    isOn = false; // Prevent multiple turns in one step.
+    isControlsOn = false; // Prevent multiple turns in one step.
   }
 }
 
