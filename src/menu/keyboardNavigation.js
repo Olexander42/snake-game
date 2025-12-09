@@ -25,7 +25,7 @@ export function handleKeydown(event) {
         // Listeners in settings menu attached to "sides" of the buttons. 
         if (focusedElement.firstElementChild && focusedElement.firstElementChild.classList.contains("side")) {
           focusedElement.firstElementChild.click();
-          updateFocusibleElements("settings button");  
+          updateContext("settings button");  
         } 
         else setTimeout(() => focusedElement.click(), DELAY); // test it
     
@@ -33,7 +33,7 @@ export function handleKeydown(event) {
 
     case 'Escape': 
       body.click(); // close all buttons
-      updateFocusibleElements("settings menu"); 
+      updateContext("settings menu"); 
 
     default:
       // something

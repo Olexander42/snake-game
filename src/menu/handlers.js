@@ -2,21 +2,23 @@ import { menu, settings } from "../common/elements.js";
 import setTheme from "../common/theme.js";
 import { updateContext as updateFocusibleElements } from "./keyboardNavigation.js";
 import { buttonFlipper, sliderMover as sizeSliderMover, Outline } from "./components.js";
+//import * as Game from "../game/game.js";
+const Game = null;
 
 
 let firstStart = true;
 let startBtn;
 
-function handleStartBtn(game) {  
+function handleStartBtn() {  
   if (firstStart) {
     firstStart = false;
     startBtn.innerText = "Start Again";
 
-    game.attachControls();
-  } else game.reset();
+    Game.attachControls();
+  } else Game.reset();
 
   menu.style.display = 'none';
-  game.begin();
+  Game.begin();
 }
 
 
@@ -59,7 +61,7 @@ function attachBackBtnListener() {
     mainMenu.style.display = 'flex';
 
     updateFocusibleElements("main menu");
-  }
+  })
 }
 
 

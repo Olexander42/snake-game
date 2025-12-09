@@ -81,7 +81,7 @@ export const sliderMover = ((slider, recipient) => {
   } 
 
   return { attach: () => slider.addEventListener('input', moveThumb)}
-})(sizeSlider, normalizeBoard());
+})(sizeSlider, normalizeBoard);
 
 
 export class Outline {

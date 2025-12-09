@@ -1,9 +1,23 @@
-import { body, bodyData, headData, snapshot, direction, newHeadData  } from "./init.js";
+import { body, bodyData, headData, snapshot } from "./init.js";
+import { direction } from "./controls.js";
 import { data as boardData } from "../board.js";
 
 
-export function isCollision() {
-  const isHeadBodyCollision = bodyData.some(({ x, y }) => newHeadData.x === x && newHeadData.y === y);
+let step;
+
+function calcNewHeadCoords() {  
+  step ??= getMinSizeUnit();
+
+  const newHeadCoords = {
+    x: headData.x + step * Math.sign(direction.x),
+    y: headData.y + step * Math.sign(direction.y),
+  }
+
+  return newHeadCoords;
+}
+
+export function checkCollision(newHeadCoords) {
+  const isHeadBodyCollision = bodyData.some(({ x, y }) => newHeadCoords.x === x && newHeadCoords.y === y);
 
   return isHeadBodyCollision || getCollisionBorder();
 }

@@ -4,13 +4,8 @@ import { soundLibrary } from "../common/sound.js";
 import { timer, stats, shrinkCounter } from "./managers.js";
 
 import * as Board from "../components/board.js";
-import * as Food from "../components/Food.js"; 
-
-import { spawn as spawnSnake, bodyData as snakeData } from "../components/snake/init.js";
-import { calcNewHeadCoords, makeStep } from "../components/snake/movement.js";
-import { isCollision, isOn as isControlsOn, turnOn as turnOnControls } from "../components/snake/control.js";
-import * as CollisionManager from "../components/snake/collision.js";
-
+import * as Food from "../components/food.js"; 
+import * as Snake from "../components/snake/API.js";
 
 let isGameActive = true;
 
@@ -31,9 +26,9 @@ export function begin() {
 function action() {   
   if (!isControlsOn) turnOnControls();
 
-  calcNewHeadCoords();
-  if (!isCollision()) {
-    makeStep();
+  const newHeadCoords = calcNewHeadCoords();
+  if (!isCollision(newHeadCoords)) {
+    makeStep(newHeadCoords);
     if (Snake.isAteFood(Food.coords)) {
       if (shrinkCounter.isTimeToShrink() && !isSnakeNearOppositeBorders()) {
         Board.shrink(); 

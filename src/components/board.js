@@ -20,8 +20,6 @@ export function normalize() {
     element.style.width = `${bounds.width}px`;
     element.style.height = `${bounds.height}px`;
   })
-
-  updateData();
 }
 
 
@@ -37,11 +35,11 @@ export function shrink() {
   backgroundClip += sizeUnit / 2; // Clip is applied from both sides.
   root.style.setProperty("--clip", `${backgroundClip}px`);
 
-  updateData();
+  //data();
 }
 
 
-let sizeUnit, backgroundClip,
+let sizeUnit, backgroundClip;
 
 function updateSizeUnits() {
   sizeUnit = getMinSizeUnit() * 2; // Board shrinks half of sizeSlider.value from each side.
@@ -52,22 +50,17 @@ function updateSizeUnits() {
   root.style.setProperty("--clip", `${backgroundClip}px`);
 }
 
-
-export const data = () => {
-  return {
-    get left() { return backgroundClip },
-    get right() { return clientWidth - backgroundClip - sizeUnit }, // - sizeUnit to offest distance to headEl.left 
-    get top() { return backgroundClip },
-    get bottom() { return container.clientHeight - backgroundClip - sizeUnit }, // - sizeUnit to offest distance to headEl.top.
-  }
+export const data = {
+  get left() { return backgroundClip },
+  get right() { return clientWidth - backgroundClip - sizeUnit }, // - sizeUnit to offest distance to headEl.left 
+  get top() { return backgroundClip },
+  get bottom() { return container.clientHeight - backgroundClip - sizeUnit }, // - sizeUnit to offest distance to headEl.top
 }
 
 
-export const center = () => {
-  return { 
-    get x() { return normalizeValue(Math.round(container.clientWidth) / 2, step) },
-    get y() { return normalizeValue(Math.round(container.clientHeight) / 2, step) }, 
-  }
+export const center = {
+  get x() { return normalizeValue(Math.round(container.clientWidth) / 2, sizeUnit) },
+  get y() { return normalizeValue(Math.round(container.clientHeight) / 2, sizeUnit) }, 
 }
 
 
