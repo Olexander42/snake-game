@@ -1,17 +1,49 @@
 import { roundTo } from "../../common/utils.js";
 import { getMinSizeUnit } from "../../common/config.js";
+import { bodyElements, bodyData, headElement, setHeadElement, headRotation, initData, snapshot } from "./data.js";
+import { calcNewHeadCoords, isCollison } from "./collisionControl.js"
 
+let step; // temp
 
-export function makeStep() {
-  moveHead();
-  bodyFollows();
+export function spawn() {
+  initData();
 
+  color = new Color(document.querySelector('input[name="snake-color"]:checked').value);
+  step = getMinSizeUnit(); // TODO: eliminate the need of 'step' in this module
+
+  createSection(boardCenter.x, boardCenter.y, color.changeColor({ changeL: -2 }), "head");
+  createSection(boardCenter.x - step, boardCenter.y, color.string, "neck");
+  setHeadElement(document.getElementById("head"));
+  
   snapshot();
 }
 
-const moveHead = (coords) => { // TODO: {x, y} destructuring 
+function createSection(x, y, color, id="") {
+  const section = document.createElement('span');
+
+  section.classList.add(`${"snake-section"}`);
+  section.id = id;
+  section.style.left = `${x}px`;
+  section.style.top = `${y}px`;
+  section.style.backgroundColor = color;
+
+  snakeDiv.append(section);
+}
+
+export function makeStep() {
+  const newHeadCoords = calcNewHeadCoords();
+  if (!isCollison(newHeadCoords)) {
+    moveHead(newHeadCoords);
+    bodyFollows();
+
+    snapshot();
+  }
+}
+
+function moveHead(coords) { 
   headElement.style.left = `${coords.x}px`; 
-  headElement.style.top = `${coords.y}px`; 
+  headElement.style.top = `${coords.y}px`;
+  headElement.style.rotation = `${headRotation}px`;
 }
 
 function bodyFollows(i = 1) {

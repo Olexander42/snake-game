@@ -1,29 +1,26 @@
 import { getMinSizeUnit } from "../../commmon/config.js";
-import { getBody, getHead, snapshot } from "./init.js";
-import { getDirection } from "./directionControl.js";
+import { bodyElements, bodyData, headData, direction, snapshot } from "./data.js";
 import { data as boardData } from "../board.js";
 
 
 let step;
-let newHeadCoords;
 
-export function isCollision() {
-  newHeadCoords = calcNewHeadCoords()
-  const isHeadBodyCollision = getBody.data.some(({ x, y }) => newHeadCoords.x === x && newHeadCoords.y === y);
-
-  return isHeadBodyCollision || getCollisionBorder();
-}
-
-function calcNewHeadCoords() {  
+export function calcNewHeadCoords() {  
   step ??= getMinSizeUnit();
 
   return {
-    x: getHead.data.x + step * Math.sign(getDirection.x),
-    y: getHead.data.y + step * Math.sign(getDirection.y),
+    x: headData.x + step * Math.sign(direction.x),
+    y: headData.y + step * Math.sign(direction.y)
   }
 }
 
-function getCollisionBorder(x = newHeadCoords.x, y = newHeadCoords.y) {
+export function isCollision(coords) {
+  const isHeadBodyCollision = bodyData.some(({ x, y }) => coords.x === x && coords.y === y);
+
+  return (isHeadBodyCollision || getCollisionBorder(coords));
+}
+
+function getCollisionBorder({ x, y }) {
   const { left, right, top, bottom } = boardData;
 
   if (x < left) return "left";
@@ -32,11 +29,7 @@ function getCollisionBorder(x = newHeadCoords.x, y = newHeadCoords.y) {
   if (y > bottom) return "bottom";
 }
 
-export const getNewHeadCoords = () => ({
-  get x() { return newHeadCoords.x },
-  get y() { return newHeadCoords.y },
-});
-
+/*
 
 const SHIFT_CONFIGS = {
   left: { axis: "x", shiftDirection: 1, side: "left" },
@@ -45,11 +38,11 @@ const SHIFT_CONFIGS = {
   bottom: { axis: "y", shiftDirection: -1, side: "top" },
 }
 
-export function offsetShrink(data) {
+export function offsetShrink() {
   let verticalCollisionBorder;
   let horizontalCollisionBorder;
 
-  for (const { x, y } of getBody.data) {
+  for (const { x, y } of bodyData) {
     // shift() can be executed only once for each border
     if (!verticalCollisionBorder) {
       verticalCollisionBorder = getCollisionBorder(x, undefined); 
@@ -88,6 +81,7 @@ export function isNearOppositeBorders() {
     && (getBody.data.some(({ x }) => (x >= right - step)))) 
   )
 }
+*/
 
 
 

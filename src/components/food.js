@@ -6,24 +6,24 @@ import { TIME_UNIT } from "../common/constants.js";
 const coords = {};
 let element, color, minSizeUnit;
 
-export function spawn(boardData, snakeCoords) {
+export function spawn(snakeCoords) {
   element ??= document.getElementById("food");
 
   color = new Color(Color.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] }));
   element.style.backgroundColor = color.string; 
 
-  teleport(boardData, snakeCoords);
+  teleport(snakeCoords);
   fadeIn();
 }
 
-export function teleport(boardData, snakeCoords) {
-  coords = generateRandomCoords(boardData, snakeCoords);
+export function teleport(snakeCoords) {
+  coords = generateRandomCoords(snakeCoords);
 
   element.style.left = `${coords.x}px`;
   element.style.top = `${coords.y}px`;
 }
 
-function generateRandomCoords(boardData, snakeCoords) {
+function generateRandomCoords(snakeCoords) {
   if (!minSizeUnit) minSizeUnit = getMinSizeUnit();
   const { left, right, top, bottom } = boardData;
   const randomCoords = {}

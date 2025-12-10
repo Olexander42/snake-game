@@ -33,8 +33,8 @@ export function attachControls() {
 function action() {   
   if (!Snake.isControlsOn) Snake.turnOnControls();
 
-  if (!Snake.isCollision()) {
-    Snake.makeStep(Snake.newHeadCoords);
+  Snake.makeStep();
+  is (Snake.isAlive) {
     if (Snake.isAteFood(Food.coords)) {
       if (shrinkCounter.isTimeToShrink() && !isSnakeNearOppositeBorders()) {
         Board.shrink(); 
