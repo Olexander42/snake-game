@@ -1,4 +1,4 @@
-import { getHead } from "./init.js";
+import { getHead, getHeadRotation, setHeadRotation, setDirection } from "./init.js";
 import { data as boardData } from "../board.js";
 
  
@@ -18,37 +18,26 @@ export function handleKeydown(arrowKey) {
  
   if (isAllowTurn()) {
     changeHeadRotation();
-    changeDirection();
-    calcNewHeadCoords();
+    setDirection(newDirection);
 
     isControlsOn = false; // Prevent multiple turns in one step.
   }
 }
 
-function isAllowTurn() {
+const isAllowTurn = () => {
   const oppositeAxis = axis === "x" ? "y" : "x"; 
-
   const isSnakeMovingAlongBorder = getHead.data[oppositeAxis] === boardData[border];
   const isTurnAngle90Deg = Math.abs(direction[axis]) === 1;
 
   return !isSnakeMovingAlongBorder && isTurnAngle90Deg
 }
 
-function changeHeadRotation() {
+const changeHeadRotation = () => {
   const clockwiseCorrection = counterClockwise === true ? -1 : 1;
-
-  newRotation += getHead.data.rotation + TURN_ROTATION * Math.sign(direction[axis]) * clockwiseCorrection;
-  getHead.element.style.rotate = `${newRotation}turn`;
+  turn = TURN_ROTATION * Math.sign(direction[axis]) * clockwiseCorrection;
+  setHeadRotation(turn);
 }
 
-const direction = { "x": 1, "y": 0 };
-
-function changeDirection() {
-  direction.x = newDirection.x;
-  direction.y = newDirection.y;
-}
-
-export const getDirection = () => ({...direction});
 
 export const turnControlsOn = () => isControlsOn = true;
 

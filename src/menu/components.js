@@ -2,7 +2,7 @@ import { settingsMenu, sizeSlider, bodyEl, borderEl } from "../common/elements.j
 import { normalize as normalizeBoard }  from "../components/board.js";
 
 
-export const buttonFlipper = (() => {
+export const buttonFlipper = (function() {
   function flipButton(event) { // <--- maybe don't pass an entire event?
     const side = event.currentTarget; 
     const isClickedOnOption = side.classList.contains("rear") && event.target !== side;
@@ -33,7 +33,7 @@ export const buttonFlipper = (() => {
 })();
 
 
-export const sliderMover = ((slider, recipient) => {
+export const sliderMover = (function(slider, recipient) {
   const STEP_DEFAULT = parseInt(slider.step);
   const STEP_TRANSITION = 3;
   const isRequiresAdjustment = STEP_DEFAULT % STEP_TRANSITION !== 0;
@@ -69,11 +69,11 @@ export const sliderMover = ((slider, recipient) => {
     }
   }
 
-  const min = slider.min;
-  const max = slider.max;
-  const PERCENT_100 = 100;
-
   function updateGradient() {
+    const min = slider.min;
+    const max = slider.max;
+    const PERCENT_100 = 100;
+
     const gradientCutoffValue = (currentValue - min) / (max - min) * PERCENT_100;
     const gradient = `linear-gradient(to right, black, black ${gradientCutoffValue}%, transparent ${gradientCutoffValue}%, transparent)`;
     slider.style.setProperty("--responsive-gradient", gradient);
@@ -89,7 +89,7 @@ export class Outline {
     this.element = document.querySelector(`${fieldsetId} .outline`);
     this.recipient = recipient;
 
-    this._attachInternalTransitionListeners(); // prevent shifts during theme changes
+    this._attachInternalTransitionListeners(); // Prevent shifts during theme changes.
     this._moveToChecked();
   }
 

@@ -5,20 +5,23 @@ let theme, style;
 
 export default function setTheme() {
   theme = document.querySelector('input[name="theme"]:checked').value;
-  style ??= document.querySelector('style');
 
   initSoundLibrary(theme);
   setImages();
   setFonts();
 }
 
-const setImages = () => {
-  outsideBackground.style.setProperty('background-image', `url(../assets/${theme}/images/outside.jpg)`);
-  borderEl.style.setProperty('border-image-source', `url(../assets/${theme}/images/border.jpg)`);
-  insideBackground.style.setProperty('background-image', `url(../assets/${theme}/images/inside.jpg)`);
+export function initStyle() {
+  style = document.querySelector('style');
 }
 
-const setFonts = () => {
+function setImages() {
+  outsideBackground.style.setProperty("background-image", `url(../assets/${theme}/images/outside.jpg)`);
+  borderEl.style.setProperty("border-image-source", `url(../assets/${theme}/images/border.jpg)`);
+  insideBackground.style.setProperty("background-image", `url(../assets/${theme}/images/inside.jpg)`);
+}
+
+function setFonts() {
   style.innerHTML = `
     @font-face {
       font-family: "main";
@@ -36,5 +39,7 @@ const setFonts = () => {
     }
   `
 }
+
+
 
 

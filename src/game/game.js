@@ -31,11 +31,10 @@ export function attachControls() {
 }
 
 function action() {   
-  if (!isControlsOn) turnOnControls();
+  if (!Snake.isControlsOn) Snake.turnOnControls();
 
-  const newHeadCoords = calcNewHeadCoords();
-  if (!isCollision(newHeadCoords)) {
-    makeStep(newHeadCoords);
+  if (!Snake.isCollision()) {
+    Snake.makeStep(Snake.newHeadCoords);
     if (Snake.isAteFood(Food.coords)) {
       if (shrinkCounter.isTimeToShrink() && !isSnakeNearOppositeBorders()) {
         Board.shrink(); 
@@ -78,7 +77,7 @@ export function reset() {
   if (stats.isNewRecord) stats.updateRecord();
   stats.resetScore();
 
-  Snake.disappear();
+  Snake.emptyOut();
 
   soundLibrary.bgMusic.play();
 }

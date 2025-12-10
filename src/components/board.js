@@ -4,6 +4,7 @@ import { getMinSizeUnit } from "../common/config.mjs";
 
 
 let containerEl, bounds;
+let sizeUnit, backgroundClip;
 
 export function normalize() {
   updateSizeUnits();
@@ -40,8 +41,20 @@ export function shrink() {
   updateData();
 }
 
+export let data;
+function updateData() {
+  data = {
+    left: backgroundClip,
+    right: containerEl.clientWidth - backgroundClip - sizeUnit, // - sizeUnit to offest distance to headEl.left 
+    top: backgroundClip,
+    bottom: containerEl.clientHeight - backgroundClip - sizeUnit, // - sizeUnit to offest distance to headEl.top
+  }
+}
 
-let sizeUnit, backgroundClip;
+export const center = {
+  get x() { return normalizeValue(Math.round(containerEl.clientWidth) / 2, sizeUnit) },
+  get y() { return normalizeValue(Math.round(containerEl.clientHeight) / 2, sizeUnit) }, 
+}
 
 function updateSizeUnits() {
   sizeUnit = getMinSizeUnit() * 2; // Board shrinks half of sizeSlider.value from each side.
@@ -52,21 +65,7 @@ function updateSizeUnits() {
   root.style.setProperty("--clip", `${backgroundClip}px`);
 }
 
-export let data;
-function updateData() {
-  data = {
-    left: backgroundClip,
-    right: containerEl.clientWidth - backgroundClip - sizeUnit, // - sizeUnit to offest distance to headEl.left 
-    top: backgroundClip,
-    bottom: containerEl.clientHeight - backgroundClip - sizeUnit, // - sizeUnit to offest distance to headEl.top
-  }
-}
-  
 
-export const center = {
-  get x() { return normalizeValue(Math.round(containerEl.clientWidth) / 2, sizeUnit) },
-  get y() { return normalizeValue(Math.round(containerEl.clientHeight) / 2, sizeUnit) }, 
-}
 
 
 

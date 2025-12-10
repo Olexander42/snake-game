@@ -6,11 +6,12 @@ import { buttonFlipper, sliderMover as sizeSliderMover, Outline } from "./compon
 const Game = null;
 
 
+export let startBtn, settingsBtn;
 let firstStart = true;
 let settingsVisited = false;
-let startBtn, settingsBtn, mainMenu;
+let mainMenu;
 
-function handleStartBtn() {  
+export function handleStartBtn() {  
   if (firstStart) {
     firstStart = false;
     startBtn.innerText = "Start Again";
@@ -22,7 +23,7 @@ function handleStartBtn() {
   Game.begin();
 }
 
-function handleSettingsBtn() {
+export function handleSettingsBtn() {
   mainMenu.style.display = 'none';
   settingsMenu.style.display = 'flex';
 
@@ -34,14 +35,20 @@ function handleSettingsBtn() {
   }
 }
 
-const attachSettingsListeners = () => {
+export function initMenuElements() {
+  mainMenu = document.getElementById("main-menu");
+  startBtn = document.getElementById("start-btn");
+  settingsBtn = document.getElementById("settings-btn");
+}
+
+function attachSettingsListeners() {
   buttonFlipper.attach();
   sizeSliderMover.attach();
   attachOutlines();
   attachBackBtnListener();
 }
 
-const attachOutlines = () => {
+function attachOutlines() {
   const colorOptionOutline = new Outline("#color-set");
   const themeThumbnailOutline = new Outline("#theme-set", setTheme);
 
@@ -52,7 +59,7 @@ const attachOutlines = () => {
   themeThumbnailOutline.attachTo(themeOptions);
 }
 
-const attachBackBtnListener = () => {
+function attachBackBtnListener() {
   const backBtn = document.getElementById("back-btn");
 
   backBtn.addEventListener('click', () => {
@@ -64,18 +71,6 @@ const attachBackBtnListener = () => {
 }
 
 
-export default function attachMainMenuListeners() {
-  initElements();
-
-  startBtn.addEventListener('click', handleStartBtn);
-  settingsBtn.addEventListener('click', handleSettingsBtn);
-}
-
-const initElements = () => {
-  startBtn = document.getElementById("start-btn");
-  settingsBtn = document.getElementById("settings-btn");
-  mainMenu = document.getElementById("main-menu");
-}
 
 
 
