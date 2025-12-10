@@ -1,13 +1,14 @@
-import { menu, settings } from "../common/elements.js";
+import { settingsMenu } from "../common/elements.js";
 import setTheme from "../common/theme.js";
-import { updateContext as updateFocusibleElements } from "./keyboardNavigation.js";
+import { updateFocusibleElements } from "./keyboardNavigation.js";
 import { buttonFlipper, sliderMover as sizeSliderMover, Outline } from "./components.js";
 //import * as Game from "../game/game.js";
 const Game = null;
 
 
 let firstStart = true;
-let startBtn;
+let settingsVisited = false;
+let startBtn, settingsBtn, mainMenu;
 
 function handleStartBtn() {  
   if (firstStart) {
@@ -17,19 +18,13 @@ function handleStartBtn() {
     Game.attachControls();
   } else Game.reset();
 
-  menu.style.display = 'none';
+  mainMenu.style.display = 'none';
   Game.begin();
 }
 
-
-let settingsVisited = false;
-let mainMenu;
-
 function handleSettingsBtn() {
-  mainMenu ??= document.getElementById("main-menu");
-
   mainMenu.style.display = 'none';
-  settings.style.display = 'flex';
+  settingsMenu.style.display = 'flex';
 
   updateFocusibleElements("settings menu");
 
@@ -37,39 +32,49 @@ function handleSettingsBtn() {
     attachSettingsListeners();
     settingsVisited = true;
   }
-} 
+}
 
-function attachSettingsListeners() {
+const attachSettingsListeners = () => {
   buttonFlipper.attach();
   sizeSliderMover.attach();
+  attachOutlines();
+  attachBackBtnListener();
+}
 
+const attachOutlines = () => {
   const colorOptionOutline = new Outline("#color-set");
   const themeThumbnailOutline = new Outline("#theme-set", setTheme);
 
-  const colorOptions = [...document.querySelectorAll("input[name='color']")]; 
+  const colorOptions = [...document.querySelectorAll("input[name='snake-color']")]; 
   const themeOptions = [...document.querySelectorAll("input[name='theme']")];
 
   colorOptionOutline.attachTo(colorOptions);
   themeThumbnailOutline.attachTo(themeOptions);
-
-  attachBackBtnListener();
 }
 
-function attachBackBtnListener() {
-  document.getElementById("back-btn").addEventListener('click', () => {
-    settings.style.display = 'none';
+const attachBackBtnListener = () => {
+  const backBtn = document.getElementById("back-btn");
+
+  backBtn.addEventListener('click', () => {
     mainMenu.style.display = 'flex';
+    settingsMenu.style.display = 'none';
 
     updateFocusibleElements("main menu");
   })
 }
 
 
-export default function attachMainMenuListeners(game) {
-  startBtn = document.getElementById("start-btn");
-  startBtn.addEventListener('click', () => handleStartBtn(game));
+export default function attachMainMenuListeners() {
+  initElements();
 
-  document.getElementById("settings-btn").addEventListener('click', handleSettingsBtn);
+  startBtn.addEventListener('click', handleStartBtn);
+  settingsBtn.addEventListener('click', handleSettingsBtn);
+}
+
+const initElements = () => {
+  startBtn = document.getElementById("start-btn");
+  settingsBtn = document.getElementById("settings-btn");
+  mainMenu = document.getElementById("main-menu");
 }
 
 

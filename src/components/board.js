@@ -1,41 +1,43 @@
 import { normalize as normalizeValue } from "../common/utils.js";
-import {  border, background, root } from "../common/elements.js";
+import {  borderEl, backgroundEl, root } from "../common/elements.js";
 import { getMinSizeUnit } from "../common/config.mjs";
 
 
-let container, bounds;
+let containerEl, bounds;
 
 export function normalize() {
   updateSizeUnits();
 
-  container ??= document.getElementById("container");
+  containerEl ??= document.getElementById("container");
   // calculate
   bounds = {
-    width: normalizeValue(container.clientWidth, sizeUnit),
-    height: normalizeValue(container.clientHeight, sizeUnit),
+    width: normalizeValue(containerEl.clientWidth, sizeUnit),
+    height: normalizeValue(containerEl.clientHeight, sizeUnit),
   };
 
   // apply
-  [container, background, border,].forEach(element => {
+  [containerEl, backgroundEl, borderEl,].forEach(element => {
     element.style.width = `${bounds.width}px`;
     element.style.height = `${bounds.height}px`;
   })
+
+  updateData()
 }
 
 
 export function shrink() {
-  // We don't resize container to keep snake's position fixed during the shrink.
+  // We don't resize containerEl to keep snake's position fixed during the shrink.
   bounds.width -= sizeUnit;
   bounds.height -= sizeUnit;
 
-  border.style.width = `${bounds.width}px`;
-  border.style.height =`${bounds.height}px`;
+  borderEl.style.width = `${bounds.width}px`;
+  borderEl.style.height =`${bounds.height}px`;
 
-  // background
+  // backgroundEl
   backgroundClip += sizeUnit / 2; // Clip is applied from both sides.
   root.style.setProperty("--clip", `${backgroundClip}px`);
 
-  //data();
+  updateData();
 }
 
 
@@ -50,17 +52,20 @@ function updateSizeUnits() {
   root.style.setProperty("--clip", `${backgroundClip}px`);
 }
 
-export const data = {
-  get left() { return backgroundClip },
-  get right() { return clientWidth - backgroundClip - sizeUnit }, // - sizeUnit to offest distance to headEl.left 
-  get top() { return backgroundClip },
-  get bottom() { return container.clientHeight - backgroundClip - sizeUnit }, // - sizeUnit to offest distance to headEl.top
+export let data;
+function updateData() {
+  data = {
+    left: backgroundClip,
+    right: containerEl.clientWidth - backgroundClip - sizeUnit, // - sizeUnit to offest distance to headEl.left 
+    top: backgroundClip,
+    bottom: containerEl.clientHeight - backgroundClip - sizeUnit, // - sizeUnit to offest distance to headEl.top
+  }
 }
-
+  
 
 export const center = {
-  get x() { return normalizeValue(Math.round(container.clientWidth) / 2, sizeUnit) },
-  get y() { return normalizeValue(Math.round(container.clientHeight) / 2, sizeUnit) }, 
+  get x() { return normalizeValue(Math.round(containerEl.clientWidth) / 2, sizeUnit) },
+  get y() { return normalizeValue(Math.round(containerEl.clientHeight) / 2, sizeUnit) }, 
 }
 
 

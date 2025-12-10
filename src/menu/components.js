@@ -1,4 +1,4 @@
-import { settings, sizeSlider, body } from "../common/elements.js";
+import { settingsMenu, sizeSlider, bodyEl, borderEl } from "../common/elements.js";
 import { normalize as normalizeBoard }  from "../components/board.js";
 
 
@@ -12,9 +12,9 @@ export const buttonFlipper = (() => {
   }
 
   function closeAllButtons(event) {
-    const isClickedBetweenButtons = event.target === settings;
-    const isClickedOnBoard = event.target === border;
-    const isClickedOnBody = event.target === body;
+    const isClickedBetweenButtons = event.target === settingsMenu;
+    const isClickedOnBoard = event.target === borderEl;
+    const isClickedOnBody = event.target === bodyEl;
     const isClickedOutsideButtons = isClickedBetweenButtons || isClickedOnBoard || isClickedOnBody;
 
     if (isClickedOutsideButtons) { 
@@ -27,8 +27,7 @@ export const buttonFlipper = (() => {
     attach: () => {
       const buttonsSides = [...document.querySelectorAll(".side")];
       buttonsSides.forEach((buttonSide) => buttonSide.addEventListener('click', flipButton)); 
-
-      body.addEventListener('click', closeAllButtons);
+      bodyEl.addEventListener('click', closeAllButtons);
     }
   }
 })();
@@ -90,12 +89,12 @@ export class Outline {
     this.element = document.querySelector(`${fieldsetId} .outline`);
     this.recipient = recipient;
 
-    this._attachInternalTransitionListeners(); // Prevent shifts during theme changes. 
+    this._attachInternalTransitionListeners(); // prevent shifts during theme changes
     this._moveToChecked();
   }
 
   _moveToChecked() {
-    // give time for :checked to update
+    // Give time for :checked to update.
     requestAnimationFrame(() => { 
       const checked = document.querySelector(`#${this.fieldset.id} input:checked + span`);
       this.element.style.left = `${checked.offsetLeft}px`;

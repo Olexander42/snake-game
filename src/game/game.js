@@ -12,7 +12,7 @@ let isGameActive = true;
 export function begin() { 
   Board.normalize();
 
-  spawnSnake();
+  Snake.spawn(Board.center);
 
   const snakeCoords = Snake.data.map(({ x, y }) => ({ x, y }))
   Food.spawn(snakeCoords);
@@ -21,6 +21,13 @@ export function begin() {
   
   timer.updateGap(speed);
   action();
+}
+
+export function attachControls() {
+  html.addEventListener('keydown', ({ code }) => {
+    if (code === 'Space') togglePause();
+    else if (isGameActive && SnakeControl.isOn && code.slice(0, 5) === "Arrow") SnakeControl.handleKeydown(code); 
+  })
 }
 
 function action() {   
@@ -50,12 +57,9 @@ function action() {
   }
 }
 
-export function attachControls() {
-  html.addEventListener('keydown', ({ code }) => {
-    if (code === 'Space') togglePause();
-    else if (isGameActive && SnakeControl.isOn && code.slice(0, 5) === "Arrow") SnakeControl.handleKeydown(code); 
-  })
-}
+
+
+const isSnakeAteFood = () => Snake.getHeadData.x === Food.coords.x && Snake.getHeadData.y === Food.coords.y;
 
 function togglePause() {
   isGameActive = isGameActive === true ? false : true;

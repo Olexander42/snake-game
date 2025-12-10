@@ -1,18 +1,24 @@
-import { html as outsideBackground, border, background as insideBackground } from "./elements.js";
+import { html as outsideBackground, borderEl, backgroundEl as insideBackground } from "./elements.js";
 import { initSoundLibrary } from "./sound.js";
 
-let style;
+let theme, style;
 
 export default function setTheme() {
-  const theme = document.querySelector('input[name="theme"]:checked').value;
-  
-  initSoundLibrary(theme);
-  
-  outsideBackground.style.setProperty('background-image', `url(../assets/${theme}/images/outside.jpg)`);
-  border.style.setProperty('border-image-source', `url(../assets/${theme}/images/border.jpg)`);
-  insideBackground.style.setProperty('background-image', `url(../assets/${theme}/images/inside.jpg)`);
-
+  theme = document.querySelector('input[name="theme"]:checked').value;
   style ??= document.querySelector('style');
+
+  initSoundLibrary(theme);
+  setImages();
+  setFonts();
+}
+
+const setImages = () => {
+  outsideBackground.style.setProperty('background-image', `url(../assets/${theme}/images/outside.jpg)`);
+  borderEl.style.setProperty('border-image-source', `url(../assets/${theme}/images/border.jpg)`);
+  insideBackground.style.setProperty('background-image', `url(../assets/${theme}/images/inside.jpg)`);
+}
+
+const setFonts = () => {
   style.innerHTML = `
     @font-face {
       font-family: "main";

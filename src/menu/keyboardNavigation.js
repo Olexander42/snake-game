@@ -1,9 +1,10 @@
-import { body, html } from "../common/elements.js";
+import { bodyEl, html } from "../common/elements.js";
 
 const DELAY = 200;
+let focusibleElements = [];
 let focusedElement;
 
-export function handleKeydown(event) {
+export default function handleKeydown(event) {
   switch (event.code) {
     case 'ArrowRight':
     case 'ArrowDown': 
@@ -25,25 +26,22 @@ export function handleKeydown(event) {
         // Listeners in settings menu attached to "sides" of the buttons. 
         if (focusedElement.firstElementChild && focusedElement.firstElementChild.classList.contains("side")) {
           focusedElement.firstElementChild.click();
-          updateContext("settings button");  
+          updateFocusibleElements("settings button");  
         } 
         else setTimeout(() => focusedElement.click(), DELAY); // test it
     
         break;
 
     case 'Escape': 
-      body.click(); // close all buttons
-      updateContext("settings menu"); 
+      bodyEl.click(); // close all buttons
+      updateFocusibleElements("settings menu"); 
 
     default:
       // something
   }
 }
 
-
-let focusibleElements = [];
-
-export function updateContext(context) { // TODO: Pass "main menu" back after game over.
+export function updateFocusibleElements(context) { // TODO: Pass "main menu" back after game over.
   let selector;
   focusibleElements = [document.querySelector("#sound-icon img")];
 
@@ -63,6 +61,7 @@ export function updateContext(context) { // TODO: Pass "main menu" back after ga
 
     default:
       focusibleElements = []; // turn off keyboard navigation 
+      console.log("I'm in default");
   }
 
   focusibleElements.unshift(...document.querySelectorAll(selector));  
@@ -78,10 +77,5 @@ function moveFocus(direction) {
   focusedElement.focus();
 }
 
-
-export function setupKeyboardNavigation() {
-  updateContext("main menu");
-  html.addEventListener('keydown', handleKeydown);
-}
 
 
