@@ -26,11 +26,10 @@ export function begin() {
 }
 
 
-
 export function attachControls() {
   html.addEventListener('keydown', ({ code }) => {
     if (code === 'Space') togglePause();
-    else if (isGameActive && SnakeControl.isOn && code.slice(0, 5) === "Arrow") SnakeControl.handleKeydown(code); 
+    else if (isGameActive) Snake.handleKeydown(code); 
   })
 }
 

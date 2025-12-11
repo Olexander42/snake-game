@@ -11,13 +11,16 @@ const TURN_CONFIGS = {
   Right: { newDirection: { x: 1, y: 0 }, axis: 'y', counterClockwise: true, border: "right" },
 }
 
-export function handleKeydown(arrowKey) {
-  const turnKey = arrowKey.slice(5, arrowKey.length); 
+export function handleKeydown(button) {
+  // Work only with "Arrow" buttons
+  if (!isControlsOn || button.slice(0, 5) !== "Arrow") return;
+
+  const turnKey = button.slice(5, button.length); 
   const { newDirection, axis, counterClockwise, border } = TURN_CONFIGS[turnKey];
  
-  if (isAllowTurn()) {
-    changeDirection();
-    changeHeadRotation();
+  if (isAllowTurn(axis, border)) {
+    changeDirection(newDirection);
+    changeHeadRotation(counterClockwise, axis);
     
     isControlsOn = false; // Prevent multiple turns in one step.
   }
@@ -25,7 +28,7 @@ export function handleKeydown(arrowKey) {
 
 export const turnOnControls = () => isControlsOn = true;
 
-function isAllowTurn() {
+function isAllowTurn(axis, border) {
   const oppositeAxis = axis === "x" ? "y" : "x";
   const isSnakeMovingAlongBorder = headCoords[oppositeAxis] === getBoardData()[border]; // TODO: clarify this.
   const isTurnAngle90Deg = Math.abs(direction[axis]) === 1;
@@ -33,14 +36,14 @@ function isAllowTurn() {
   return !isSnakeMovingAlongBorder && isTurnAngle90Deg
 }
 
-function changeDirecton() {
-  direction.x = newDirection.x;
-  direction.y = newDirection.y; 
+function changeDirection(newDir) {
+  direction.x = newDir.x;
+  direction.y = newDir.y; 
 }
 
-function changeHeadRotation() {
-  const clockwiseCorrection = counterClockwise === true ? -1 : 1;
-  turn = TURN_ROTATION * Math.sign(direction[axis]) * clockwiseCorrection;
+function changeHeadRotation(ccw, axis) {
+  const clockwiseCorrection = ccw === true ? -1 : 1;
+  const turn = TURN_ROTATION * Math.sign(direction[axis]) * clockwiseCorrection;
   setHeadRotation(turn);
 }
 
