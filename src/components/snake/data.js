@@ -46,7 +46,7 @@ export const speedUp = () => {
 }
 
 export const setBoardData = (data) => boardData = data;
-export const getBoardData = () => deepCopy(boardData);
+export const getBoardData = () => boardData;
 
 export const die = () => isAlive = false;
 

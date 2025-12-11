@@ -13,7 +13,7 @@ export function calcNewHeadCoords() {
   }
 }
 
-export function isCollision(newHeadcoords) {
+export function isCollision(newHeadCoords) {
   const isHeadBodyCollision = bodyData.some(({ x, y }) => newHeadCoords.x === x && newHeadCoords.y === y);
 
   return (isHeadBodyCollision || getCollisionBorder(newHeadCoords));

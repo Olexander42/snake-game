@@ -18,7 +18,7 @@ export function spawn(boardCenter) {
 
 export function makeStep() {
   const newHeadCoords = calcNewHeadCoords();
-  if (!isCollison(newHeadCoords)) {
+  if (!isCollision(newHeadCoords)) {
     moveHead(newHeadCoords);
     bodyFollows();
 

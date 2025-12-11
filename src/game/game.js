@@ -12,15 +12,17 @@ let isGameActive = true;
 export function begin() { 
   Board.normalize();
 
+  Snake.setBoardData(Board.data);
   Snake.spawn(Board.center);
+
 
   //const snakeCoords = Snake.data.map(({ x, y }) => ({ x, y }))
   //Food.spawn(snakeCoords);
   
   //Food.transitionColors();
   
-  //timer.updateGap(speed);
-  //action();
+  timer.updateGap(Snake.speed);
+  action();
 }
 
 
@@ -30,6 +32,13 @@ export function attachControls() {
     if (code === 'Space') togglePause();
     else if (isGameActive && SnakeControl.isOn && code.slice(0, 5) === "Arrow") SnakeControl.handleKeydown(code); 
   })
+}
+
+function action() {
+  if (!Snake.isControlsOn) Snake.turnOnControls();
+
+  Snake.makeStep();
+  setTimeout(() => action(), timer.gap)
 }
 
 /*
