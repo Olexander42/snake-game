@@ -29,6 +29,7 @@ export function begin() {
 export function attachControls() {
   html.addEventListener('keydown', ({ code }) => {
     if (code === 'Space') togglePause();
+    else if (code === 'KeyG') Snake.levelUp();
     else if (isGameActive) Snake.handleKeydown(code); 
   })
 }

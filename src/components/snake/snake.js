@@ -10,10 +10,13 @@ export function spawn(boardCenter) {
 
   step = getMinSizeUnit(); // TODO: eliminate the need of 'step' in this module
 
-  createSection(boardCenter.x, boardCenter.y, colorManager.changeColor({ changeL: -2 }), "head");
-  createSection(boardCenter.x - step, boardCenter.y, colorManager.string, "neck");
-  
+  createSection(boardCenter.x, boardCenter.y, colorManager.changeColor({ changeL: -2 }), "head"); // TODO: createHead()?
+
   snapshot();
+
+
+  
+  //createSection(boardCenter.x - step, boardCenter.y, colorManager.string, "neck");
 }
 
 export function makeStep() {
@@ -29,9 +32,8 @@ export function makeStep() {
 export const isAteFood = ({ foodX, foodY }) => headCoords.x === foodX && headCoords.y === foodY;
 
 export function levelUp() {
-  speedUp();
+  //speedUp();
   grow();
-  snapshot();
   rescaleSections();
 }
 
@@ -79,42 +81,46 @@ function moveHead(coords) {
 
   headElement.style.left = `${coords.x}px`; 
   headElement.style.top = `${coords.y}px`;
-  headElement.style.rotation = `${headRotation}px`;
+  headElement.style.rotate = `${headRotation}turn`;
 }
 
-function bodyFollows(i = 1) {
-  const currentSection = bodyElements[i];
-  const nextSectionData = bodyData[i - 1]; 
 
-  currentSection.style.left = `${nextSectionData.x}px`;
-  currentSection.style.top = `${nextSectionData.y}px`;
-  currentSection.style.rotate = `${nextSectionData.rotate}px`;
+function bodyFollows() {
+  bodyData.forEach((sectionData, i) => {
+    if (i < bodyData.length - 1) {
+      const nextSectionElement = bodyElements[i + 1];
 
-  if (i < bodyElements.length - 1) bodyFollows(i + 1); // get rid of the recursion
+      nextSectionElement.style.left = `${sectionData.x}px`;
+      nextSectionElement.style.top = `${sectionData.y}px`;
+      nextSectionElement.style.rotate = `${sectionData.rotate}px`;
+    }
+  })
 }
 
 function grow() {
   const oldTailElement = bodyElements[bodyElements.length - 1];
-  if (oldTailElement.id === "tail") oldTailElement.id = ""; // TODO: try to get rid of this or move it
+  //if (oldTailElement.id === "head") oldTailElement.id = ""; // TODO: try to get rid of this or move it
 
   const newTailElement = oldTailElement.cloneNode(false);
-  newTailElement.id = "tail"; // why do we need this id?
+  if (newTailElement.id = "tail") newTailElement.id = ""; // why do we need this id?
   newTailElement.style.zIndex = `-${bodyElements.length}`; // correct overlapping 
   newTailElement.style.backgroundColor = colorManager.changeColor({ changeL: bodyElements.length }); // Each section gets progressively lighter.
   snakeDiv.append(newTailElement);
 
   snapshot();
-  rescaleSections();
 }
 
 function rescaleSections() {
-  // Tapering effect.
+  // Tapering effect from tail to head.
+  // Minimum scale is 0.5 to avoid gaps between sections.
+  const j = bodyElements.length + 1;
   let scale = 0;
-  let i = 0; 
-  
-  bodyElements.forEach((section) => { 
-    scale += 1 / (2 ** i); 
-    section.style.scale = Math.min(`${roundTo(scale, 2)}`, 1); 
+
+  bodyElements.forEach((section, i) => { 
+    if (i !== 0) { // exclude head
+      scale = 1 - 1 / (j - i); 
+      section.style.scale = `${roundTo(scale, 3)}`; 
+    }
   })
 }
 

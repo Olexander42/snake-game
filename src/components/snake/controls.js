@@ -19,8 +19,8 @@ export function handleKeydown(button) {
   const { newDirection, axis, counterClockwise, border } = TURN_CONFIGS[turnKey];
  
   if (isAllowTurn(axis, border)) {
-    changeDirection(newDirection);
     changeHeadRotation(counterClockwise, axis);
+    changeDirection(newDirection);
     
     isControlsOn = false; // Prevent multiple turns in one step.
   }

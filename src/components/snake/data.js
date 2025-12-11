@@ -38,7 +38,7 @@ export const headCoords = {
   get y() { return bodyData[0].y },
 }
 
-export const setHeadRotation = (rot) => headRotation += rot;
+export const setHeadRotation = (turn) => headRotation += turn;
 
 export const speedUp = () => {
   const ACCELARATION = 0.15;
