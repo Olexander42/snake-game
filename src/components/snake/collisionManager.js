@@ -1,6 +1,5 @@
-import { getMinSizeUnit } from "../../commmon/config.js";
-import { bodyElements, bodyData, headData, direction, snapshot } from "./data.js";
-import { data as boardData } from "../board.js";
+import { getMinSizeUnit } from "../../common/config.js";
+import { bodyElements, bodyData, headCoords, direction, snapshot, getBoardData } from "./data.js";
 
 
 let step;
@@ -9,19 +8,19 @@ export function calcNewHeadCoords() {
   step ??= getMinSizeUnit();
 
   return {
-    x: headData.x + step * Math.sign(direction.x),
-    y: headData.y + step * Math.sign(direction.y)
+    x: headCoords.x + step * Math.sign(direction.x),
+    y: headCoords.y + step * Math.sign(direction.y)
   }
 }
 
-export function isCollision(coords) {
-  const isHeadBodyCollision = bodyData.some(({ x, y }) => coords.x === x && coords.y === y);
+export function isCollision(newHeadcoords) {
+  const isHeadBodyCollision = bodyData.some(({ x, y }) => newHeadCoords.x === x && newHeadCoords.y === y);
 
-  return (isHeadBodyCollision || getCollisionBorder(coords));
+  return (isHeadBodyCollision || getCollisionBorder(newHeadCoords));
 }
 
 function getCollisionBorder({ x, y }) {
-  const { left, right, top, bottom } = boardData;
+  const { left, right, top, bottom } = getBoardData();
 
   if (x < left) return "left";
   if (x > right) return "right";
@@ -29,7 +28,6 @@ function getCollisionBorder({ x, y }) {
   if (y > bottom) return "bottom";
 }
 
-/*
 
 const SHIFT_CONFIGS = {
   left: { axis: "x", shiftDirection: 1, side: "left" },
@@ -81,7 +79,7 @@ export function isNearOppositeBorders() {
     && (getBody.data.some(({ x }) => (x >= right - step)))) 
   )
 }
-*/
+
 
 
 

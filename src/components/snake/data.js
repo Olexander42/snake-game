@@ -1,22 +1,24 @@
-import { normalize, Color, roundTo, deepCopy } from "../../common/utils.js";
-import { getMinSizeUnit } from "../../common/config.js";
-import { center as boardCenter } from "../board.js";
-
-
+import { deepCopy } from "../../common/utils.js";
+import Color from "../../common/Color.js";
 
 export let isAlive;
-export let direction;
-export let bodyElements, bodyData, headElement, headData;
-export let headRotation;
-
 export let snakeDiv;
-export let step;
+export let bodyElements, bodyData;
+export let direction, headRotation;
+export let speed;
+export let colorManager;
+
+let boardData;
 
 export function initData() {
+  isAlive = true;
   snakeDiv = document.getElementById("snake");
   direction = { "x": 1, "y": 0 };
   headRotation = 0;
-  isAlive = true;
+  speed = 1;
+
+  const color = document.querySelector('input[name="snake-color"]:checked').value;
+  colorManager = new Color(color);
 }
 
 export function snapshot() {
@@ -29,14 +31,24 @@ export function snapshot() {
 
     bodyData.push(sectionData);
   })
-
-  headData = bodyData[0];
 }
 
-export const setHeadElement = (el) => headElement = el;
-export const setHeadRotation = (rot) => headRotation += rot;
-export const die = () => isALive = false;
+export const headCoords = {
+  get x() { return bodyData[0].x },
+  get y() { return bodyData[0].y },
+}
 
+export const setHeadRotation = (rot) => headRotation += rot;
+
+export const speedUp = () => {
+  const ACCELARATION = 0.15;
+  speed += ACCELARATION;
+}
+
+export const setBoardData = (data) => boardData = data;
+export const getBoardData = () => deepCopy(boardData);
+
+export const die = () => isAlive = false;
 
 
 

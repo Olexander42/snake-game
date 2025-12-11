@@ -2,7 +2,7 @@ import { vi, test, expect } from 'vitest';
 import { generateRandomCoords } from "../src/components/food.js";
 
 document.body.innerHTML = `<span id="food"></span>`;
-vi.mock("../src/common/config.mjs", () => ( { getMinSizeUnit: () => 30 }));
+vi.mock("../src/common/config.js", () => ( { getMinSizeUnit: () => 30 }));
 
 const boardData = {
   "left": 60,

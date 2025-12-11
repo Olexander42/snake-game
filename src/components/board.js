@@ -1,6 +1,6 @@
 import { normalize as normalizeValue } from "../common/utils.js";
 import {  borderEl, backgroundEl, root } from "../common/elements.js";
-import { getMinSizeUnit } from "../common/config.mjs";
+import { getMinSizeUnit } from "../common/config.js";
 
 
 let containerEl, bounds;

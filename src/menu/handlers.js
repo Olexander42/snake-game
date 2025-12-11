@@ -2,8 +2,6 @@ import { settingsMenu } from "../common/elements.js";
 import setTheme from "../common/theme.js";
 import { updateFocusibleElements } from "./keyboardNavigation.js";
 import { buttonFlipper, sliderMover as sizeSliderMover, Outline } from "./components.js";
-//import * as Game from "../game/game.js";
-const Game = null;
 
 
 export let startBtn, settingsBtn;
@@ -11,16 +9,16 @@ let firstStart = true;
 let settingsVisited = false;
 let mainMenu;
 
-export function handleStartBtn() {  
+export function handleStartBtn(game) {  
   if (firstStart) {
     firstStart = false;
     startBtn.innerText = "Start Again";
 
-    Game.attachControls();
-  } else Game.reset();
+    game.attachControls();
+  } else game.reset();
 
   mainMenu.style.display = 'none';
-  Game.begin();
+  game.begin();
 }
 
 export function handleSettingsBtn() {

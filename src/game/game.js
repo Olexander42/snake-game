@@ -14,20 +14,32 @@ export function begin() {
 
   Snake.spawn(Board.center);
 
-  const snakeCoords = Snake.data.map(({ x, y }) => ({ x, y }))
-  Food.spawn(snakeCoords);
+  //const snakeCoords = Snake.data.map(({ x, y }) => ({ x, y }))
+  //Food.spawn(snakeCoords);
   
   //Food.transitionColors();
   
-  timer.updateGap(speed);
-  action();
+  //timer.updateGap(speed);
+  //action();
 }
+
+
 
 export function attachControls() {
   html.addEventListener('keydown', ({ code }) => {
     if (code === 'Space') togglePause();
     else if (isGameActive && SnakeControl.isOn && code.slice(0, 5) === "Arrow") SnakeControl.handleKeydown(code); 
   })
+}
+
+/*
+export function reset() {
+  if (stats.isNewRecord) stats.updateRecord();
+  stats.resetScore();
+
+  Snake.emptyOut();
+
+  soundLibrary.bgMusic.play();
 }
 
 function action() {   
@@ -51,14 +63,10 @@ function action() {
       timer.speedUp();
       timer.updateGap();
     }
-    */
     if (isGameActive) setTimeout(() => action(), timer.gap);
   }
 }
 
-
-
-const isSnakeAteFood = () => Snake.getHeadData.x === Food.coords.x && Snake.getHeadData.y === Food.coords.y;
 
 function togglePause() {
   isGameActive = isGameActive === true ? false : true;
@@ -72,15 +80,9 @@ function gameOver() {
   Snake.greyout(TIME_UNIT);
   setTimeout(() => menu.style.display = 'flex', TIME_UNIT);
 }
+*/
 
-export function reset() {
-  if (stats.isNewRecord) stats.updateRecord();
-  stats.resetScore();
 
-  Snake.emptyOut();
-
-  soundLibrary.bgMusic.play();
-}
 
 
 

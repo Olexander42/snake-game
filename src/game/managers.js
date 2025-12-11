@@ -1,17 +1,12 @@
 import { TIME_UNIT } from "../common/constants.js";
-import { speed as snakeSpeed } from "../components/snake/snake.js";
 import { root } from "../common/elements.js";
 
 
 export const timer = (() => {
-  const ACCELERATION = 0.25;
-  let speed = 1;
   let gap = TIME_UNIT;
 
   return {
     get gap() { return gap },
-
-    speedUp() { speed += ACCELERATION },
 
     updateGap(speed) {
       gap = Math.round(TIME_UNIT / speed);

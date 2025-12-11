@@ -1,16 +1,18 @@
-import { getMinSizeUnit } from "../common/config.mjs";
-import { normalize, getRandomInt, Color } from "../common/utils.js";
+import { getMinSizeUnit } from "../common/config.js";
+import { normalize, getRandomInt } from "../common/utils.js";
+import Color from "../common/Color.js";
 import { TIME_UNIT } from "../common/constants.js";
 
 
 const coords = {};
-let element, color, minSizeUnit;
+let element, colorManager, minSizeUnit;
 
 export function spawn(snakeCoords) {
   element ??= document.getElementById("food");
 
-  color = new Color(Color.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] }));
-  element.style.backgroundColor = color.string; 
+  const color = Color.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] })
+  colorManager = new Color(color);
+  element.style.backgroundColor = colorManager.string; 
 
   teleport(snakeCoords);
   fadeIn();
