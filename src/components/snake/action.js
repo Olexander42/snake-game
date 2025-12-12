@@ -1,18 +1,20 @@
 import { roundTo } from "../../common/utils.js";
 import { getMinSizeUnit } from "../../common/config.js";
 
-import { snakeDiv, bodyElements, bodyData, headRotation, colorManager, snapshot, speedUp, die } from "./snake.js";
+import { getBodyElements, getBodyData, headRotation, colorManager, speedUp, snakeDiv, setIsAlive, } from "./data.js";
 import { calcNewHeadCoords, isCollision } from "./collisionManager.js"
+import { snapshot } from "./snake.js"
 
 
 export function makeStep() {
   const newHeadCoords = calcNewHeadCoords();
+
   if (!isCollision(newHeadCoords)) {
     moveHead(newHeadCoords);
     bodyFollows();
-
-    snapshot();
-  } else die();
+  } else {
+    setIsAlive(false);
+  }
 }
 
 export function levelUp() {
@@ -22,7 +24,7 @@ export function levelUp() {
 }
 
 function moveHead(coords) {
-  const headElement = bodyElements[0];
+  const headElement = getBodyElements()[0];
 
   headElement.style.left = `${coords.x}px`; 
   headElement.style.top = `${coords.y}px`;
@@ -30,22 +32,22 @@ function moveHead(coords) {
 }
 
 function bodyFollows() {
-  bodyData.forEach((sectionData, i) => {
-    if (i < bodyData.length - 1) {
-      const nextSectionElement = bodyElements[i + 1];
-
+  getBodyData().forEach((sectionData, i) => {
+    if (i < getBodyData().length - 1) {
+      const nextSectionElement = getBodyElements()[i + 1];
       nextSectionElement.style.left = `${sectionData.x}px`;
       nextSectionElement.style.top = `${sectionData.y}px`;
     }
   })
+  snapshot();
 }
 
 function grow() {
-  const newTailElement = bodyElements[bodyElements.length - 1].cloneNode(false);
+  const newTailElement = getBodyElements()[getBodyElements().length - 1].cloneNode(false);
 
   if (newTailElement.id === "head") newTailElement.id = "";
-  newTailElement.style.zIndex = `-${bodyElements.length}`; // correct overlapping 
-  newTailElement.style.backgroundColor = colorManager.changeColor({ changeL: bodyElements.length }); // Each section gets progressively lighter.
+  newTailElement.style.zIndex = `-${getBodyElements().length}`; // correct overlapping 
+  newTailElement.style.backgroundColor = colorManager.changeColor({ changeL: getBodyElements().length }); // Each section gets progressively lighter.
   
   snakeDiv.append(newTailElement);
   snapshot();
@@ -53,10 +55,10 @@ function grow() {
 
 function rescaleSections() {
   // Tapering effect.
-  const length = bodyElements.length + 1; // The last section always ends up with scale 0.5. 
+  const length = getBodyElements().length + 1; // The last section always ends up with scale 0.5. 
   const MAX_SCALE = 1;
 
-  bodyElements.forEach((section, i) => { 
+  getBodyElements().forEach((section, i) => { 
     if (i !== 0) { // exclude head
       const distance = length - i;
       const scale = MAX_SCALE - 1 / distance;

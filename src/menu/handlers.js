@@ -16,7 +16,6 @@ export function handleStartBtn(game) {
     firstStart = false;
     startBtn.innerText = "Start Again";
 
-    game.initComponentsElements();
     game.attachControls();
   } else game.reset();
 

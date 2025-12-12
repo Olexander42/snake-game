@@ -1,20 +1,18 @@
-import { getMinSizeUnit } from "../../common/config.js";
-import { bodyElements, bodyData, headCoords, direction, snapshot, getBoardData } from "./snake.js";
+import { step, initStep, getBodyElements, getBodyData, getHeadCoords, getDirection, getBoardData } from "./data.js";
+import { snapshot } from "./snake.js";
 
-
-let step;
 
 export function calcNewHeadCoords() {  
-  step ??= getMinSizeUnit();
+  step ?? initStep();
 
   return {
-    x: headCoords.x + step * Math.sign(direction.x),
-    y: headCoords.y + step * Math.sign(direction.y)
+    x: getHeadCoords().x + step * Math.sign(getDirection().x),
+    y: getHeadCoords().y + step * Math.sign(getDirection().y)
   }
 }
 
 export function isCollision(newHeadCoords) {
-  const isHeadBodyCollision = bodyData.some(({ x, y }) => newHeadCoords.x === x && newHeadCoords.y === y);
+  const isHeadBodyCollision = getBodyData().some(({ x, y }) => newHeadCoords.x === x && newHeadCoords.y === y);
 
   return (isHeadBodyCollision || getCollisionBorder(newHeadCoords));
 }
@@ -40,7 +38,7 @@ export function offsetShrink() {
   let verticalCollisionBorder;
   let horizontalCollisionBorder;
 
-  for (const { x, y } of bodyData) {
+  for (const { x, y } of getBodyData()) {
     // shift() can be executed only once for each border
     if (!verticalCollisionBorder) {
       verticalCollisionBorder = getCollisionBorder(x, undefined); 
@@ -57,9 +55,9 @@ export function offsetShrink() {
 }
 
 function shift({ axis, shiftDirection, side }) {
-  getBody.data.forEach((data, i) => {
+  getBodyData().forEach((data, i) => {
     const coordValue = data[axis];
-    const element = getBody.elements[i];
+    const element = getBodyElements[i];
     const newCoordValue = coordValue + step * shiftDirection;
 
     element.style[side] = `${newCoordValue}px`;
@@ -73,11 +71,11 @@ export function isNearOppositeBorders() {
   const { top, bottom, left, right, step } = boardData;
 
   return (
-    (getBody.data.some(({ y }) => (y <= top + step) 
-    && getBody.data.some(({ y }) => (y >= bottom - step)))) 
+    (getBodyData().some(({ y }) => (y <= top + step) 
+    && getBodyData().some(({ y }) => (y >= bottom - step)))) 
     ||
-    ((getBody.data.some(({ x }) => (x <= left + step))) 
-    && (getBody.data.some(({ x }) => (x >= right - step)))) 
+    ((getBodyData().some(({ x }) => (x <= left + step))) 
+    && (getBodyData().some(({ x }) => (x >= right - step)))) 
   )
 }
 

@@ -3,13 +3,16 @@ import {  borderEl, backgroundEl, root } from "../common/elements.js";
 import { getMinSizeUnit } from "../common/config.js";
 
 
-export let data;
+let borders;
+export const getBorders = () => ({...borders});
 
 let containerEl, bounds;
 let sizeUnit, backgroundClip;
 
 export function normalize() {
   updateSizeUnits();
+
+  containerEl ??= document.getElementById("container")
 
   bounds = {
     width: normalizeValue(containerEl.clientWidth, sizeUnit),
@@ -21,7 +24,7 @@ export function normalize() {
     element.style.height = `${bounds.height}px`;
   })
 
-  updateData()
+  updateBorders()
 }
 
 export function shrink() {
@@ -35,11 +38,7 @@ export function shrink() {
   backgroundClip += sizeUnit / 2; // Clip is applied from both sides.
   root.style.setProperty("--clip", `${backgroundClip}px`);
 
-  updateData();
-}
-
-export const initContainerEl = () => {
-  containerEl = document.getElementById("container");
+  updateBorders();
 }
 
 export const center = {
@@ -47,8 +46,8 @@ export const center = {
   get y() { return normalizeValue(Math.round(containerEl.clientHeight) / 2, sizeUnit) }, 
 }
 
-function updateData() {
-  data = {
+function updateBorders() {
+  borders = {
     left: backgroundClip,
     right: containerEl.clientWidth - backgroundClip - sizeUnit, // - sizeUnit to offest distance to headEl.left 
     top: backgroundClip,

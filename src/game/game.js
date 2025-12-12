@@ -3,8 +3,8 @@ import { root, html, menu } from "../common/elements.js";
 import { soundLibrary } from "../common/sound.js";
 
 import * as Board from "../components/board.js";
-import * as Food from "../components/food.js"; 
 import * as Snake from "../components/snake/API.js";
+//import * as Food from "../components/food/API.js"; 
 
 import { timer, stats, shrinkCounter } from "./managers.js";
 
@@ -14,12 +14,10 @@ let isGameActive = true;
 export function begin() { 
   Board.normalize();
 
-  Snake.setBoardData({...Board.data});
-  Snake.init({...Board.center});
+  Snake.setBoardData(Board.getBorders());
+  Snake.spawn(Board.center);
 
-
-  //const snakeCoords = Snake.data.map(({ x, y }) => ({ x, y }))
-  //Food.spawn(snakeCoords);
+  //Food.init(Snake.bodyData);
   
   //Food.transitionColors();
   
@@ -36,20 +34,17 @@ export function attachControls() {
   })
 }
 
-export function initComponentsElements() {
-  Board.initContainerEl();
-  Snake.initDiv();
-  //Food.initFoodEl();
-}
-
 function action() {
   if (!Snake.isControlsOn) Snake.turnOnControls();
 
   Snake.makeStep();
-  setTimeout(() => action(), timer.gap)
+  if (isGameActive) setTimeout(() => action(), timer.gap)
 }
 
-
+function togglePause() {
+  isGameActive = isGameActive === true ? false : true;
+  if (isGameActive) action();
+}
 /*
 export function reset() {
   if (stats.isNewRecord) stats.updateRecord();

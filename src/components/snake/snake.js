@@ -1,81 +1,58 @@
-import { deepCopy } from "../../common/utils.js";
-import Color from "../../common/Color.js";
+import * as Data from "./data.js";
+// TODO: come up with a better name
 
-export let isAlive;
-export let snakeDiv;
-export let bodyElements, bodyData;
-export let direction, headRotation;
-export let colorManager;
-export let speed;
+export function spawn(center) {
+  const snakeColor = document.querySelector('input[name="snake-color"]:checked').value;
+  Data.initColorManager(snakeColor);
+  
+  Data.setIsAlive(true);
+  Data.setDirection(1, 0);
+  Data.resetHeadRotation();
+  Data.resetSpeed();
 
-let boardData;
-
-export function init(center) {
-  isAlive = true;
-  direction = { "x": 1, "y": 0 };
-  headRotation = 0;
-  speed = 1;
-
-  const color = document.querySelector('input[name="snake-color"]:checked').value;
-  colorManager = new Color(color);
-
+  Data.snakeDiv ?? Data.initSnakeDiv();
   createHead(center);
 }
 
-export function snapshot() {
-  bodyElements = [...document.querySelectorAll(".snake-section")];
-  bodyData = [];
+export function snapshot() { 
+  Data.updateBodyElements()
+  Data.emptyBodyData();
 
-  bodyElements.forEach((section) => {
+  Data.getBodyElements().forEach((section) => {
     const [x, y] = [parseInt(section.style.left), parseInt(section.style.top)]
-    bodyData.push({ x, y });
+    Data.bodyDataAdd(x, y);
   })
+  //console.log(Data.getBodyElements());
 }
 
-export function greyout(duration) {
-  const DESATURATION = 0.15
-  colorManager.hslComponents.s *= DESATURATION;
+export function greyoutBody(duration) { // IIFE?
+  Data.colorManager.hslComponents.s *= 0.15; // desaturation
 
   let timeLeft = duration;
   let i = 0;
-  let j = bodyElements.length + 1; // eliminate the need of +1
+  let j = Data.getBodyElements().length + 1; // eliminate the need of +1
 
   const greyoutSection = (ms) => {
     ms = timeLeft / ( 2 ** (j - i));
     timeLeft -= ms;
     setTimeout(() => {
-      const color = colorManager.changeColor({ changeL: i }); // The original lightness is preserved.
-      const section = bodyElements[i];
+      const color = Data.colorManager.changeColor({ changeL: i }); // The original lightness is preserved.
+      const section = Data.getBodyElements()[i];
       section.style.backgroundColor = color;
 
       i++;
-      if (i < bodyElements.length) setTimeout(() => greyoutSection(ms), ms);  
+      if (i < Data.getBodyElements().length) setTimeout(() => greyoutSection(ms), ms);  
     }, ms)
   }
   greyoutSection(0);
 }
 
-export const headCoords = {
-  get x() { return bodyData[0].x },
-  get y() { return bodyData[0].y },
+function greyoutSection(ms) {
+
 }
 
-export function speedUp() {
-  const ACCELERATION = 0.25;
-  speed += ACCELERATION;
-}
-
-export const initDiv = () => snakeDiv = document.getElementById("snake");
-
-export const setBoardData = (data) => boardData = data;
-export const getBoardData = () => boardData;
-
-export const setHeadRotation = (turn) => headRotation += turn;
-
-export const isAteFood = ({ foodX, foodY }) => headCoords.x === foodX && headCoords.y === foodY; 
-
-export const die = () => isAlive = false;
-export const emptyOut = () => snakeDiv.replaceChildren();
+export const isAteFood = ({ foodX, foodY }) => Data.headCoords.x === foodX && Data.headCoords.y === foodY; 
+export const emptyOut = () => Data.snakeDiv.replaceChildren();
 
 function createHead({ x, y }) {
   const section = document.createElement('span');
@@ -84,9 +61,9 @@ function createHead({ x, y }) {
   section.id = "head";
   section.style.left = `${x}px`;
   section.style.top = `${y}px`;
-  section.style.backgroundColor =  colorManager.changeColor({ changeL: -2 });
+  section.style.backgroundColor =  Data.colorManager.changeColor({ changeL: -2 });
 
-  snakeDiv.append(section);
+  Data.snakeDiv.append(section);
   snapshot();
 }
 

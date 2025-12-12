@@ -10,10 +10,6 @@ export default function setTheme() {
   setFonts(theme);
 }
 
-export function initStyleEl() {
-  style = document.querySelector('style');
-}
-
 function setImages(theme) {
   outsideBackground.style.setProperty("background-image", `url(../assets/${theme}/images/outside.jpg)`);
   borderEl.style.setProperty("border-image-source", `url(../assets/${theme}/images/border.jpg)`);
@@ -21,6 +17,7 @@ function setImages(theme) {
 }
 
 function setFonts(theme) {
+  style ??= document.querySelector('style');
   style.innerHTML = `
     @font-face {
       font-family: "main";
