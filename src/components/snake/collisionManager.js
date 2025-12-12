@@ -1,5 +1,5 @@
 import { getMinSizeUnit } from "../../common/config.js";
-import { bodyElements, bodyData, headCoords, direction, snapshot, getBoardData } from "./data.js";
+import { bodyElements, bodyData, headCoords, direction, snapshot, getBoardData } from "./snake.js";
 
 
 let step;
@@ -61,9 +61,10 @@ function shift({ axis, shiftDirection, side }) {
     const coordValue = data[axis];
     const element = getBody.elements[i];
     const newCoordValue = coordValue + step * shiftDirection;
+
     element.style[side] = `${newCoordValue}px`;
   })
-
+  
   snapshot();
 }
 

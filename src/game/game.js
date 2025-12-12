@@ -1,19 +1,21 @@
 import { TIME_UNIT } from "../common/constants.js";
 import { root, html, menu } from "../common/elements.js";
 import { soundLibrary } from "../common/sound.js";
-import { timer, stats, shrinkCounter } from "./managers.js";
 
 import * as Board from "../components/board.js";
 import * as Food from "../components/food.js"; 
 import * as Snake from "../components/snake/API.js";
+
+import { timer, stats, shrinkCounter } from "./managers.js";
+
 
 let isGameActive = true;
 
 export function begin() { 
   Board.normalize();
 
-  Snake.setBoardData(Board.data);
-  Snake.spawn(Board.center);
+  Snake.setBoardData({...Board.data});
+  Snake.init({...Board.center});
 
 
   //const snakeCoords = Snake.data.map(({ x, y }) => ({ x, y }))
@@ -34,12 +36,19 @@ export function attachControls() {
   })
 }
 
+export function initComponentsElements() {
+  Board.initContainerEl();
+  Snake.initDiv();
+  //Food.initFoodEl();
+}
+
 function action() {
   if (!Snake.isControlsOn) Snake.turnOnControls();
 
   Snake.makeStep();
   setTimeout(() => action(), timer.gap)
 }
+
 
 /*
 export function reset() {
@@ -90,6 +99,7 @@ function gameOver() {
   setTimeout(() => menu.style.display = 'flex', TIME_UNIT);
 }
 */
+
 
 
 

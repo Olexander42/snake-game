@@ -1,4 +1,4 @@
-import { direction, headCoords, setHeadRotation, getBoardData } from "./data.js";
+import { direction, headCoords, setHeadRotation, getBoardData } from "./snake.js";
 
 
 export let isControlsOn = true;
@@ -12,8 +12,7 @@ const TURN_CONFIGS = {
 }
 
 export function handleKeydown(button) {
-  // Work only with "Arrow" buttons
-  if (!isControlsOn || button.slice(0, 5) !== "Arrow") return;
+  if (!isControlsOn || button.slice(0, 5) !== "Arrow") return; // Work only with "Arrow" buttons.
 
   const turnKey = button.slice(5, button.length); 
   const { newDirection, axis, counterClockwise, border } = TURN_CONFIGS[turnKey];
@@ -30,6 +29,7 @@ export const turnOnControls = () => isControlsOn = true;
 
 function isAllowTurn(axis, border) {
   const oppositeAxis = axis === "x" ? "y" : "x";
+
   const isSnakeMovingAlongBorder = headCoords[oppositeAxis] === getBoardData()[border]; // TODO: clarify this.
   const isTurnAngle90Deg = Math.abs(direction[axis]) === 1;
 
@@ -44,6 +44,7 @@ function changeDirection(newDir) {
 function changeHeadRotation(ccw, axis) {
   const clockwiseCorrection = ccw === true ? -1 : 1;
   const turn = TURN_ROTATION * Math.sign(direction[axis]) * clockwiseCorrection;
+  
   setHeadRotation(turn);
 }
 

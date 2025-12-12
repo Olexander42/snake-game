@@ -1,10 +1,12 @@
 import { settingsMenu } from "../common/elements.js";
 import setTheme from "../common/theme.js";
+
 import { updateFocusibleElements } from "./keyboardNavigation.js";
 import { buttonFlipper, sliderMover as sizeSliderMover, Outline } from "./components.js";
 
 
 export let startBtn, settingsBtn;
+
 let firstStart = true;
 let settingsVisited = false;
 let mainMenu;
@@ -14,6 +16,7 @@ export function handleStartBtn(game) {
     firstStart = false;
     startBtn.innerText = "Start Again";
 
+    game.initComponentsElements();
     game.attachControls();
   } else game.reset();
 
@@ -58,14 +61,13 @@ function attachOutlines() {
 }
 
 function attachBackBtnListener() {
-  const backBtn = document.getElementById("back-btn");
+  document.getElementById("back-btn")
+    .addEventListener('click', () => {
+      mainMenu.style.display = 'flex';
+      settingsMenu.style.display = 'none';
 
-  backBtn.addEventListener('click', () => {
-    mainMenu.style.display = 'flex';
-    settingsMenu.style.display = 'none';
-
-    updateFocusibleElements("main menu");
-  })
+      updateFocusibleElements("main menu");
+    })
 }
 
 

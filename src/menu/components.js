@@ -5,6 +5,7 @@ import { normalize as normalizeBoard }  from "../components/board.js";
 export const buttonFlipper = (function() {
   function flipButton(event) { // <--- maybe don't pass an entire event?
     const side = event.currentTarget; 
+
     const isClickedOnOption = side.classList.contains("rear") && event.target !== side;
     const isClickedOnFieldset = [...document.querySelectorAll('fieldset')].includes(event.target); 
     
@@ -15,18 +16,19 @@ export const buttonFlipper = (function() {
     const isClickedBetweenButtons = event.target === settingsMenu;
     const isClickedOnBoard = event.target === borderEl;
     const isClickedOnBody = event.target === bodyEl;
+
     const isClickedOutsideButtons = isClickedBetweenButtons || isClickedOnBoard || isClickedOnBody;
 
     if (isClickedOutsideButtons) { 
-      const clickedButtons = [...document.querySelectorAll(".clicked")];
-      clickedButtons.forEach((clickedButton) => clickedButton.classList.remove("clicked"));
+      [...document.querySelectorAll(".clicked")]
+        .forEach((clickedButton) => clickedButton.classList.remove("clicked"));
     }
   }
  
   return {
     attach: () => {
-      const buttonsSides = [...document.querySelectorAll(".side")];
-      buttonsSides.forEach((buttonSide) => buttonSide.addEventListener('click', flipButton)); 
+      [...document.querySelectorAll(".side")]
+        .forEach((buttonSide) => buttonSide.addEventListener('click', flipButton));
       bodyEl.addEventListener('click', closeAllButtons);
     }
   }
@@ -36,6 +38,7 @@ export const buttonFlipper = (function() {
 export const sliderMover = (function(slider, recipient) {
   const STEP_DEFAULT = parseInt(slider.step);
   const STEP_TRANSITION = 3;
+
   const isRequiresAdjustment = STEP_DEFAULT % STEP_TRANSITION !== 0;
 
   let currentValue = parseInt(slider.value);
@@ -43,6 +46,7 @@ export const sliderMover = (function(slider, recipient) {
 
   function moveThumb() {
     targetValue = parseInt(slider.value);
+
     slider.value = currentValue;
     slider.step = STEP_TRANSITION; 
 
@@ -52,7 +56,7 @@ export const sliderMover = (function(slider, recipient) {
   function makeStep(step) {
     currentValue += (currentValue > targetValue) ? -step : step;
     slider.value = currentValue;
-    updateGradient();
+    updateGradient(currentValue);
 
     if (currentValue === targetValue) { 
       recipient();
@@ -69,12 +73,12 @@ export const sliderMover = (function(slider, recipient) {
     }
   }
 
-  function updateGradient() {
+  function updateGradient(val) {
     const min = slider.min;
     const max = slider.max;
     const PERCENT_100 = 100;
 
-    const gradientCutoffValue = (currentValue - min) / (max - min) * PERCENT_100;
+    const gradientCutoffValue = (val - min) / (max - min) * PERCENT_100;
     const gradient = `linear-gradient(to right, black, black ${gradientCutoffValue}%, transparent ${gradientCutoffValue}%, transparent)`;
     slider.style.setProperty("--responsive-gradient", gradient);
   } 

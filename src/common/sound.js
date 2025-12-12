@@ -17,7 +17,7 @@ export function toggleMute() {
   toggleIcon();
 }
 
-export function initSoundIcon() {
+export function initSoundIconEl() {
   soundIcon = document.getElementById("sound-icon");
 }
 

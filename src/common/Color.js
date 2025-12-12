@@ -26,8 +26,6 @@ export default class Color {
     const s = Math.min(this.hslComponents.s + changeS, 100);
     const l = Math.min(this.hslComponents.l + changeL, 100);
 
-    const newColor = `hsl(${h}, ${s}%, ${l}%)`
-
-    return newColor;
+    return `hsl(${h}, ${s}%, ${l}%)`;
   }
 }

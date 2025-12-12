@@ -3,20 +3,19 @@ import {  borderEl, backgroundEl, root } from "../common/elements.js";
 import { getMinSizeUnit } from "../common/config.js";
 
 
+export let data;
+
 let containerEl, bounds;
 let sizeUnit, backgroundClip;
 
 export function normalize() {
   updateSizeUnits();
 
-  containerEl ??= document.getElementById("container");
-  // calculate
   bounds = {
     width: normalizeValue(containerEl.clientWidth, sizeUnit),
     height: normalizeValue(containerEl.clientHeight, sizeUnit),
   };
 
-  // apply
   [containerEl, backgroundEl, borderEl,].forEach(element => {
     element.style.width = `${bounds.width}px`;
     element.style.height = `${bounds.height}px`;
@@ -24,7 +23,6 @@ export function normalize() {
 
   updateData()
 }
-
 
 export function shrink() {
   // We don't resize containerEl to keep snake's position fixed during the shrink.
@@ -34,14 +32,21 @@ export function shrink() {
   borderEl.style.width = `${bounds.width}px`;
   borderEl.style.height =`${bounds.height}px`;
 
-  // backgroundEl
   backgroundClip += sizeUnit / 2; // Clip is applied from both sides.
   root.style.setProperty("--clip", `${backgroundClip}px`);
 
   updateData();
 }
 
-export let data;
+export const initContainerEl = () => {
+  containerEl = document.getElementById("container");
+}
+
+export const center = {
+  get x() { return normalizeValue(Math.round(containerEl.clientWidth) / 2, sizeUnit) },
+  get y() { return normalizeValue(Math.round(containerEl.clientHeight) / 2, sizeUnit) }, 
+}
+
 function updateData() {
   data = {
     left: backgroundClip,
@@ -51,19 +56,14 @@ function updateData() {
   }
 }
 
-export const center = {
-  get x() { return normalizeValue(Math.round(containerEl.clientWidth) / 2, sizeUnit) },
-  get y() { return normalizeValue(Math.round(containerEl.clientHeight) / 2, sizeUnit) }, 
-}
-
 function updateSizeUnits() {
   sizeUnit = getMinSizeUnit() * 2; // Board shrinks half of sizeSlider.value from each side.
   backgroundClip = sizeUnit;
 
-  // apply
   root.style.setProperty("--size", `${sizeUnit}px`);
   root.style.setProperty("--clip", `${backgroundClip}px`);
 }
+
 
 
 

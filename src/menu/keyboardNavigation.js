@@ -1,6 +1,7 @@
 import { bodyEl, html } from "../common/elements.js";
 
 const DELAY = 200;
+
 let focusibleElements = [];
 let focusedElement;
 

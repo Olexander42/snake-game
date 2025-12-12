@@ -1,50 +1,44 @@
-import { roundTo } from "../../common/utils.js";
-import { getMinSizeUnit } from "../../common/config.js";
-import { initData, colorManager, snakeDiv, bodyElements, bodyData, headCoords, headRotation, snapshot, speedUp, die } from "./data.js";
-import { calcNewHeadCoords, isCollision } from "./collisionManager.js"
+import { deepCopy } from "../../common/utils.js";
+import Color from "../../common/Color.js";
 
-let step; // temp
+export let isAlive;
+export let snakeDiv;
+export let bodyElements, bodyData;
+export let direction, headRotation;
+export let colorManager;
+export let speed;
 
-export function spawn(boardCenter) {
-  initData();
+let boardData;
 
-  step = getMinSizeUnit(); // TODO: eliminate the need of 'step' in this module
+export function init(center) {
+  isAlive = true;
+  direction = { "x": 1, "y": 0 };
+  headRotation = 0;
+  speed = 1;
 
-  createSection(boardCenter.x, boardCenter.y, colorManager.changeColor({ changeL: -2 }), "head"); // TODO: createHead()?
+  const color = document.querySelector('input[name="snake-color"]:checked').value;
+  colorManager = new Color(color);
 
-  snapshot();
-
-
-  
-  //createSection(boardCenter.x - step, boardCenter.y, colorManager.string, "neck");
+  createHead(center);
 }
 
-export function makeStep() {
-  const newHeadCoords = calcNewHeadCoords();
-  if (!isCollision(newHeadCoords)) {
-    moveHead(newHeadCoords);
-    bodyFollows();
+export function snapshot() {
+  bodyElements = [...document.querySelectorAll(".snake-section")];
+  bodyData = [];
 
-    snapshot();
-  } else die();
-}
-
-export const isAteFood = ({ foodX, foodY }) => headCoords.x === foodX && headCoords.y === foodY;
-
-export function levelUp() {
-  //speedUp();
-  grow();
-  rescaleSections();
+  bodyElements.forEach((section) => {
+    const [x, y] = [parseInt(section.style.left), parseInt(section.style.top)]
+    bodyData.push({ x, y });
+  })
 }
 
 export function greyout(duration) {
   const DESATURATION = 0.15
+  colorManager.hslComponents.s *= DESATURATION;
 
   let timeLeft = duration;
   let i = 0;
-  let j = bodyElements.length + 1;
-
-  colorManager.hslComponents.s *= DESATURATION;
+  let j = bodyElements.length + 1; // eliminate the need of +1
 
   const greyoutSection = (ms) => {
     ms = timeLeft / ( 2 ** (j - i));
@@ -52,7 +46,6 @@ export function greyout(duration) {
     setTimeout(() => {
       const color = colorManager.changeColor({ changeL: i }); // The original lightness is preserved.
       const section = bodyElements[i];
-
       section.style.backgroundColor = color;
 
       i++;
@@ -62,71 +55,40 @@ export function greyout(duration) {
   greyoutSection(0);
 }
 
+export const headCoords = {
+  get x() { return bodyData[0].x },
+  get y() { return bodyData[0].y },
+}
+
+export function speedUp() {
+  const ACCELERATION = 0.25;
+  speed += ACCELERATION;
+}
+
+export const initDiv = () => snakeDiv = document.getElementById("snake");
+
+export const setBoardData = (data) => boardData = data;
+export const getBoardData = () => boardData;
+
+export const setHeadRotation = (turn) => headRotation += turn;
+
+export const isAteFood = ({ foodX, foodY }) => headCoords.x === foodX && headCoords.y === foodY; 
+
+export const die = () => isAlive = false;
 export const emptyOut = () => snakeDiv.replaceChildren();
 
-function createSection(x, y, color, id="") {
+function createHead({ x, y }) {
   const section = document.createElement('span');
 
   section.classList.add(`${"snake-section"}`);
-  section.id = id;
+  section.id = "head";
   section.style.left = `${x}px`;
   section.style.top = `${y}px`;
-  section.style.backgroundColor = color;
+  section.style.backgroundColor =  colorManager.changeColor({ changeL: -2 });
 
   snakeDiv.append(section);
-}
-
-function moveHead(coords) {
-  const headElement = bodyElements[0];
-
-  headElement.style.left = `${coords.x}px`; 
-  headElement.style.top = `${coords.y}px`;
-  headElement.style.rotate = `${headRotation}turn`;
-}
-
-
-function bodyFollows() {
-  bodyData.forEach((sectionData, i) => {
-    if (i < bodyData.length - 1) {
-      const nextSectionElement = bodyElements[i + 1];
-
-      nextSectionElement.style.left = `${sectionData.x}px`;
-      nextSectionElement.style.top = `${sectionData.y}px`;
-      nextSectionElement.style.rotate = `${sectionData.rotate}px`;
-    }
-  })
-}
-
-function grow() {
-  const oldTailElement = bodyElements[bodyElements.length - 1];
-  //if (oldTailElement.id === "head") oldTailElement.id = ""; // TODO: try to get rid of this or move it
-
-  const newTailElement = oldTailElement.cloneNode(false);
-  if (newTailElement.id = "tail") newTailElement.id = ""; // why do we need this id?
-  newTailElement.style.zIndex = `-${bodyElements.length}`; // correct overlapping 
-  newTailElement.style.backgroundColor = colorManager.changeColor({ changeL: bodyElements.length }); // Each section gets progressively lighter.
-  snakeDiv.append(newTailElement);
-
   snapshot();
 }
-
-function rescaleSections() {
-  // Tapering effect from tail to head.
-  // Minimum scale is 0.5 to avoid gaps between sections.
-  const j = bodyElements.length + 1;
-  let scale = 0;
-
-  bodyElements.forEach((section, i) => { 
-    if (i !== 0) { // exclude head
-      scale = 1 - 1 / (j - i); 
-      section.style.scale = `${roundTo(scale, 3)}`; 
-    }
-  })
-}
-
-
-
-
 
 
 

@@ -1,27 +1,26 @@
 import { html as outsideBackground, borderEl, backgroundEl as insideBackground } from "./elements.js";
 import { initSoundLibrary } from "./sound.js";
 
-let theme, style;
+let style;
 
 export default function setTheme() {
-  theme = document.querySelector('input[name="theme"]:checked').value;
-
+  const theme = document.querySelector('input[name="theme"]:checked').value;
   initSoundLibrary(theme);
-  setImages();
-  setFonts();
+  setImages(theme);
+  setFonts(theme);
 }
 
-export function initStyle() {
+export function initStyleEl() {
   style = document.querySelector('style');
 }
 
-function setImages() {
+function setImages(theme) {
   outsideBackground.style.setProperty("background-image", `url(../assets/${theme}/images/outside.jpg)`);
   borderEl.style.setProperty("border-image-source", `url(../assets/${theme}/images/border.jpg)`);
   insideBackground.style.setProperty("background-image", `url(../assets/${theme}/images/inside.jpg)`);
 }
 
-function setFonts() {
+function setFonts(theme) {
   style.innerHTML = `
     @font-face {
       font-family: "main";
