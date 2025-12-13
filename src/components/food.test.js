@@ -1,8 +1,8 @@
 import { vi, test, expect } from 'vitest';
-import { spawn, getFoodCoords } from "../src/components/food.js";
+import { spawn, getFoodCoords } from "./food.js";
 
 document.body.innerHTML = `<span id="food"></span>`;
-vi.mock("../src/common/config.js", () => ( { getMinSizeUnit: () => 30 }));
+vi.mock("../common/config.js", () => ( { getMinSizeUnit: () => 30 }));
 
 const borders = {
   "left": 60,
