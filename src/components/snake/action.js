@@ -2,7 +2,7 @@ import { roundTo } from "../../common/utils.js";
 import { getMinSizeUnit } from "../../common/config.js";
 
 import { getBodyElements, getBodyData, getHeadCoords, getDirection, headRotation, colorManager, speedUp, snakeDiv, setIsAlive, step } from "./data.js";
-import { isCollision } from "./collisionManager.js"
+import { getCollisionBorder } from "./shrinkManager.js"
 import { snapshot } from "./snake.js"
 
 
@@ -15,15 +15,25 @@ export function makeStep() {
   if (!isCollision(newHeadCoords)) {
     moveHead(newHeadCoords);
     bodyFollows();
+    snapshot();
   } else {
     setIsAlive(false);
   }
 }
 
 export function levelUp() {
-  speedUp();
   grow();
+  speedUp();
+  snapshot();
   rescaleSections();
+}
+
+function isCollision(headCoords) {
+  const isHeadBodyCollision = getBodyData().some(({ x, y }) => {
+    return headCoords.x === x && headCoords.y === y;
+  })
+
+  return isHeadBodyCollision || getCollisionBorder(headCoords);
 }
 
 function moveHead( { x, y }) {
@@ -42,7 +52,6 @@ function bodyFollows() {
       nextSectionElement.style.top = `${sectionData.y}px`;
     }
   })
-  snapshot();
 }
 
 function grow() {
@@ -53,7 +62,7 @@ function grow() {
   newTailElement.style.backgroundColor = colorManager.changeColor({ changeL: getBodyElements().length }); // Each section gets progressively lighter.
   
   snakeDiv.append(newTailElement);
-  snapshot();
+  console.log(getBodyData());
 }
 
 function rescaleSections() {

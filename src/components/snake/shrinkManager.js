@@ -2,29 +2,23 @@ import { step, getBodyElements, getBodyData, getHeadCoords, getDirection, setBor
 import { snapshot } from "./snake.js";
 
 
-export function isCollision(headCoords) {
-  const isHeadBodyCollision = getBodyData().some(({ x, y }) => {
-    headCoords.x === x && headCoords.y === y
-  });
-
-  return (isHeadBodyCollision || getCollisionBorder(headCoords));
-}
-
-function getCollisionBorder( { x, y }) {
-  const { left, right, top, bottom } = getBorders();
-
-  if (x < left) return "left";
-  if (x > right) return "right";
-  if (y < top) return "top";
-  if (y > bottom) return "bottom";
-}
-
-
 const SHIFT_CONFIGS = {
   left: { axis: "x", shiftDirection: 1, side: "left" },
   right: { axis: "x", shiftDirection: -1, side: "left" },
   top: { axis: "y", shiftDirection: 1, side: "top" },
   bottom: { axis: "y", shiftDirection: -1, side: "top" },
+}
+
+export function isNearOppositeBorders() {
+  const { top, bottom, left, right } = getBorders();
+ 
+  return (
+    ((getBodyData().some(({ x }) => (x <= left + step))) 
+    && (getBodyData().some(({ x }) => (x >= right - step))))
+    || 
+    (getBodyData().some(({ y }) => (y <= top + step) 
+    && getBodyData().some(({ y }) => (y >= bottom - step)))) 
+  )
 }
 
 export function offsetShrink(borders) {
@@ -50,6 +44,15 @@ export function offsetShrink(borders) {
   }
 }
 
+export function getCollisionBorder({ x, y }) {
+  const { left, right, top, bottom } = getBorders();
+
+  if (x < left) return "left";
+  if (x > right) return "right";
+  if (y < top) return "top";
+  if (y > bottom) return "bottom";
+}
+
 function shift({ axis, shiftDirection, side }) {
   getBodyData().forEach((coords, i) => {
     const coordValue = coords[axis];
@@ -62,17 +65,7 @@ function shift({ axis, shiftDirection, side }) {
   snapshot();
 }
 
-export function isNearOppositeBorders() {
-  const { top, bottom, left, right } = getBorders();
- 
-  return (
-    ((getBodyData().some(({ x }) => (x <= left + step))) 
-    && (getBodyData().some(({ x }) => (x >= right - step))))
-    || 
-    (getBodyData().some(({ y }) => (y <= top + step) 
-    && getBodyData().some(({ y }) => (y >= bottom - step)))) 
-  )
-}
+
 
 
 
