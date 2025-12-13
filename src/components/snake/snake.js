@@ -10,7 +10,7 @@ export function spawn(center) {
   Data.resetHeadRotation();
   Data.resetSpeed();
 
-  Data.snakeDiv ?? Data.initSnakeDiv();
+  if (!Data.snakeDiv) Data.initSnakeDiv();
   createHead(center);
 }
 
@@ -22,7 +22,6 @@ export function snapshot() {
     const [x, y] = [parseInt(section.style.left), parseInt(section.style.top)]
     Data.bodyDataAdd(x, y);
   })
-  //console.log(Data.getBodyElements());
 }
 
 export function greyoutBody(duration) { // IIFE?

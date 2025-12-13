@@ -45,6 +45,6 @@ export const initSnakeDiv = () => snakeDiv = document.getElementById("snake");
 export let colorManager;
 export const initColorManager = (color) => colorManager = new Color(color);
 
-let boardData;
-export const setBoardData = (data) => boardData = data;
-export const getBoardData = () => ({...boardData});
+let borders;
+export const setBorders = (data) => borders = data;
+export const getBorders = () => ({...borders});

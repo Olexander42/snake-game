@@ -23,11 +23,11 @@ export function levelUp() {
   rescaleSections();
 }
 
-function moveHead(coords) {
+function moveHead( { x, y }) {
   const headElement = getBodyElements()[0];
 
-  headElement.style.left = `${coords.x}px`; 
-  headElement.style.top = `${coords.y}px`;
+  headElement.style.left = `${x}px`; 
+  headElement.style.top = `${y}px`;
   headElement.style.rotate = `${headRotation}turn`;
 }
 

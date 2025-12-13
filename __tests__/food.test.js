@@ -4,14 +4,14 @@ import { initFoodEl, generateRandomCoords } from "../src/components/food/food.js
 document.body.innerHTML = `<span id="food"></span>`;
 vi.mock("../src/common/config.js", () => ( { getMinSizeUnit: () => 30 }));
 
-const boardData = {
+const borders = {
   "left": 60,
   "right": 660,
   "top": 60,
   "bottom": 600
 }
 
-const { left, right, top, bottom } = boardData;
+const { left, right, top, bottom } = borders;
 
 const snakeCoords = [
   {
@@ -27,7 +27,7 @@ const snakeCoords = [
 initFoodEl();
 
 test("Food random coords get generated correctly", { repeats: 1000 }, () => {
-  const randomCoords = generateRandomCoords(boardData, snakeCoords);
+  const randomCoords = generateRandomCoords(borders, snakeCoords);
 
   expect(randomCoords).toSatisfy((foodCoords) => 
     (left <= randomCoords.x <= right)

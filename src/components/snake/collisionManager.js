@@ -1,9 +1,9 @@
-import { step, initStep, getBodyElements, getBodyData, getHeadCoords, getDirection, getBoardData } from "./data.js";
+import { step, initStep, getBodyElements, getBodyData, getHeadCoords, getDirection, setBorders, getBorders } from "./data.js";
 import { snapshot } from "./snake.js";
 
 
 export function calcNewHeadCoords() {  
-  step ?? initStep();
+  if (!step) initStep();
 
   return {
     x: getHeadCoords().x + step * Math.sign(getDirection().x),
@@ -17,8 +17,8 @@ export function isCollision(newHeadCoords) {
   return (isHeadBodyCollision || getCollisionBorder(newHeadCoords));
 }
 
-function getCollisionBorder({ x, y }) {
-  const { left, right, top, bottom } = getBoardData();
+function getCollisionBorder( { x, y }) {
+  const { left, right, top, bottom } = getBorders();
 
   if (x < left) return "left";
   if (x > right) return "right";
@@ -34,19 +34,21 @@ const SHIFT_CONFIGS = {
   bottom: { axis: "y", shiftDirection: -1, side: "top" },
 }
 
-export function offsetShrink() {
+export function offsetShrink(borders) {
+  setBorders(borders);
+
   let verticalCollisionBorder;
   let horizontalCollisionBorder;
 
   for (const { x, y } of getBodyData()) {
-    // shift() can be executed only once for each border
+    // shift() can be executed only once for each *CollisionBorder.
     if (!verticalCollisionBorder) {
-      verticalCollisionBorder = getCollisionBorder(x, undefined); 
+      verticalCollisionBorder = getCollisionBorder({ "x": x, "y": undefined }); // We check one axis at a time to filter the relevant pair of borders.
       if (verticalCollisionBorder) shift(SHIFT_CONFIGS[verticalCollisionBorder]);
     }
 
     if (!horizontalCollisionBorder) {
-      horizontalCollisionBorder = getCollisionBorder(undefined, y); 
+      horizontalCollisionBorder = getCollisionBorder({ "x": undefined, "y": y }); 
       if (horizontalCollisionBorder) shift(SHIFT_CONFIGS[horizontalCollisionBorder]);
     }
 
@@ -55,12 +57,12 @@ export function offsetShrink() {
 }
 
 function shift({ axis, shiftDirection, side }) {
-  getBodyData().forEach((data, i) => {
-    const coordValue = data[axis];
-    const element = getBodyElements[i];
+  getBodyData().forEach((coords, i) => {
+    const coordValue = coords[axis];
+    const section = getBodyElements()[i];
     const newCoordValue = coordValue + step * shiftDirection;
 
-    element.style[side] = `${newCoordValue}px`;
+    section.style[side] = `${newCoordValue}px`;
   })
   
   snapshot();
@@ -68,7 +70,7 @@ function shift({ axis, shiftDirection, side }) {
 
 
 export function isNearOppositeBorders() {
-  const { top, bottom, left, right, step } = boardData;
+  const { top, bottom, left, right, step } = borders;
 
   return (
     (getBodyData().some(({ y }) => (y <= top + step) 

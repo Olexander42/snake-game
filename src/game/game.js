@@ -14,7 +14,7 @@ let isGameActive = true;
 export function begin() { 
   Board.normalize();
 
-  Snake.setBoardData(Board.getBorders());
+  Snake.setBorders(Board.getBorders());
   Snake.spawn(Board.center);
 
   //Food.init(Snake.bodyData);
@@ -30,6 +30,10 @@ export function attachControls() {
   html.addEventListener('keydown', ({ code }) => {
     if (code === 'Space') togglePause();
     else if (code === 'KeyG') Snake.levelUp();
+    else if (code === 'KeyS') {
+      Board.shrink();
+      Snake.offsetShrink(Board.getBorders());
+    }
     else if (isGameActive) Snake.handleKeydown(code); 
   })
 }
