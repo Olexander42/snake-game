@@ -19,8 +19,7 @@ export function begin() {
   Snake.setBorders(borders);
   
   Food.spawn(borders, Snake.getBodyData());
-  
-  //Food.transitionColors();
+  Food.transitionColors();
   
   timer.updateGap(Snake.speed);
   action();

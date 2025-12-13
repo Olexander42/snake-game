@@ -31,7 +31,6 @@ export function teleport(borders, snakeCoords) {
   foodEl.style.top = `${foodCoords.y}px`;
 }
 
-
 function generateRandomCoords(borders, snakeCoords) {
   const { left, right, top, bottom } = borders;
   const randomCoords = {}
@@ -47,23 +46,23 @@ function generateRandomCoords(borders, snakeCoords) {
 }
 
 export function transitionColors(ms=TRANSITION_DURATION) { 
-  // Due to performance issues, we transition opacity of the ::before pseudo-foodEl, not the food foodEl itself.
-  foodEl.style.setProperty("--pseudo-colorManager", colorManager); // sync ::before and main foodEl colorManager
-  
-  const newRandomColor = colorManager.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] });
-  foodEl.style.backgroundColor = newRandomColor; // Change the main foodEl colorManager.
+  // Due to performance issues, we transition opacity of the ::before pseudo-element, not the food element itself.
+  foodEl.style.setProperty("--pseudo-color", colorManager.string); // Sync ::before and the main element color.
+  console.log(colorManager.string);
+  const newRandomColor = Color.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] });
+  foodEl.style.backgroundColor = newRandomColor;
 
-  // The change is hidden by the fully opaque pseudo-foodEl.
+  // The change is hidden by the fully opaque pseudo-element.
   foodEl.style.setProperty("--pseudo-transition", 'none'); 
   foodEl.style.setProperty("--pseudo-opacity", 1); 
   
   foodEl.offsetLeft; // force repaint
 
-  // Increasingly transparent pseudo-foodEl gradually reveals the new colorManager of the food foodEl underneath.
-  foodEl.style.setProperty("--pseudo-transition", `opacity ${TRANSITION_DURATION / 1000}s linear`); 
+  // Increasingly transparent pseudo-element gradually reveals the new color of the food element underneath.
+  foodEl.style.setProperty("--pseudo-transition", `opacity ${TRANSITION_DURATION / MS_IN_SECOND}s linear`); 
   foodEl.style.setProperty("--pseudo-opacity", 0);
 
-  colorManager = newRandomColor; 
+  colorManager.string = newRandomColor; 
   setTimeout(() => transitionColors(), TRANSITION_DURATION); 
 }
 
@@ -73,5 +72,3 @@ function fadeIn() {
   foodEl.addEventListener('transitionend', () => foodEl.style.transition = 'none');
 }
 
-
-export { generateRandomCoords }; // for testing
