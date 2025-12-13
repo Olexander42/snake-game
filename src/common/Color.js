@@ -1,3 +1,6 @@
+import { getRandomInt } from "./utils.js";
+
+
 export default class Color {
   static getRandomColor({ rangeH = [0, 360], rangeS = [0, 100], rangeL = [0, 100] } = {}) {
     const [h, s, l] = [

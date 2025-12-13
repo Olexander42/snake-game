@@ -53,16 +53,8 @@ function greyoutSection(ms) {
 }
 
 
-export function isCollision(headCoords) {
-
-
-  return (isHeadBodyCollision || getCollisionBorder(headCoords));
-}
-
-
 export const isAteFood = ({ foodX, foodY }) => Data.headCoords.x === foodX && Data.headCoords.y === foodY; 
 export const emptyOut = () => Data.snakeDiv.replaceChildren();
-
 
 
 function createHead({ x, y }) {

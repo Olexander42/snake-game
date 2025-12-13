@@ -4,7 +4,7 @@ import { soundLibrary } from "../common/sound.js";
 
 import * as Board from "../components/board.js";
 import * as Snake from "../components/snake/API.js";
-//import * as Food from "../components/food/API.js"; 
+import * as Food from "../components/food.js"; 
 
 import { timer, stats, shrinkCounter } from "./managers.js";
 
@@ -13,11 +13,12 @@ let isGameActive = true;
 
 export function begin() { 
   Board.normalize();
+  const borders = Board.getBorders();
 
-  Snake.setBorders(Board.getBorders());
   Snake.spawn(Board.center);
-
-  //Food.init(Snake.bodyData);
+  Snake.setBorders(borders);
+  
+  Food.spawn(borders, Snake.getBodyData());
   
   //Food.transitionColors();
   
@@ -29,14 +30,6 @@ export function begin() {
 export function attachControls() {
   html.addEventListener('keydown', ({ code }) => {
     if (code === 'Space') togglePause();
-    else if (code === 'KeyG') Snake.levelUp();
-    else if (code === 'KeyS') {
-      if (!Snake.isNearOppositeBorders()) {
-        console.log(Snake.isNearOppositeBorders());
-        Board.shrink();
-        Snake.offsetShrink(Board.getBorders());
-      }
-    }
     else if (isGameActive) Snake.handleKeydown(code); 
   })
 }

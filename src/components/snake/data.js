@@ -4,14 +4,20 @@ import { getMinSizeUnit } from "../../common/config.js";
 
 
 export let isAlive;
-export const setIsAlive = (bool) => isAlive = bool; 
+export const setIsAlive = (bool) => {
+  if (typeof bool === 'boolean') isAlive = bool; 
+  else throw new TypeError(`Expected a boolean, but ${typeof bool} was provided`);
+}
 
 const direction = { "x": null, "y": null };
 export const setDirection = (x, y) => [direction.x, direction.y] = [x, y];
 export const getDirection = () => ({...direction});
 
 export let headRotation;
-export const setHeadRotation = (turn) => headRotation += turn;
+export const setHeadRotation = (turn) => {
+  if (typeof turn === 'number') headRotation += turn;
+  else throw new TypeError(`Expected a number, but ${typeof bool} was provided`);
+}
 export const resetHeadRotation = () => headRotation = 0;
 
 export let speed;
@@ -27,7 +33,10 @@ export const updateBodyElements = () => {
 export const getBodyElements = () => bodyElements.slice();
 
 const bodyData = [];
-export const bodyDataAdd = (x, y) => bodyData.push({ x, y });
+export const bodyDataAdd = (x, y) => {
+  if (typeof x === 'number' && typeof y === 'number') bodyData.push({ x, y });
+  else throw new TypeError(`Expected numbers, but ${x} of type ${typeof x} and ${y} of ${typeof y} was provided`);
+}
 export const getBodyData = () => deepCopy(bodyData);
 export const emptyBodyData = () => bodyData.splice(0, bodyData.length);
 
