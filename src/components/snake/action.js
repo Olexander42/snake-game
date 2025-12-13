@@ -1,13 +1,16 @@
 import { roundTo } from "../../common/utils.js";
 import { getMinSizeUnit } from "../../common/config.js";
 
-import { getBodyElements, getBodyData, headRotation, colorManager, speedUp, snakeDiv, setIsAlive, } from "./data.js";
-import { calcNewHeadCoords, isCollision } from "./collisionManager.js"
+import { getBodyElements, getBodyData, getHeadCoords, getDirection, headRotation, colorManager, speedUp, snakeDiv, setIsAlive, step } from "./data.js";
+import { isCollision } from "./collisionManager.js"
 import { snapshot } from "./snake.js"
 
 
 export function makeStep() {
-  const newHeadCoords = calcNewHeadCoords();
+  const newHeadCoords =  {
+    x: getHeadCoords().x + step * Math.sign(getDirection().x),
+    y: getHeadCoords().y + step * Math.sign(getDirection().y)
+  }
 
   if (!isCollision(newHeadCoords)) {
     moveHead(newHeadCoords);

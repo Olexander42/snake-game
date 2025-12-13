@@ -31,8 +31,11 @@ export function attachControls() {
     if (code === 'Space') togglePause();
     else if (code === 'KeyG') Snake.levelUp();
     else if (code === 'KeyS') {
-      Board.shrink();
-      Snake.offsetShrink(Board.getBorders());
+      if (!Snake.isNearOppositeBorders()) {
+        console.log(Snake.isNearOppositeBorders());
+        Board.shrink();
+        Snake.offsetShrink(Board.getBorders());
+      }
     }
     else if (isGameActive) Snake.handleKeydown(code); 
   })

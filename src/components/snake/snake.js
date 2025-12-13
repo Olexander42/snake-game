@@ -9,6 +9,8 @@ export function spawn(center) {
   Data.setDirection(1, 0);
   Data.resetHeadRotation();
   Data.resetSpeed();
+  Data.initStep();
+  console.log(Data.step);
 
   if (!Data.snakeDiv) Data.initSnakeDiv();
   createHead(center);
