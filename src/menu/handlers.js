@@ -1,4 +1,4 @@
-import { settingsMenu } from "../common/elements.js";
+import { menu, settingsMenu } from "../common/elements.js";
 import setTheme from "../common/theme.js";
 
 import { updateFocusibleElements } from "./keyboardNavigation.js";
@@ -19,7 +19,7 @@ export function handleStartBtn(game) {
     game.attachControls();
   } else game.reset();
 
-  mainMenu.style.display = 'none';
+  menu.style.display = 'none';
   game.begin();
 }
 

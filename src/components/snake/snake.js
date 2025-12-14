@@ -52,10 +52,12 @@ function greyoutSection(ms) {
 
 }
 
+export const isAteFood = (foodCoords) => { 
+  console.log(foodCoords);
+  return Data.getHeadCoords().x === foodCoords.x && Data.getHeadCoords().y === foodCoords.y;
+}
 
-export const isAteFood = ({ foodX, foodY }) => Data.headCoords.x === foodX && Data.headCoords.y === foodY; 
 export const emptyOut = () => Data.snakeDiv.replaceChildren();
-
 
 function createHead({ x, y }) {
   const section = document.createElement('span');

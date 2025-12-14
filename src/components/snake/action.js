@@ -1,7 +1,7 @@
 import { roundTo } from "../../common/utils.js";
 import { getMinSizeUnit } from "../../common/config.js";
 
-import { getBodyElements, getBodyData, getHeadCoords, getDirection, headRotation, colorManager, speedUp, snakeDiv, setIsAlive, step } from "./data.js";
+import { getBodyElements, getBodyData, getHeadCoords, getDirection, headRotation, colorManager, snakeDiv, setIsAlive, step } from "./data.js";
 import { getCollisionBorder } from "./shrinkManager.js"
 import { snapshot } from "./snake.js"
 
@@ -21,19 +21,14 @@ export function makeStep() {
   }
 }
 
-export function levelUp() {
-  grow();
-  speedUp();
-  snapshot();
-  rescaleSections();
-}
-
 function isCollision(headCoords) {
+  const isBorderCollision = getCollisionBorder(headCoords);
+
   const isHeadBodyCollision = getBodyData().some(({ x, y }) => {
     return headCoords.x === x && headCoords.y === y;
   })
 
-  return isHeadBodyCollision || getCollisionBorder(headCoords);
+  return isBorderCollision || isHeadBodyCollision;
 }
 
 function moveHead( { x, y }) {
@@ -54,18 +49,19 @@ function bodyFollows() {
   })
 }
 
-function grow() {
+export function grow() {
   const newTailElement = getBodyElements()[getBodyElements().length - 1].cloneNode(false);
 
   if (newTailElement.id === "head") newTailElement.id = "";
   newTailElement.style.zIndex = `-${getBodyElements().length}`; // correct overlapping 
   newTailElement.style.backgroundColor = colorManager.changeColor({ changeL: getBodyElements().length }); // Each section gets progressively lighter.
-  
   snakeDiv.append(newTailElement);
-  console.log(getBodyData());
+
+  snapshot();
+  rescaleSections();
 }
 
-function rescaleSections() {
+export function rescaleSections() {
   // Tapering effect.
   const length = getBodyElements().length + 1; // The last section always ends up with scale 0.5. 
   const MAX_SCALE = 1;

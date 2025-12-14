@@ -5,7 +5,7 @@ import Color from "../common/Color.js";
 
 
 let foodCoords;
-export const getFoodCoords = () => ({...foodCoords});
+export const getCoords = () => ({...foodCoords});
 
 let foodEl, colorManager, minSizeUnit;
 
@@ -48,7 +48,7 @@ function generateRandomCoords(borders, snakeCoords) {
 export function transitionColors(ms=TRANSITION_DURATION) { 
   // Due to performance issues, we transition opacity of the ::before pseudo-element, not the food element itself.
   foodEl.style.setProperty("--pseudo-color", colorManager.string); // Sync ::before and the main element color.
-  console.log(colorManager.string);
+
   const newRandomColor = Color.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] });
   foodEl.style.backgroundColor = newRandomColor;
 

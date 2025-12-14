@@ -1,6 +1,6 @@
 import { TIME_UNIT } from "../common/constants.js";
 import { root, html, menu } from "../common/elements.js";
-import { soundLibrary } from "../common/sound.js";
+import { soundLibrary, isMuted } from "../common/sound.js";
 
 import * as Board from "../components/board.js";
 import * as Snake from "../components/snake/API.js";
@@ -22,7 +22,7 @@ export function begin() {
   Food.transitionColors();
   
   timer.updateGap(Snake.speed);
-  action();
+  setTimeout(() => action(), timer.gap);
 }
 
 
@@ -33,18 +33,6 @@ export function attachControls() {
   })
 }
 
-function action() {
-  if (!Snake.isControlsOn) Snake.turnOnControls();
-
-  Snake.makeStep();
-  if (isGameActive) setTimeout(() => action(), timer.gap)
-}
-
-function togglePause() {
-  isGameActive = isGameActive === true ? false : true;
-  if (isGameActive) action();
-}
-/*
 export function reset() {
   if (stats.isNewRecord) stats.updateRecord();
   stats.resetScore();
@@ -58,25 +46,14 @@ function action() {
   if (!Snake.isControlsOn) Snake.turnOnControls();
 
   Snake.makeStep();
-  is (Snake.isAlive) {
-    if (Snake.isAteFood(Food.coords)) {
-      if (shrinkCounter.isTimeToShrink() && !isSnakeNearOppositeBorders()) {
-        Board.shrink(); 
-        Snake.offsetShrink();
+  if (!Snake.isAlive) gameOver();
 
-        shrinkCounter.incrementOuter();
-      }
-      stats.incrementScore();
-      Food.teleport(Board.data, Snake.bodyData);
-
-      Snake.grow();
-      Snake.rescaleSections()
-
-      timer.speedUp();
-      timer.updateGap();
-    }
-    if (isGameActive) setTimeout(() => action(), timer.gap);
+  else if (Snake.isAteFood(Food.getCoords())) {
+    handleShrink();
+    levelUp();
   }
+
+  if (isGameActive) setTimeout(() => action(), timer.gap);
 }
 
 
@@ -85,14 +62,39 @@ function togglePause() {
   if (isGameActive) action();
 }
 
-function gameOver() {
-  soundLibrary.bgMusic.pause();
-  soundLibrary.gameOver.play();
-  
-  Snake.greyout(TIME_UNIT);
-  setTimeout(() => menu.style.display = 'flex', TIME_UNIT);
+function levelUp() {
+  Snake.grow();
+  Snake.speedUp();
+  timer.updateGap(Snake.speed);
+
+  Food.teleport(Board.getBorders(), Snake.getBodyData());
+
+  stats.incrementScore();
 }
-*/
+
+function handleShrink() {
+  shrinkCounter.incrementInner();
+  const isAllowShrink = shrinkCounter.isTimeToShrink && !Snake.isNearOppositeBorders();
+  if (isAllowShrink) {
+    Board.shrink(); 
+    Snake.offsetShrink(Board.getBorders());
+
+    shrinkCounter.incrementOuter();
+  }
+}
+
+function gameOver() {
+  if (!isMuted) {
+    soundLibrary.bgMusic.pause();
+    soundLibrary.gameOver.play();
+  }
+
+  Snake.greyoutBody(TIME_UNIT);
+  setTimeout(() => menu.style.display = 'flex', TIME_UNIT);
+
+  isGameActive = false;
+}
+
 
 
 

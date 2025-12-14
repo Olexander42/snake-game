@@ -54,16 +54,17 @@ export const shrinkCounter = (() => {
   let inner = 0;
 
   return {
-    get isTimeToShrink() { inner >= outer },
-
-    incrementOuter() {
+    incrementInner: () => inner++,
+    incrementOuter: () => {
       inner = 0;
       outer++;
     },
 
-    reset() {
+    reset: () => {
       outer = 1;
       inner = 0; 
     },
+
+    get isTimeToShrink() { inner >= outer },
   }
 })();

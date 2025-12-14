@@ -1,7 +1,7 @@
 export const soundLibrary = {};
 export let soundIcon;
 
-let isMuted = true;
+export let isMuted = true;
 
 export function initSoundLibrary(theme) { 
   soundLibrary.bgMusic = new Audio(`../assets/${theme}/sounds/background.mp3`);
