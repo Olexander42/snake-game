@@ -36,7 +36,6 @@ export function initSoundIconEl() {
 function toggleIcon() {
   if (isMuted) soundIcon.classList.replace("sound-on", "sound-off");
   else soundIcon.classList.replace("sound-off", "sound-on");
-  console.log(soundLibrary.bgMusic.muted)
 }
 
 const applyMutedState = () => Object.values(soundLibrary).forEach((sound) => sound.muted = isMuted);
