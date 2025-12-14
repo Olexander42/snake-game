@@ -1,7 +1,0 @@
-*.txt
-node_modules/
-*.sublime-*
-.gitignote
-.json
-vitest.*
-README.md
