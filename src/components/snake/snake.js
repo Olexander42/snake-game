@@ -1,5 +1,5 @@
 import * as Data from "./data.js";
-// TODO: come up with a better name
+
 
 export function spawn(center) {
   const snakeColor = document.querySelector('input[name="snake-color"]:checked').value;
@@ -23,30 +23,6 @@ export function snapshot() {
     const [x, y] = [parseInt(section.style.left), parseInt(section.style.top)]
     Data.bodyDataAdd(x, y);
   })
-}
-
-export function greyoutBodyOff(duration) { // IIFE?
-  Data.colorManager.hslComponents.s *= 0.15; // desaturation
-
-  let timeLeft = duration;
-  let i = 0;
-  let length = Data.getBodyElements().length + 1; // TODO: eliminate the need of +1
-
-  const greyoutSection = (ms) => {
-    const progress = length - i;
-    ms = timeLeft / ( 2 ** progress); // Each section exponentially takes longer to greyout.
-    console.log(ms);
-    timeLeft -= ms;
-    setTimeout(() => {
-      const color = Data.colorManager.changeColor({ changeL: i }); // The original lightness is preserved.
-      const section = Data.getBodyElements()[i];
-      section.style.backgroundColor = color;
-
-      i++;
-      if (i < length - 1) setTimeout(() => greyoutSection(ms), ms);  
-    }, ms)
-  }
-  greyoutSection(0);
 }
 
 export function greyoutBody(duration) {

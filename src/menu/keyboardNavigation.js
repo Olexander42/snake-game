@@ -42,7 +42,7 @@ export default function handleKeydown(event) {
   }
 }
 
-export function updateFocusibleElements(context) { // TODO: Pass "main menu" back after game over.
+export function updateFocusibleElements(context) { // TODO: Pass "main menu" back after game over. 
   let selector;
   focusibleElements = [document.querySelector("#sound-icon img")];
 
@@ -55,7 +55,7 @@ export function updateFocusibleElements(context) { // TODO: Pass "main menu" bac
       selector = "#settings-menu button";
       break;
 
-    case "settings button":
+    case "settings button": // FIX: Can't change theme with keyboard
       focusibleElements = []; 
       selector = "button [tabindex = '0']";
       break;

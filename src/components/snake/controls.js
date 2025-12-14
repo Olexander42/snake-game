@@ -32,7 +32,7 @@ export const turnOnControls = () => isControlsOn = true;
 function isAllowTurn(axis, border) {
   const oppositeAxis = axis === "x" ? "y" : "x";
 
-  const isSnakeMovingAlongBorder = getHeadCoords()[oppositeAxis] === getBorders()[border]; // TODO: clarify this.
+  const isSnakeMovingAlongBorder = getHeadCoords()[oppositeAxis] === getBorders()[border];
   const isTurnAngle90Deg = Math.abs(getDirection()[axis]) === 1;
 
   return !isSnakeMovingAlongBorder && isTurnAngle90Deg

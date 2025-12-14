@@ -1,36 +1,45 @@
-export const soundLibrary = {};
+export let soundLibrary;
 export let soundIcon;
 
 export let isMuted = true;
 
+let isFirstUnmute = true;
+
 export function initSoundLibrary(theme) { 
-  soundLibrary.bgMusic = new Audio(`../assets/${theme}/sounds/background.mp3`);
-  soundLibrary.bite = new Audio(`../assets/${theme}/sounds/bite.mp3`);
-  soundLibrary.gameOver = new Audio(`../assets/${theme}/sounds/game-over.mp3`);
+  if (soundLibrary) soundLibrary.bgMusic.pause(); // allow bgMusic to change
+
+  soundLibrary = {
+    bgMusic: new Audio(`../assets/${theme}/sounds/background.mp3`),
+    bite: new Audio(`../assets/${theme}/sounds/bite.mp3`),
+    gameOver: new Audio(`../assets/${theme}/sounds/game-over.mp3`),
+  };
 
   applyMutedState();
+  if (!isMuted || !isFirstUnmute) soundLibrary.bgMusic.play(); 
 }
 
 export function toggleMute() {
   isMuted = isMuted === false ? true : false;
-  applyMutedState(); 
   toggleIcon();
+  applyMutedState(); 
+
+  if (isFirstUnmute) {
+    soundLibrary.bgMusic.play();
+    isFirstUnmute = false;
+  }
 }
 
 export function initSoundIconEl() {
   soundIcon = document.getElementById("sound-icon");
 }
 
-function applyMutedState() {
-  Object.values(soundLibrary).forEach((sound) => sound.muted = isMuted);
-
-  if (!isMuted) soundLibrary.bgMusic.play();
-}
-
 function toggleIcon() {
   if (isMuted) soundIcon.classList.replace("sound-on", "sound-off");
   else soundIcon.classList.replace("sound-off", "sound-on");
+  console.log(soundLibrary.bgMusic.muted)
 }
+
+const applyMutedState = () => Object.values(soundLibrary).forEach((sound) => sound.muted = isMuted);
 
 
 

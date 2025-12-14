@@ -56,6 +56,7 @@ function action() {
   if (!Snake.isAlive) gameOver();
 
   else if (Snake.isAteFood(Food.getCoords())) {
+    soundLibrary.bite.play();
     handleShrink();
     levelUp();
   }

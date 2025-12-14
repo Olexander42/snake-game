@@ -1,22 +1,22 @@
 import { html as outsideBackground, borderEl, backgroundEl as insideBackground } from "./elements.js";
-import { initSoundLibrary } from "./sound.js";
+import { initSoundLibrary, soundLibrary, isMuted } from "./sound.js";
 
-let style;
+let theme, style;
 
 export default function setTheme() {
-  const theme = document.querySelector('input[name="theme"]:checked').value;
+  theme = document.querySelector('input[name="theme"]:checked').value;
+  setImages();
+  setFonts();
   initSoundLibrary(theme);
-  setImages(theme);
-  setFonts(theme);
 }
 
-function setImages(theme) {
+function setImages() {
   outsideBackground.style.setProperty("background-image", `url(../assets/${theme}/images/outside.jpg)`);
   borderEl.style.setProperty("border-image-source", `url(../assets/${theme}/images/border.jpg)`);
   insideBackground.style.setProperty("background-image", `url(../assets/${theme}/images/inside.jpg)`);
 }
 
-function setFonts(theme) {
+function setFonts() {
   style ??= document.querySelector('style');
   style.innerHTML = `
     @font-face {
