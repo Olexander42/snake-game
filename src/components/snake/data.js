@@ -3,7 +3,7 @@ import Color from "../../common/Color.js";
 import { getMinSizeUnit } from "../../common/config.js";
 
 
-export let isAlive;
+export let isAlive = false;
 export const setIsAlive = (bool) => {
   if (typeof bool === 'boolean') isAlive = bool; 
   else throw new TypeError(`Expected a boolean, but ${typeof bool} was provided`);

@@ -26,7 +26,8 @@ export function snapshot() {
 }
 
 export function greyoutBody(duration) {
-  Data.colorManager.hslComponents.s *= 0.15; // desaturation
+  const DESATURATION = 0.15
+  Data.colorManager.hslComponents.s *= DESATURATION;
 
   let timeLeft = duration;
   let i = 0;
@@ -38,7 +39,7 @@ export function greyoutBody(duration) {
     timeLeft -= delay; // but the total duration stays the same.
     
     setTimeout(() => {
-      const color = Data.colorManager.changeColor({ changeL: i }); // The original lightness is preserved.
+      const color = Data.colorManager.changeColor({ changeL: i }); // preserve the original lightness
       section.style.backgroundColor = color;
     }, delay)
   })

@@ -9,7 +9,7 @@ import * as Food from "../components/food.js";
 import { timer, stats, shrinkCounter } from "./managers.js";
 
 export let isFirstStart = true;
-let isGameActive;
+let isGameActive = false;
 
 export function begin() { 
   Board.normalize();
@@ -19,17 +19,19 @@ export function begin() {
   Snake.setBorders(borders);
   const snakeCoords =  Snake.getBodyData();
   
-  if (isFirstStart) {
+  if (isFirstStart) {  
     Food.spawn(borders, snakeCoords);
     Food.transitionColors();
+
+    stats.initElements(); 
+    isFirstStart = false;
   } else Food.teleport(borders, snakeCoords);
   Food.fadeIn();
-  
+
   timer.updateGap(Snake.speed);
   setTimeout(() => action(), timer.gap);
 
   isGameActive = true;
-  if (isFirstStart) isFirstStart = false;
 }
 
 export function attachControls() {

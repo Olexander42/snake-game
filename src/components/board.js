@@ -7,12 +7,12 @@ let borders;
 export const getBorders = () => ({...borders});
 
 let containerEl, bounds;
-let sizeUnit, backgroundClip;
+let minSizeUnit, sizeUnit, backgroundClip;
 
 export function normalize() {
   updateSizeUnits();
 
-  containerEl ??= document.getElementById("container")
+  containerEl ??= document.getElementById("container");
 
   bounds = {
     width: normalizeValue(containerEl.clientWidth, sizeUnit),
@@ -35,7 +35,7 @@ export function shrink() {
   borderEl.style.width = `${bounds.width}px`;
   borderEl.style.height =`${bounds.height}px`;
 
-  backgroundClip += sizeUnit / 2; // Clip is applied from both sides.
+  backgroundClip += minSizeUnit; 
   root.style.setProperty("--clip", `${backgroundClip}px`);
 
   updateBorders();
@@ -56,7 +56,8 @@ function updateBorders() {
 }
 
 function updateSizeUnits() {
-  sizeUnit = getMinSizeUnit() * 2; // Board shrinks half of sizeSlider.value from each side.
+  minSizeUnit = getMinSizeUnit();
+  sizeUnit = minSizeUnit * 2; // Board should shrink minSizeUnit from EACH side.
   backgroundClip = sizeUnit;
 
   root.style.setProperty("--size", `${sizeUnit}px`);
