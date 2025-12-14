@@ -14,7 +14,6 @@ const MS_IN_SECOND = 1000;
 
 export function spawn(borders, snakeCoords) {
   foodEl = document.getElementById("food");
-
   colorManager = new Color(Color.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] }));
   foodEl.style.backgroundColor = colorManager.string; 
 
@@ -68,7 +67,7 @@ export function transitionColors(ms=TRANSITION_DURATION) {
 export function fadeIn() {
   foodEl.style.opacity = 0;
   foodEl.offsetLeft; // force repaint
-  
+
   foodEl.style.transition = `opacity ${TRANSITION_DURATION / MS_IN_SECOND}s linear`;
   foodEl.addEventListener('transitionend', () => foodEl.style.transition = 'none');
   requestAnimationFrame(() => foodEl.style.opacity = 1); 

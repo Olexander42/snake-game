@@ -10,7 +10,6 @@ export function spawn(center) {
   Data.resetHeadRotation();
   Data.resetSpeed();
   Data.initStep();
-  console.log(Data.step);
 
   if (!Data.snakeDiv) Data.initSnakeDiv();
   createHead(center);
@@ -26,15 +25,17 @@ export function snapshot() {
   })
 }
 
-export function greyoutBody(duration) { // IIFE?
+export function greyoutBodyOff(duration) { // IIFE?
   Data.colorManager.hslComponents.s *= 0.15; // desaturation
 
   let timeLeft = duration;
   let i = 0;
-  let j = Data.getBodyElements().length + 1; // eliminate the need of +1
+  let length = Data.getBodyElements().length + 1; // TODO: eliminate the need of +1
 
   const greyoutSection = (ms) => {
-    ms = timeLeft / ( 2 ** (j - i));
+    const progress = length - i;
+    ms = timeLeft / ( 2 ** progress); // Each section exponentially takes longer to greyout.
+    console.log(ms);
     timeLeft -= ms;
     setTimeout(() => {
       const color = Data.colorManager.changeColor({ changeL: i }); // The original lightness is preserved.
@@ -42,14 +43,29 @@ export function greyoutBody(duration) { // IIFE?
       section.style.backgroundColor = color;
 
       i++;
-      if (i < Data.getBodyElements().length) setTimeout(() => greyoutSection(ms), ms);  
+      if (i < length - 1) setTimeout(() => greyoutSection(ms), ms);  
     }, ms)
   }
   greyoutSection(0);
 }
 
-function greyoutSection(ms) {
+export function greyoutBody(duration) {
+  Data.colorManager.hslComponents.s *= 0.15; // desaturation
 
+  let timeLeft = duration;
+  let i = 0;
+  let length = Data.getBodyElements().length;
+
+  Data.getBodyElements().forEach((section, i) => {
+    const progress = length - i;
+    const delay = timeLeft / (progress ** 2); // Each section exponentially takes longer to greyout,
+    timeLeft -= delay; // but the total duration stays the same.
+    
+    setTimeout(() => {
+      const color = Data.colorManager.changeColor({ changeL: i }); // The original lightness is preserved.
+      section.style.backgroundColor = color;
+    }, delay)
+  })
 }
 
 export const isAteFood = (foodCoords) => { 

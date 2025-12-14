@@ -32,10 +32,10 @@ export function begin() {
   if (isFirstStart) isFirstStart = false;
 }
 
-
 export function attachControls() {
   html.addEventListener('keydown', ({ code }) => {
     if (code === 'Space') togglePause();
+    if (code === 'KeyG') Snake.grow();
     else if (isGameActive) Snake.handleKeydown(code); 
   })
 }
@@ -46,7 +46,7 @@ export function reset() {
 
   Snake.emptyOut();
 
-  soundLibrary.bgMusic.play();
+  if (!isMuted) soundLibrary.bgMusic.play();
 }
 
 function action() {   
@@ -62,7 +62,6 @@ function action() {
 
   if (isGameActive) setTimeout(() => action(), timer.gap);
 }
-
 
 function togglePause() {
   isGameActive = isGameActive === true ? false : true;

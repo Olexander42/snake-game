@@ -68,8 +68,8 @@ export function rescaleSections() {
 
   getBodyElements().forEach((section, i) => { 
     if (i !== 0) { // exclude head
-      const distance = length - i;
-      const scale = MAX_SCALE - 1 / distance;
+      const progress = length - i;
+      const scale = MAX_SCALE - 1 / progress;
 
       section.style.scale = `${roundTo(scale, 2)}`; 
     }
