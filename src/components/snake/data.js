@@ -10,13 +10,18 @@ export const setIsAlive = (bool) => {
 }
 
 const direction = { "x": null, "y": null };
-export const setDirection = (x, y) => [direction.x, direction.y] = [x, y];
+export const setDirection = (x, y) => {
+  if ([-1, 0, 1].includes(x) && [-1, 0, 1].includes(y)) {
+    [direction.x, direction.y] = [x, y];
+  }
+  else throw new Error("Direction of wrong format was provided.");
+}
 export const getDirection = () => ({...direction});
 
 export let headRotation;
 export const setHeadRotation = (turn) => {
   if (typeof turn === 'number') headRotation += turn;
-  else throw new TypeError(`Expected a number, but ${typeof bool} was provided`);
+  else throw new TypeError(`Expected a number, but ${typeof turn} was provided`);
 }
 export const resetHeadRotation = () => headRotation = 0;
 
@@ -35,7 +40,7 @@ export const getBodyElements = () => bodyElements.slice();
 const bodyData = [];
 export const bodyDataAdd = (x, y) => {
   if (typeof x === 'number' && typeof y === 'number') bodyData.push({ x, y });
-  else throw new TypeError(`Expected numbers, but ${x} of type ${typeof x} and ${y} of ${typeof y} was provided`);
+  else throw new TypeError(`Expected numbers, but ${x} of type ${typeof x} and ${y} of ${typeof y} were provided`);
 }
 export const getBodyData = () => deepCopy(bodyData);
 export const emptyBodyData = () => bodyData.splice(0, bodyData.length);
@@ -52,7 +57,10 @@ export let snakeDiv;
 export const initSnakeDiv = () => snakeDiv = document.getElementById("snake");
 
 export let colorManager;
-export const initColorManager = (color) => colorManager = new Color(color);
+export const initColorManager = (color) => {
+  if (typeof color === 'string') colorManager = new Color(color);
+  else throw new TypeError(`Expected string, but ${typeof color} was provided.`);
+}
 
 let borders;
 export const setBorders = (data) => borders = data;

@@ -3,7 +3,7 @@ export let soundIcon;
 
 export let isMuted = true;
 
-let isFirstUnmute = true;
+let isFirstInteraction = true;
 
 export function initSoundLibrary(theme) { 
   if (soundLibrary) soundLibrary.bgMusic.pause(); // allow bgMusic to change
@@ -15,7 +15,7 @@ export function initSoundLibrary(theme) {
   };
 
   applyMutedState();
-  if (!isMuted || !isFirstUnmute) soundLibrary.bgMusic.play(); 
+  if (!isMuted || !isFirstInteraction) soundLibrary.bgMusic.play(); 
 }
 
 export function toggleMute() {
@@ -23,9 +23,9 @@ export function toggleMute() {
   toggleIcon();
   applyMutedState(); 
 
-  if (isFirstUnmute) {
+  if (isFirstInteraction) {
     soundLibrary.bgMusic.play();
-    isFirstUnmute = false;
+    isFirstInteraction = false;
   }
 }
 

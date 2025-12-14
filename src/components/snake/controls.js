@@ -38,8 +38,8 @@ function isAllowTurn(axis, border) {
   return !isSnakeMovingAlongBorder && isTurnAngle90Deg
 }
 
-function changeHeadRotation(ccw, axis) {
-  const clockwiseCorrection = ccw === true ? -1 : 1;
+function changeHeadRotation(counterClockwise, axis) {
+  const clockwiseCorrection = counterClockwise === true ? -1 : 1;
   const turn = TURN_ROTATION * Math.sign(getDirection()[axis]) * clockwiseCorrection;
   
   setHeadRotation(turn);
