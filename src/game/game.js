@@ -8,8 +8,8 @@ import * as Food from "../components/food.js";
 
 import { timer, stats, shrinkCounter } from "./managers.js";
 
-
-let isGameActive = true;
+export let isFirstStart = true;
+let isGameActive;
 
 export function begin() { 
   Board.normalize();
@@ -17,12 +17,19 @@ export function begin() {
 
   Snake.spawn(Board.center);
   Snake.setBorders(borders);
+  const snakeCoords =  Snake.getBodyData();
   
-  Food.spawn(borders, Snake.getBodyData());
-  Food.transitionColors();
+  if (isFirstStart) {
+    Food.spawn(borders, snakeCoords);
+    Food.transitionColors();
+  } else Food.teleport(borders, snakeCoords);
+  Food.fadeIn();
   
   timer.updateGap(Snake.speed);
   setTimeout(() => action(), timer.gap);
+
+  isGameActive = true;
+  if (isFirstStart) isFirstStart = false;
 }
 
 

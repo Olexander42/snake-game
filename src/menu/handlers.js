@@ -12,8 +12,7 @@ let settingsVisited = false;
 let mainMenu;
 
 export function handleStartBtn(game) {  
-  if (firstStart) {
-    firstStart = false;
+  if (game.isFirstStart) {
     startBtn.innerText = "Start Again";
 
     game.attachControls();

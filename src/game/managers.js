@@ -29,7 +29,7 @@ export const stats = (() => {
   let recordVal = 0;
 
   return {
-    get isNewRecord() { scoreVal > recordVal },
+    get isNewRecord() { return scoreVal > recordVal },
 
     incrementScore() { 
       scoreVal++;
@@ -65,6 +65,6 @@ export const shrinkCounter = (() => {
       inner = 0; 
     },
 
-    get isTimeToShrink() { inner >= outer },
+    get isTimeToShrink() { return inner >= outer },
   }
 })();

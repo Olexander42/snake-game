@@ -53,7 +53,6 @@ function greyoutSection(ms) {
 }
 
 export const isAteFood = (foodCoords) => { 
-  console.log(foodCoords);
   return Data.getHeadCoords().x === foodCoords.x && Data.getHeadCoords().y === foodCoords.y;
 }
 

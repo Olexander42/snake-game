@@ -21,7 +21,6 @@ export function spawn(borders, snakeCoords) {
   minSizeUnit = getMinSizeUnit();
 
   teleport(borders, snakeCoords);
-  fadeIn();
 }
 
 export function teleport(borders, snakeCoords) {
@@ -66,9 +65,12 @@ export function transitionColors(ms=TRANSITION_DURATION) {
   setTimeout(() => transitionColors(), TRANSITION_DURATION); 
 }
 
-function fadeIn() {
+export function fadeIn() {
+  foodEl.style.opacity = 0;
+  foodEl.offsetLeft; // force repaint
+  
   foodEl.style.transition = `opacity ${TRANSITION_DURATION / MS_IN_SECOND}s linear`;
-  requestAnimationFrame(() => foodEl.style.opacity = 1); 
   foodEl.addEventListener('transitionend', () => foodEl.style.transition = 'none');
+  requestAnimationFrame(() => foodEl.style.opacity = 1); 
 }
 
