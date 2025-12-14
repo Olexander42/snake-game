@@ -2,7 +2,7 @@ import { menu, settingsMenu } from "../common/elements.js";
 import setTheme from "../common/theme.js";
 
 import { updateFocusibleElements } from "./keyboardNavigation.js";
-import { buttonFlipper, sliderMover as sizeSliderMover, Outline } from "./components.js";
+import { buttonFlipper, sizeSliderMover, Outline } from "./components.js";
 
 
 export let startBtn, settingsBtn;

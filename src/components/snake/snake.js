@@ -1,3 +1,4 @@
+import { roundTo } from "../../common/utils.js";
 import * as Data from "./data.js";
 
 
@@ -13,6 +14,10 @@ export function spawn(center) {
 
   if (!Data.snakeDiv) Data.initSnakeDiv();
   createHead(center);
+  
+  // create body 
+  grow();
+  grow();
 }
 
 export function snapshot() { 
@@ -50,6 +55,37 @@ export const isAteFood = (foodCoords) => {
 }
 
 export const emptyOut = () => Data.snakeDiv.replaceChildren();
+
+export function grow() { 
+  const lastSection = Data.getBodyElements()[Data.getBodyElements().length - 1]
+  const newLastSection = lastSection.cloneNode(false);
+
+  if (newLastSection.id === "head") newLastSection.id = "";
+  newLastSection.style.zIndex = `-${Data.getBodyElements().length}`; // enforce correct overlapping 
+  newLastSection.style.backgroundColor = Data.colorManager.changeColor({ 
+    changeL: Data.getBodyElements().length // Each section gets progressively lighter.
+  }); 
+  Data.snakeDiv.append(newLastSection);
+
+  snapshot();
+  rescaleSections();
+}
+
+export function rescaleSections() {
+  // Tapering effect.
+  const length = Data.getBodyElements().length + 1; // The last section always ends up with scale 0.5.
+  const MAX_SCALE = 1;
+
+  Data.getBodyElements().forEach((section, i) => { 
+    if (i !== 0) { // exclude head
+      const progress = length - i;
+      const scale = MAX_SCALE - 1 / progress;
+
+      section.style.scale = `${roundTo(scale, 2)}`; 
+    }
+  })
+}
+
 
 function createHead({ x, y }) {
   const section = document.createElement('span');

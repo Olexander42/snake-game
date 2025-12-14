@@ -35,7 +35,7 @@ export const buttonFlipper = (function() {
 })();
 
 
-export const sliderMover = (function(slider, recipient) {
+export const sizeSliderMover = (function(slider, recipient) { // TODO: fix default gradient bug
   const STEP_DEFAULT = parseInt(slider.step);
   const STEP_TRANSITION = 3;
 
@@ -78,9 +78,9 @@ export const sliderMover = (function(slider, recipient) {
     const max = slider.max;
     const PERCENT_100 = 100;
 
-    const gradientCutoffValue = (val - min) / (max - min) * PERCENT_100;
-    const gradient = `linear-gradient(to right, black, black ${gradientCutoffValue}%, transparent ${gradientCutoffValue}%, transparent)`;
-    slider.style.setProperty("--responsive-gradient", gradient);
+    const cutOffVal = (val - min) / (max - min) * PERCENT_100;
+    const grad = `linear-gradient(to right, black, black ${cutOffVal}%, transparent ${cutOffVal}%, transparent)`;
+    slider.style.setProperty("--responsive-gradient", grad);
   } 
 
   return { attach: () => slider.addEventListener('input', moveThumb)}
@@ -93,13 +93,12 @@ export class Outline {
     this.element = document.querySelector(`${fieldsetId} .outline`);
     this.recipient = recipient;
 
-    this._attachInternalTransitionListeners(); // Prevent shifts during theme changes.
+    this._attachInternalTransitionListeners(); // prevent shifts during theme changes
     this._moveToChecked();
   }
 
   _moveToChecked() {
-    // Give time for :checked to update.
-    requestAnimationFrame(() => { 
+    requestAnimationFrame(() => { // give time for :checked to update
       const checked = document.querySelector(`#${this.fieldset.id} input:checked + span`);
       this.element.style.left = `${checked.offsetLeft}px`;
     })
@@ -119,7 +118,7 @@ export class Outline {
 
   attachTo(elements) {
     [...elements].forEach((element) => element.addEventListener('click', (event) => { 
-      this.fieldset.style.setProperty("--checked-outline", 'none'); // Hide CSS outline asap to avoid flashes.
+      this.fieldset.style.setProperty("--checked-outline", 'none'); // hide CSS outline asap to avoid flashes
       this._moveToChecked();
 
       if (this.recipient) this.recipient(event.currentTarget.value);

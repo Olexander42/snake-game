@@ -16,6 +16,7 @@ export function begin() {
   const borders = Board.getBorders();
 
   Snake.spawn(Board.center);
+ 
   Snake.setBorders(borders);
   const snakeCoords =  Snake.getBodyData();
   
