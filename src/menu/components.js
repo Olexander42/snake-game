@@ -35,7 +35,7 @@ export const buttonFlipper = (function() {
 })();
 
 
-export const sizeSliderMover = (function(slider, recipient) { // TODO: fix default gradient bug
+export const sizeSliderMover = (function(slider, recipient) { 
   const STEP_DEFAULT = parseInt(slider.step);
   const STEP_TRANSITION = 3;
 
@@ -81,9 +81,10 @@ export const sizeSliderMover = (function(slider, recipient) { // TODO: fix defau
     const cutOffVal = (val - min) / (max - min) * PERCENT_100;
     const grad = `linear-gradient(to right, black, black ${cutOffVal}%, transparent ${cutOffVal}%, transparent)`;
     slider.style.setProperty("--responsive-gradient", grad);
-  } 
+  }
+  updateGradient(currentValue); // apply default gradient
 
-  return { attach: () => slider.addEventListener('input', moveThumb)}
+  return { attach: () => slider.addEventListener('input', moveThumb) }
 })(sizeSlider, normalizeBoard);
 
 
