@@ -73,7 +73,8 @@ export function grow() {
 
 export function rescaleSections() {
   // Tapering effect.
-  const length = Data.getBodyElements().length + 1; // The last section always ends up with scale 0.5.
+  // The last section always ends up with scale 0.5 to avoid gaps between sections,
+  const length = Data.getBodyElements().length + 1; // so length - i can't be less than 2.
   const MAX_SCALE = 1;
 
   Data.getBodyElements().forEach((section, i) => { 

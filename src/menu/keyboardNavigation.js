@@ -5,7 +5,9 @@ const DELAY = 200;
 let focusibleElements = [];
 let focusedElement;
 
-export default function handleKeydown(event) {
+export default function handleKeydown(event, isGameActive) {
+  if (isGameActive) return;
+  
   switch (event.code) {
     case 'ArrowRight':
     case 'ArrowDown': 
@@ -59,10 +61,6 @@ export function updateFocusibleElements(context) { // TODO: Pass "main menu" bac
       focusibleElements = []; 
       selector = "button [tabindex = '0']";
       break;
-
-    default:
-      focusibleElements = []; // turn off keyboard navigation 
-      console.log("I'm in default");
   }
 
   focusibleElements.unshift(...document.querySelectorAll(selector));  

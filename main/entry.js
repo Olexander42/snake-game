@@ -9,7 +9,7 @@ import handleMenuNavigation, { updateFocusibleElements } from "../src/menu/keybo
 setDefaultTheme();
 
 updateFocusibleElements("main menu");
-html.addEventListener('keydown', handleMenuNavigation);
+html.addEventListener('keydown', (event) => handleMenuNavigation(event, Game.isGameActive));
 
 initMenuElements()
 startBtn.addEventListener('click', () => handleStartBtn(Game));
@@ -17,23 +17,6 @@ settingsBtn.addEventListener('click', handleSettingsBtn);
 
 initSoundIconEl();
 soundIcon.addEventListener('click', toggleMute);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
