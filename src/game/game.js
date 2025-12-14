@@ -46,6 +46,7 @@ export function attachControls() {
 export function reset() {
   if (stats.isNewRecord) stats.updateRecord();
   stats.resetScore();
+  shrinkCounter.reset();
 
   Snake.emptyOut();
 
