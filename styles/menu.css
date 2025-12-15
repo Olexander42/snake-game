@@ -19,9 +19,10 @@
   gap: 1rem;
 }
 
-#main-menu {
-  gap: 1rem;
+#main-menu button.active {
+  scale: 1;
 }
+
 
 #settings-menu {
   perspective: 1000px;
@@ -49,8 +50,7 @@ button {
     scale: 1.1;
   }
 
-  &:active,
-  &.active {
+  &:active {
     scale: 1;
   }
 }
@@ -95,12 +95,13 @@ fieldset {
     margin-top: 1rem;
   }
 
-  & button:hover:not(:last-child) {
-    scale: 1.25;
-  }
+  /*& button:hover:not(:last-child) {
+    scale/: 1.1;
+  }*/
 
   & .clicked {
       transform: rotateX(180deg);
+      scale: 1.1;
     }
 }
 
@@ -116,13 +117,16 @@ fieldset {
   transform: rotateX(180deg);
 }
 
-.color-box,
-.thumbnail {
+.option {
   display: inline-block;
   width: 100%;
   height: 100%;
   border-radius: 10%; 
   margin-bottom: 0.05rem;
+
+  &:focus-visible {
+    scale: 1.1;
+  }
 }
 
 .outline {
@@ -204,6 +208,10 @@ input[type=radio]:checked + span {
   width: max-content;
   align-self: end;
   margin-top: 0.5rem;
+
+  &.active {
+    scale: 1;
+  }
 }
 
 #sound-icon {
