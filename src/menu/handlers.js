@@ -5,7 +5,7 @@ import { updateFocusibleElements } from "./keyboardNavigation.js";
 import { buttonFlipper, sizeSliderMover, Outline } from "./components.js";
 
 
-export let startBtn, settingsBtn;
+export let startBtn, settingsMenuBtn;
 
 let firstStart = true;
 let settingsVisited = false;
@@ -22,7 +22,7 @@ export function handleStartBtn(game) {
   game.begin();
 }
 
-export function handleSettingsBtn() {
+export function handlesettingsMenuBtn() {
   mainMenu.style.display = 'none';
   settingsMenu.style.display = 'flex';
 
@@ -37,7 +37,7 @@ export function handleSettingsBtn() {
 export function initMenuElements() {
   mainMenu = document.getElementById("main-menu");
   startBtn = document.getElementById("start-btn");
-  settingsBtn = document.getElementById("settings-btn");
+  settingsMenuBtn = document.getElementById("settings-btn");
 }
 
 function attachSettingsListeners() {

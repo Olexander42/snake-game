@@ -1,6 +1,6 @@
 import { TIME_UNIT } from "../common/constants.js";
 import { root, html, menu } from "../common/elements.js";
-import { soundLibrary, isMuted } from "../common/sound.js";
+import { soundLibrary, isMuted, toggleMute } from "../common/sound.js";
 
 import * as Board from "../components/board.js";
 import * as Snake from "../components/snake/API.js";
@@ -9,7 +9,7 @@ import * as Food from "../components/food.js";
 import { timer, stats, shrinkCounter } from "./managers.js";
 
 export let isFirstStart = true;
-let isGameActive = false;
+export let isGameActive = false;
 
 export function begin() { 
   Board.normalize();
@@ -36,10 +36,13 @@ export function begin() {
 }
 
 export function attachControls() {
+  const whitelist = ['ControlLeft', 'Shift', 'KeyR'];
+  
   html.addEventListener('keydown', (event) => {
-    event.preventDefault();
+    if (!whitelist.includes(event.code)) event.preventDefault();
+  
     if (event.code === 'Space') togglePause();
-    if (event.code === 'KeyG') Snake.grow();
+    if (event.code === 'KeyM') toggleMute();
     else if (isGameActive) Snake.handleKeydown(event.code); 
   })
 }

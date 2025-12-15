@@ -1,13 +1,15 @@
 import { bodyEl, html } from "../common/elements.js";
+import { toggleMute, soundIcon } from "../common/sound.js";
 
-const DELAY = 200;
 
 let focusibleElements = [];
 let focusedElement;
 
+const DELAY = 200;
+
 export default function handleKeydown(event, isGameActive) {
   if (isGameActive) return;
-  
+
   switch (event.code) {
     case 'ArrowRight':
     case 'ArrowDown': 
@@ -19,21 +21,26 @@ export default function handleKeydown(event, isGameActive) {
       moveFocus("Up");
       break;
 
+    case 'KeyM':
+      emulateActiveState(soundIcon);
+      toggleMute();
+      break;
+
     case 'Enter': // TODO: extact this into a method, probably.
       event.preventDefault();
+      emulateActiveState(focusedElement);
 
-      // Recreate :active state behavior.
-      focusedElement.classList.add("active"); 
-      setTimeout(() => focusedElement.classList.remove("active"), DELAY);
+      // Listeners in settings menu attached to "sides" of the buttons. 
+      const child = focusedElement.firstElementChild;
+      const isSettingsBtnSide = child && child.classList.contains("side");
 
-        // Listeners in settings menu attached to "sides" of the buttons. 
-        if (focusedElement.firstElementChild && focusedElement.firstElementChild.classList.contains("side")) {
-          focusedElement.firstElementChild.click();
-          updateFocusibleElements("settings button");  
-        } 
-        else setTimeout(() => focusedElement.click(), DELAY); // test it
-    
-        break;
+      if (isSettingsBtnSide) {
+        child.click();
+        updateFocusibleElements("settings button");  
+      } 
+      else setTimeout(() => focusedElement.click(), DELAY); // test it
+  
+      break;
 
     case 'Escape': 
       bodyEl.click(); // close all buttons
@@ -44,9 +51,9 @@ export default function handleKeydown(event, isGameActive) {
   }
 }
 
-export function updateFocusibleElements(context) { // TODO: Pass "main menu" back after game over. 
+export function updateFocusibleElements(context) { 
   let selector;
-  focusibleElements = [document.querySelector("#sound-icon img")];
+  focusibleElements = [document.querySelector("#sound-icon")];
 
   switch(context) {
     case "main menu":
@@ -76,5 +83,10 @@ function moveFocus(direction) {
   focusedElement.focus();
 }
 
+function emulateActiveState(el) {
+  console.log(el);
+  el.classList.add("active"); 
+  setTimeout(() => el.classList.remove("active"), DELAY);
+}
 
 

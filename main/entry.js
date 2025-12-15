@@ -3,7 +3,7 @@ import { initSoundIconEl, soundIcon, toggleMute } from "../src/common/sound.js";
 import setDefaultTheme from "../src/common/theme.js";
 
 import * as Game from "../src/game/game.js";
-import { initMenuElements, startBtn, settingsBtn, handleStartBtn, handleSettingsBtn } from "../src/menu/handlers.js";
+import { initMenuElements, startBtn, settingsMenuBtn, handleStartBtn, handlesettingsMenuBtn } from "../src/menu/handlers.js";
 import handleMenuNavigation, { updateFocusibleElements } from "../src/menu/keyboardNavigation.js";
 
 setDefaultTheme();
@@ -13,7 +13,7 @@ html.addEventListener('keydown', (event) => handleMenuNavigation(event, Game.isG
 
 initMenuElements()
 startBtn.addEventListener('click', () => handleStartBtn(Game));
-settingsBtn.addEventListener('click', handleSettingsBtn);
+settingsMenuBtn.addEventListener('click', handlesettingsMenuBtn);
 
 initSoundIconEl();
 soundIcon.addEventListener('click', toggleMute);
