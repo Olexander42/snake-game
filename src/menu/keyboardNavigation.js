@@ -3,7 +3,7 @@ import { toggleMute, soundIcon } from "../common/sound.js";
 
 
 let focusibleElements = [];
-let focusedElement;
+let focusedEl;
 
 const DELAY = 200;
 
@@ -28,17 +28,17 @@ export default function handleKeydown(event, isGameActive) {
 
     case 'Enter': // TODO: extact this into a method, probably.
       event.preventDefault();
-      emulateActiveState(focusedElement);
+      emulateActiveState(focusedEl);
 
       // Listeners in settings menu attached to "sides" of the buttons. 
-      const child = focusedElement.firstElementChild;
+      const child = focusedEl.firstElementChild; 
       const isSettingsBtnSide = child && child.classList.contains("side");
 
       if (isSettingsBtnSide) {
         child.click();
         updateFocusibleElements("settings button");  
       } 
-      else setTimeout(() => focusedElement.click(), DELAY); // test it
+      else setTimeout(() => focusedEl.click(), DELAY); 
   
       break;
 
@@ -52,7 +52,7 @@ export default function handleKeydown(event, isGameActive) {
 }
 
 export function updateFocusibleElements(context) { 
-  let selector;
+  let selector; // TODO: why not const for each case?
   focusibleElements = [document.querySelector("#sound-icon")];
 
   switch(context) {
@@ -64,9 +64,13 @@ export function updateFocusibleElements(context) {
       selector = "#settings-menu button";
       break;
 
-    case "settings button": // FIX: Can't change theme with keyboard
-      focusibleElements = []; 
-      selector = "button [tabindex = '0']";
+    case "settings button":
+      focusibleElements = []; // remove sound icon
+
+      const rearSide = focusedEl.children[1];
+      const fieldsetId = rearSide.firstElementChild.id;
+
+      selector = `#${fieldsetId} [tabindex = '0']`;
       break;
   }
 
@@ -76,15 +80,14 @@ export function updateFocusibleElements(context) {
 
 function moveFocus(direction) {
   const increment = direction === "Down" ? 1 : -1;
-  const focusedElementIndex = focusibleElements.indexOf(focusedElement); 
-  const newFocusedElementIndex = Math.max(Math.min(focusedElementIndex + increment, focusibleElements.length - 1) , 0); 
+  const focusedElIndex = focusibleElements.indexOf(focusedEl); 
+  const newfocusedElIndex = Math.max(Math.min(focusedElIndex + increment, focusibleElements.length - 1) , 0); 
 
-  focusedElement = focusibleElements[newFocusedElementIndex];
-  focusedElement.focus();
+  focusedEl = focusibleElements[newfocusedElIndex];
+  focusedEl.focus();
 }
 
 function emulateActiveState(el) {
-  console.log(el);
   el.classList.add("active"); 
   setTimeout(() => el.classList.remove("active"), DELAY);
 }
