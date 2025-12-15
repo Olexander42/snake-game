@@ -79,11 +79,16 @@ export function updateFocusibleElements(context) {
 }
 
 function moveFocus(direction) {
+  const INDEX_MIN = 0;
+  const INDEX_MAX = focusibleElements.length - 1;
+
   const increment = direction === "Down" ? 1 : -1;
   const focusedElIndex = focusibleElements.indexOf(focusedEl); 
-  const newfocusedElIndex = Math.max(Math.min(focusedElIndex + increment, focusibleElements.length - 1) , 0); 
+  const newIndex = focusedElIndex + increment;
 
-  focusedEl = focusibleElements[newfocusedElIndex];
+  const newIndexSafe = Math.max(Math.min(newIndex, INDEX_MAX), INDEX_MIN); 
+
+  focusedEl = focusibleElements[newIndexSafe];
   focusedEl.focus();
 }
 
