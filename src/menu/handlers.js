@@ -58,7 +58,7 @@ function attachOutlines() {
   themeThumbnailOutline.attachTo(themeOptions);
 }
 
-function attachBackBtnListener() {
+function attachBackBtnListener() { // TODO: should close all buttons too
   document.getElementById("back-btn")
     .addEventListener('click', () => {
       mainMenu.style.display = 'flex';

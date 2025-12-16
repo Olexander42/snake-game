@@ -93,19 +93,25 @@ export class Outline {
     this.fieldset = document.querySelector(fieldsetId);
     this.element = document.querySelector(`${fieldsetId} .outline`);
     this.recipient = recipient;
-
-    this._attachInternalTransitionListeners(); // prevent shifts during theme changes
+    this.checked = null;
+    
+    this._attachInternalTransitionListeners(); // prevent shifts during theme changes.
     this._moveToChecked();
   }
 
-  _moveToChecked() {
-    requestAnimationFrame(() => { // give time for :checked to update
-      const checked = document.querySelector(`#${this.fieldset.id} input:checked + span`);
-      this.element.style.left = `${checked.offsetLeft}px`;
-    })
+  async _moveToChecked() {
+    const oldChecked = this.checked;
+    await this._updateChecked();
+  
+    if (oldChecked !== this.checked) {
+      this.fieldset.style.setProperty("--checked-outline", 'none'); // hide CSS outline asap to avoid flashes
+      this.element.style.left = `${this.checked.offsetLeft}px`; 
+    }
   }
 
   _attachInternalTransitionListeners() { 
+    this.element.style.left = 0; // enable the first transition
+
     this.element.addEventListener('transitionstart', () => {
       this.element.style.opacity = 1;
     })
@@ -113,13 +119,22 @@ export class Outline {
     this.element.addEventListener('transitionend', () => {
       // Native CSS outline replaces disappeared outline element.
       this.element.style.opacity = 0;
-      this.fieldset.style.setProperty("--checked-outline", '4px solid var(--white)'); 
+      this.fieldset.style.setProperty("--checked-outline", '4px solid var(--white)');
+    })
+  }
+
+  _updateChecked() {
+    return new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        // Give time for :checked to update. 
+        this.checked = document.querySelector(`#${this.fieldset.id} input:checked + span`);
+        resolve(true);
+      })
     })
   }
 
   attachTo(elements) {
     [...elements].forEach((element) => element.addEventListener('click', (event) => { 
-      this.fieldset.style.setProperty("--checked-outline", 'none'); // hide CSS outline asap to avoid flashes
       this._moveToChecked();
 
       if (this.recipient) this.recipient(event.currentTarget.value);

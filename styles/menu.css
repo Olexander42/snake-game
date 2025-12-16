@@ -5,6 +5,7 @@
 #menu {
   --white: hsl(57, 100%, 95%);
   --letter-gap: 16px;
+  --scale-up: 1.1;
 
   position: fixed;
   width: max-content;
@@ -33,7 +34,7 @@ button {
 
   &:hover,
   &:focus {
-    scale: 1.1;
+    scale: var(--scale-up);
   }
 }
 
@@ -112,7 +113,7 @@ input[type='radio'] {
 
 .clicked {
   transform: rotateX(180deg);
-  scale: 1.1;
+  scale: var(--scale-up);
 }
 
 .option { /* TODO: the same color-box option fix disappearaing outline bug */
@@ -127,7 +128,7 @@ input[type='radio'] {
   &:hover,
   &:focus-visible {
     outline: none;
-    scale: 1.1;
+    scale: var(--scale-up);
   }
 }
 
@@ -177,6 +178,7 @@ input[type='radio'] {
   outline: 4px solid var(--white);
   border-radius: 10%;
   opacity: 0;
+  scale: var(--scale-up);
   z-index: 1; 
   transition: left 0.25s;
 }
@@ -243,12 +245,12 @@ input[type=radio]:checked + span {
     } 
 
   &:focus-visible {
-    scale: 1.1;
+    scale: var(--scale-up);
   }
 
   &:active,
   &.active {
-    scale: 1.25;
+    scale: calc(var(--scale-up) * var(--scale-up));
   }
 }
 
