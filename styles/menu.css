@@ -225,6 +225,7 @@ input[type=radio]:checked + span {
 #sound-icon {
   position: absolute;
   right: 0%;
+  top: 101%;
   width: 50px;
   height: 30px;
   transition: scale 0.1s;
@@ -243,21 +244,23 @@ input[type=radio]:checked + span {
   }
 }
 
-.sound-off {
-  top: 101%;
-}
-
-.sound-on {
-  top: 101.15%;
-}
-
-img {
-  .sound-off & {
-    object-position: top;
+#sound-icon {
+  &.sound-off {
+    & #sound-off-icon {
+      display: block;
+    }
+    & #sound-on-icon {
+      display: none;
+    }
   }
 
-  .sound-on & {
-    object-position: bottom;
+  &.sound-on {
+    #sound-off-icon {
+      display: none;
+    }
+    #sound-on-icon {
+      display: block;
+    }
   }
 }
 
