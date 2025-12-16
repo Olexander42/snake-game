@@ -1,9 +1,7 @@
 #menu {
   --letter-gap: 16px;
   --white: hsl(57, 100%, 95%);
-}
 
-#menu {
   position: fixed;
   width: max-content;
   height: max-content;
@@ -19,16 +17,6 @@
   gap: 1rem;
 }
 
-#main-menu button.active {
-  scale: 1;
-}
-
-
-#settings-menu {
-  perspective: 1000px;
-  display: none;
-}
-
 button {
   font-family: "main";
   font-size: 2rem;
@@ -37,26 +25,43 @@ button {
   border-style: outset;
   letter-spacing: var(--letter-gap);
   background: none;
-  -webkit-backdrop-filter: blur(3px); /* for Safari 9+ support */
-  backdrop-filter: blur(3px);
-  transition: scale 0.1s linear; 
-
-  &, * {
-    cursor: pointer;
-  }
+  transition: scale 0.1s,  transform 0.5s; 
 
   &:hover,
   &:focus {
     scale: 1.1;
   }
+}
 
-  &:active {
-    scale: 1;
+
+#main-menu {
+  button {
+    -webkit-backdrop-filter: blur(3px); /* for Safari 9+ support */
+    backdrop-filter: blur(3px);
+    cursor: pointer;
+
+    &:active,
+    &.active {
+      scale: 1;
+    }
   }
 }
 
-input[type='radio'] {
+
+#settings-menu {
+  perspective: 1000px;
   display: none;
+
+  & button:not(:last-child) { 
+    position: relative;
+    width: 20ch;
+    height: 100px;
+    transform-style: preserve-3d;
+
+    + button:not(:last-child) {
+      margin-top: 1rem;
+    }
+  }
 }
 
 fieldset {
@@ -77,44 +82,33 @@ fieldset {
   }
 }
 
-
-
-
-#settings-menu {
-  & button:not(:last-child) {
-    position: relative;
-    width: 20ch;
-    height: 100px;
-    -webkit-backdrop-filter: unset; /* for Safari 9+ support */
-    backdrop-filter: unset;
-    transform-style: preserve-3d;
-    transition: scale 0.2s linear,  transform 0.5s linear; 
-  }
-
-  & button + button:not(:last-child) {
-    margin-top: 1rem;
-  }
-
-  /*& button:hover:not(:last-child) {
-    scale/: 1.1;
-  }*/
-
-  & .clicked {
-      transform: rotateX(180deg);
-      scale: 1.1;
-    }
+input[type='radio'] {
+  display: none;
 }
 
 .side {
   position: absolute;
   inset: 0;
-  -webkit-backdrop-filter: blur(3px); /* for Safari 9+ support */
-  backdrop-filter: blur(3px);
+
+  /* We apply backdrop-filter here,
+  and not on button, because it creates its own context, 
+  breaking the rotation effect */
+  -webkit-backdrop-filter: blur(3px); /* Safari 9+ support */
+  backdrop-filter: blur(3px); 
   backface-visibility: hidden;
+}
+
+.front {
+  cursor: pointer;
 }
 
 .rear {
   transform: rotateX(180deg);
+}
+
+.clicked {
+  transform: rotateX(180deg);
+  scale: 1.1;
 }
 
 .option {
@@ -123,23 +117,14 @@ fieldset {
   height: 100%;
   border-radius: 10%; 
   margin-bottom: 0.05rem;
+  cursor: pointer;
+  transition: scale 0.2s;
 
+  &:hover,
   &:focus-visible {
+    outline: none;
     scale: 1.1;
   }
-}
-
-.outline {
-  position: absolute;
-  outline: 4px solid var(--white);
-  border-radius: 10%;
-  transition: left 0.25s ease-out;
-  opacity: 0;
-}
-
-
-input[type=radio]:checked + span {
-  outline: var(--checked-outline, 4px solid var(--white));
 }
 
 
@@ -151,6 +136,7 @@ input[type=radio]:checked + span {
   -webkit-appearance: none;
   background: transparent;
   padding: calc(var(--letter-gap) / 4);
+  cursor: pointer;
 
   &::-webkit-slider-runnable-track {
    background: var(--responsive-gradient);
@@ -168,7 +154,7 @@ input[type=radio]:checked + span {
     border-radius: 50%;
   }
 
-  & + datalist {
+  + datalist { 
     display: flex;
     justify-content: space-between;
     position: absolute;
@@ -181,6 +167,20 @@ input[type=radio]:checked + span {
   }
 }
 
+
+.outline {
+  position: absolute;
+  outline: 4px solid var(--white);
+  border-radius: 10%;
+  opacity: 0;
+  z-index: 1; 
+  transition: left 0.25s;
+}
+
+input[type=radio]:checked + span {
+  outline: var(--checked-outline, 4px solid var(--white));
+}
+
 #theme .rear {
   padding-bottom: 0.25rem;
 
@@ -190,16 +190,19 @@ input[type=radio]:checked + span {
     height: 1.75rem;
   }
 }
-
-#urban + .thumbnail {
-  background-image: url(../../../assets/urban/images/outside.jpg);
+/* TODO: smooth out the theme switch visuals */
+.thumbnail {
   background-size: 150%;
+
+  #urban + & {
+    background-image: url(../../../assets/urban/images/outside.jpg); 
+  }
+
+  #aqua + & {
+    background-image: url(../../../assets/aqua/images/outside.jpg); 
+  }
 }
 
-#aqua + .thumbnail {
-  background-image: url(../../../assets/aqua/images/outside.jpg);
-  background-size: 150%;
-}
 
 #back-btn {
   font-family: "secondary";
@@ -208,11 +211,16 @@ input[type=radio]:checked + span {
   width: max-content;
   align-self: end;
   margin-top: 0.5rem;
+  -webkit-backdrop-filter: blur(3px); /* Safari 9+ support */
+  backdrop-filter: blur(3px); 
+  cursor: pointer;
 
+  &:active,
   &.active {
     scale: 1;
   }
 }
+
 
 #sound-icon {
   position: absolute;
@@ -237,16 +245,18 @@ input[type=radio]:checked + span {
 
 .sound-off {
   top: 101%;
-
-  & img {
-    object-position: top;
-  }
 }
 
 .sound-on {
   top: 101.15%;
+}
 
-  & img {
+img {
+  .sound-off & {
+    object-position: top;
+  }
+
+  .sound-on & {
     object-position: bottom;
   }
 }

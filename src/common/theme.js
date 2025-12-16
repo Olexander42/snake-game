@@ -10,10 +10,11 @@ export default function setTheme() {
   initSoundLibrary(theme);
 }
 
-function setImages() {
+function setImages() {  
   outsideBackground.style.setProperty("background-image", `url(../assets/${theme}/images/outside.jpg)`);
   borderEl.style.setProperty("border-image-source", `url(../assets/${theme}/images/border.jpg)`);
   insideBackground.style.setProperty("background-image", `url(../assets/${theme}/images/inside.jpg)`);
+
 }
 
 function setFonts() {
