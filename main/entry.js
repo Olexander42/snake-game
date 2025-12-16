@@ -1,10 +1,12 @@
-import { html } from "../src/common/elements.js"
+import { root, html, sizeSlider } from "../src/common/elements.js";
 import { initSoundIconEl, soundIcon, toggleMute } from "../src/common/sound.js";
 import setDefaultTheme from "../src/common/theme.js";
 
 import * as Game from "../src/game/game.js";
 import { initMenuElements, startBtn, settingsMenuBtn, handleStartBtn, handlesettingsMenuBtn } from "../src/menu/handlers.js";
 import handleMenuNavigation, { updateFocusibleElements } from "../src/menu/keyboardNavigation.js";
+
+root.style.setProperty("--size", `${sizeSlider.value}px`);
 
 setDefaultTheme();
 

@@ -4,11 +4,6 @@
 @import url("../styles/food.css");
 
 
-:root {
-  --size: 40px; /* hardcoded value? not cool */
-  --time-gap: 1s;
-}
-
 html {
   font-size: 40px;
   background-repeat: round;
