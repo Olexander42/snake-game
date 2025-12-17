@@ -65,14 +65,14 @@ function attachOutlines() {
 }
 
 function attachBackBtnListener() { // TODO: should close all buttons too
-  document.getElementById("back-btn")
-    .addEventListener('click', () => {
-      mainMenu.style.display = 'flex';
-      settingsMenu.style.display = 'none';
+  document.getElementById("back-btn").addEventListener('click', () => {
+    mainMenu.style.display = 'flex';
+    settingsMenu.style.display = 'none';
 
-      updateFocusibleElements("main menu");
-    })
+    updateFocusibleElements("main menu");
+  })
 }
+
 
 
 

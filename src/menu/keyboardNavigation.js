@@ -26,7 +26,7 @@ export default function handleKeydown(event, isGameActive) {
       toggleMute();
       break;
 
-    case 'Enter': // TODO: extact this into a method, probably.
+    case 'Enter':
       event.preventDefault();
 
       // Listeners in settings menu attached to "sides" of the buttons. 
@@ -75,7 +75,7 @@ export function updateFocusibleElements(context) {
   }
 
   focusibleElements.unshift(...document.querySelectorAll(selector));  
-  //console.log("Focusible Elements:", focusibleElements);
+  console.log("Focusible Elements:", focusibleElements);
 }
 
 function moveFocus(direction) {

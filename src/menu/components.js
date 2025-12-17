@@ -43,11 +43,13 @@ export class Slider {
 
     this.STEP_DEFAULT = parseInt(this.slider.step);
     this.currentValue = parseInt(this.slider.value);
+
+    this.options = [...document.querySelectorAll(`#${this.slider.id} + datalist option`)];
   }
 
-  _moveThumb() {
+  _moveThumb(value = this.slider.value) {
     // Intercept input before the slider reacts to it.
-    this.targetValue = parseInt(this.slider.value); 
+    this.targetValue = parseInt(value); 
     this.slider.value = this.currentValue; 
 
     const totalDistance = this.targetValue - this.currentValue;
@@ -93,6 +95,9 @@ export class Slider {
 
   attach() {
     this.slider.addEventListener('input', () => this._moveThumb()); 
+    this.options.forEach((option) => {
+      option.addEventListener('click', ({ currentTarget: { value } }) => this._moveThumb(value));
+    });
   }
 }
 
