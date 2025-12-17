@@ -2,11 +2,13 @@
   outline: none;
 }
 
-#menu {
+#container {
   --white: hsl(57, 100%, 95%);
   --letter-gap: 16px;
   --scale-up: 1.1;
+}
 
+#menu {
   position: fixed;
   width: max-content;
   height: max-content;
@@ -116,7 +118,7 @@ input[type='radio'] {
   scale: var(--scale-up);
 }
 
-.option { /* TODO: the same color-box option fix disappearaing outline bug */
+.option { 
   display: inline-block;
   width: 100%;
   height: 100%;
@@ -196,7 +198,7 @@ input[type=radio]:checked + span {
     height: 1.75rem;
   }
 }
-/* TODO: smooth out the theme switch visuals */
+
 .thumbnail {
   background-size: 150%;
 
@@ -245,6 +247,7 @@ input[type=radio]:checked + span {
     } 
 
   &:focus-visible {
+    outline: revert;
     scale: var(--scale-up);
   }
 

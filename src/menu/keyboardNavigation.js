@@ -28,7 +28,6 @@ export default function handleKeydown(event, isGameActive) {
 
     case 'Enter': // TODO: extact this into a method, probably.
       event.preventDefault();
-      emulateActiveState(focusedEl);
 
       // Listeners in settings menu attached to "sides" of the buttons. 
       const child = focusedEl.firstElementChild; 
@@ -39,7 +38,8 @@ export default function handleKeydown(event, isGameActive) {
         updateFocusibleElements("settings button");  
       } 
       else setTimeout(() => focusedEl.click(), DELAY); 
-  
+
+      emulateActiveState(focusedEl);
       break;
 
     case 'Escape': 
@@ -52,7 +52,7 @@ export default function handleKeydown(event, isGameActive) {
 }
 
 export function updateFocusibleElements(context) { 
-  let selector; // TODO: why not const for each case?
+  let selector; 
   focusibleElements = [document.querySelector("#sound-icon")];
 
   switch(context) {
@@ -65,7 +65,7 @@ export function updateFocusibleElements(context) {
       break;
 
     case "settings button":
-      focusibleElements = []; // remove sound icon
+      focusibleElements = []; 
 
       const rearSide = focusedEl.children[1];
       const fieldsetId = rearSide.firstElementChild.id;
@@ -75,7 +75,7 @@ export function updateFocusibleElements(context) {
   }
 
   focusibleElements.unshift(...document.querySelectorAll(selector));  
-  console.log("Focusible Elements:", focusibleElements);
+  //console.log("Focusible Elements:", focusibleElements);
 }
 
 function moveFocus(direction) {

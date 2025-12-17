@@ -1,8 +1,7 @@
-
 #background {
   background-repeat: repeat;
   clip-path: inset(var(--clip, 0));
-  transition: clip-path var(--time-gap) linear;
+  transition: clip-path var(--time-gap, 1s) linear;
 }
 
 
@@ -23,7 +22,7 @@
   border-image-slice: 100;
   border-image-width: var(--size);
   border-image-repeat: repeat;
-  transition: all var(--time-gap) linear;
+  transition: all var(--time-gap, 1s) linear;
 }
 
 #score,
@@ -33,7 +32,7 @@
   height: var(--size);
   margin: 0 var(--size);
   line-height: var(--size);
-  transition: all var(--time-gap) linear;
+  transition: all var(--time-gap, 1s) linear;
 }
 
 #score {
