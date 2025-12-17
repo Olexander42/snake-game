@@ -3,6 +3,9 @@
 @import url("../styles/snake.css");
 @import url("../styles/food.css");
 
+:root {
+  --time-gap: 0.5s;
+}
 
 html {
   font-size: 40px;

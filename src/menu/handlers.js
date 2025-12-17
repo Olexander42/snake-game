@@ -1,8 +1,10 @@
-import { menu, settingsMenu } from "../common/elements.js";
+import { menu, settingsMenu, sizeSlider } from "../common/elements.js";
 import setTheme from "../common/theme.js";
 
+import { normalize as normalizeBoard }  from "../components/board.js";
+
 import { updateFocusibleElements } from "./keyboardNavigation.js";
-import { buttonFlipper, sizeSliderMover, Outline } from "./components.js";
+import { buttonFlipper, Slider, Outline } from "./components.js";
 
 
 export let startBtn, settingsMenuBtn;
@@ -42,8 +44,12 @@ export function initMenuElements() {
 
 function attachSettingsListeners() {
   buttonFlipper.attach();
-  sizeSliderMover.attach();
+  
+  const sizeSliderTransitioner = new Slider(sizeSlider, normalizeBoard);
+  sizeSliderTransitioner.attach();
+
   attachOutlines();
+
   attachBackBtnListener();
 }
 

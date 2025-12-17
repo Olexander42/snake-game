@@ -1,5 +1,5 @@
 import { normalize as normalizeValue } from "../common/utils.js";
-import {  borderEl, backgroundEl, root } from "../common/elements.js";
+import {  root, borderEl, backgroundEl, sizeSlider } from "../common/elements.js";
 import { getMinSizeUnit } from "../common/config.js";
 
 
@@ -49,16 +49,16 @@ export const center = {
 function updateBorders() {
   borders = {
     left: backgroundClip,
-    right: containerEl.clientWidth - backgroundClip - sizeUnit, // - sizeUnit to offest distance to headEl.left 
+    right: containerEl.clientWidth - backgroundClip - sizeUnit, // "- sizeUnit" to offest distance to headEl.left 
     top: backgroundClip,
-    bottom: containerEl.clientHeight - backgroundClip - sizeUnit, // - sizeUnit to offest distance to headEl.top
+    bottom: containerEl.clientHeight - backgroundClip - sizeUnit, // "- sizeUnit" to offest distance to headEl.top
   }
 }
 
 function updateSizeUnits() {
   minSizeUnit = getMinSizeUnit();
-  sizeUnit = minSizeUnit * 2; // Board should shrink minSizeUnit from EACH side.
-  backgroundClip = sizeUnit;
+  sizeUnit = minSizeUnit * 2; // board should shrink minSizeUnit from EACH side
+  backgroundClip = sizeUnit - 1; // compensate for sub pixel rounding error
 
   root.style.setProperty("--size", `${sizeUnit}px`);
   root.style.setProperty("--clip", `${backgroundClip}px`);

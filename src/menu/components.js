@@ -1,6 +1,4 @@
-import { settingsMenu, sizeSlider, bodyEl, borderEl } from "../common/elements.js";
-import { roundTo } from "../common/utils.js";
-import { normalize as normalizeBoard }  from "../components/board.js";
+import { settingsMenu, bodyEl, borderEl } from "../common/elements.js";
 
 
 export const buttonFlipper = (function() {
@@ -36,66 +34,67 @@ export const buttonFlipper = (function() {
 })();
 
 
-export const sizeSliderMover = (function(slider, recipient) {  // TODO: switch it back to class, for Christ's sake.
-  const STEP_DEFAULT = parseInt(slider.step);
-  let currentValue = parseInt(slider.value);
+export class Slider {
+  static SPEED = 0.2;
 
-  let targetValue;
-  let minStep;
-  let direction;
+  constructor(slider, recipient) {
+    this.slider = slider;
+    this.recipient = recipient;
 
-  const SPEED = 0.2;
-
-  function moveThumb() {
-    // Intercept input before the slider reacts to it.
-    targetValue = parseInt(slider.value); 
-    slider.value = currentValue; 
-
-    const totalDistance = targetValue - currentValue;
-    const ONE_PERCENT = 0.01;
-    minStep = Math.abs(totalDistance * ONE_PERCENT);
-    direction = 1 * Math.sign(totalDistance);
-
-    slider.step = minStep;
-    
-    makeStep();
+    this.STEP_DEFAULT = parseInt(this.slider.step);
+    this.currentValue = parseInt(this.slider.value);
   }
 
-  function makeStep() {
-    const step = calcStep();
-    currentValue += step * direction;
-    slider.value = currentValue;
+  _moveThumb() {
+    // Intercept input before the slider reacts to it.
+    this.targetValue = parseInt(this.slider.value); 
+    this.slider.value = this.currentValue; 
 
-    updateGradient();
+    const totalDistance = this.targetValue - this.currentValue;
+    const ONE_PERCENT = 0.01;
+    this.minStep = Math.abs(totalDistance * ONE_PERCENT);
+    this.direction = 1 * Math.sign(totalDistance);
 
-    if (currentValue === targetValue) { 
-      recipient();
-      slider.step = STEP_DEFAULT;
+    this.slider.step = this.minStep;
+    
+    this._updateGradient();
+    this._makeStep();
+  }
+
+  _makeStep() {
+    const step = this._calcStep();
+    this.currentValue += step * this.direction;
+    this.slider.value = this.currentValue;
+
+    this._updateGradient();
+
+    if (this.currentValue === this.targetValue) { 
+      this.recipient();
+      this.slider.step = this.STEP_DEFAULT;
     } else {
-      requestAnimationFrame(() => makeStep());
+      requestAnimationFrame(() => this._makeStep());
     }
   }
 
-  function calcStep() {
-    const distLeft = Math.abs(targetValue - currentValue);
-    minStep = distLeft < minStep ? distLeft : minStep; // don't overshoot the target value
+  _calcStep() {
+    const distLeft = Math.abs(this.targetValue - this.currentValue);
+    this.minStep = distLeft < this.minStep ? distLeft : this.minStep; // don't overshoot the target value
 
-    return Math.max(distLeft * SPEED, minStep); // don't slow down in the last 1% of the transition
+    return Math.max(distLeft * Slider.SPEED, this.minStep); // don't slow down in the last 1% of the transition
   }
 
-  function updateGradient() {
+  _updateGradient() {
     const HUNDRED_PERCENT = 100;
 
-    const cutoffVal = (currentValue - slider.min) / (slider.max - slider.min) * HUNDRED_PERCENT;
+    const cutoffVal = (this.currentValue - this.slider.min) / (this.slider.max - this.slider.min) * HUNDRED_PERCENT;
     const grad = `linear-gradient(to right, black, black ${cutoffVal}%, transparent ${cutoffVal}%, transparent)`;
-    slider.style.setProperty("--responsive-gradient", grad);
+    this.slider.style.setProperty("--responsive-gradient", grad);
   }
-  updateGradient(currentValue); // apply default gradient
 
-
-
-  return { attach: () => slider.addEventListener('input', moveThumb) }
-})(sizeSlider, normalizeBoard);
+  attach() {
+    this.slider.addEventListener('input', () => this._moveThumb()); 
+  }
+}
 
 
 export class Outline {
