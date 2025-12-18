@@ -1,8 +1,9 @@
 import { settingsMenu, bodyEl, borderEl } from "../common/elements.js";
+import { updateFocusibleElements, setFocus } from "./keyboardNavigation.js";
 
 
 export const buttonFlipper = (function() {
-  function flipButton(event) { // <--- maybe don't pass an entire event?
+  function flipButton(currentTarget, target) { // <--- maybe don't pass an entire event?
     const side = event.currentTarget; 
 
     const isClickedOnOption = side.classList.contains("rear") && event.target !== side;
@@ -11,24 +12,35 @@ export const buttonFlipper = (function() {
     if (!isClickedOnOption || isClickedOnFieldset) side.parentElement.classList.toggle("clicked"); 
   }
 
-  function closeAllButtons(event) {
-    const isClickedBetweenButtons = event.target === settingsMenu;
-    const isClickedOnBoard = event.target === borderEl;
-    const isClickedOnBody = event.target === bodyEl;
+  function closeAllButtons(target) {
+    const isClickedBetweenButtons = target === settingsMenu;
+    const isClickedOnBoard = target === borderEl;
+    const isClickedOnBody = target === bodyEl;
 
     const isClickedOutsideButtons = isClickedBetweenButtons || isClickedOnBoard || isClickedOnBody;
 
     if (isClickedOutsideButtons) { 
-      [...document.querySelectorAll(".clicked")]
-        .forEach((clickedButton) => clickedButton.classList.remove("clicked"));
+      const openButtons = [...document.querySelectorAll(".clicked")];
+      openButtons.forEach((openButton) => openButton.classList.remove("clicked"));
+      console.log("inside closeAllButtons()");
+      updateFocusibleElements("settings menu");
     }
   }
  
   return {
     attach: () => {
       [...document.querySelectorAll(".side")]
-        .forEach((buttonSide) => buttonSide.addEventListener('click', flipButton));
-      bodyEl.addEventListener('click', closeAllButtons);
+        .forEach((buttonSide) => buttonSide.addEventListener('click', ({ currentTarget, target }) => {
+          flipButton(currentTarget, target);
+
+          if (currentTarget.classList.contains("front")) {
+            setFocus(currentTarget.parentNode);
+            console.log("inside side.attachEventListener");
+            updateFocusibleElements("settings button");
+          }
+        }));
+
+      bodyEl.addEventListener('click', ({ target }) => closeAllButtons(target));
     }
   }
 })();

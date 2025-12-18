@@ -4,6 +4,7 @@ import { toggleMute, soundIcon } from "../common/sound.js";
 
 let focusibleElements = [];
 let focusedEl;
+let context;
 
 const DELAY = 200;
 
@@ -35,25 +36,26 @@ export default function handleKeydown(event, isGameActive) {
 
       if (isSettingsBtnSide) {
         child.click();
-        updateFocusibleElements("settings button");  
       } 
-      else setTimeout(() => focusedEl.click(), DELAY); 
-
-      emulateActiveState(focusedEl);
+      else {
+        emulateActiveState(focusedEl);
+        setTimeout(() => focusedEl.click(), DELAY); 
+      }
       break;
 
     case 'Escape': 
-      bodyEl.click(); // close all buttons
-      updateFocusibleElements("settings menu"); 
+      if (context === "settings button") bodyEl.click(); // close all buttons
 
     default:
       // something
   }
 }
 
-export function updateFocusibleElements(context) { 
-  let selector; 
+export function updateFocusibleElements(ctx) { 
+  context = ctx;
   focusibleElements = [document.querySelector("#sound-icon")];
+ 
+  let selector; 
 
   switch(context) {
     case "main menu":
@@ -66,7 +68,7 @@ export function updateFocusibleElements(context) {
 
     case "settings button":
       focusibleElements = []; 
-
+  
       const rearSide = focusedEl.children[1];
       const fieldsetId = rearSide.firstElementChild.id;
 
@@ -75,7 +77,24 @@ export function updateFocusibleElements(context) {
   }
 
   focusibleElements.unshift(...document.querySelectorAll(selector));  
-  console.log("Focusible Elements:", focusibleElements);
+  focusedEl = null;
+  for (const el of focusibleElements) {
+    if (el.classList.contains("focused")) {
+      setFocus(el);
+      break;
+    }
+  }
+  console.log("Focusible  Elements:", focusibleElements); 
+}
+
+export const setFocus = (el) => {
+  if (focusedEl) focusedEl.classList.remove("focused");
+
+  focusedEl = el;
+  focusedEl.focus();
+
+  focusedEl.classList.add("focused"); 
+  console.log("FocusedEl:", focusedEl);
 }
 
 function moveFocus(direction) {
@@ -88,8 +107,7 @@ function moveFocus(direction) {
 
   const newIndexSafe = Math.max(Math.min(newIndex, INDEX_MAX), INDEX_MIN); 
 
-  focusedEl = focusibleElements[newIndexSafe];
-  focusedEl.focus();
+  setFocus(focusibleElements[newIndexSafe]);
 }
 
 function emulateActiveState(el) {
