@@ -8,7 +8,7 @@ let context;
 
 const DELAY = 200;
 
-export default function handleKeydown(event, isGameActive) {
+export function handleMenuNavigation(event, isGameActive) {
   if (isGameActive) return;
 
   switch (event.code) {
@@ -29,6 +29,7 @@ export default function handleKeydown(event, isGameActive) {
 
     case 'Enter':
       event.preventDefault();
+      if (!focusedEl) return;
 
       // Listeners in settings menu attached to "sides" of the buttons. 
       const child = focusedEl.firstElementChild; 
@@ -108,6 +109,13 @@ function moveFocus(direction) {
   const newIndexSafe = Math.max(Math.min(newIndex, INDEX_MAX), INDEX_MIN); 
 
   setFocus(focusibleElements[newIndexSafe]);
+}
+
+export function attachClickToFocus() {
+  const allFocusibleElements = document.querySelectorAll("button, option, .optionm");
+  allFocusibleElements.forEach((el) => el.addEventListener('click', ({ currentTarget }) => {
+    setFocus(currentTarget);
+  }))
 }
 
 function emulateActiveState(el) {

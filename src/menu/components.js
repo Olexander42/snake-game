@@ -3,7 +3,7 @@ import { updateFocusibleElements, setFocus } from "./keyboardNavigation.js";
 
 
 export const buttonFlipper = (function() {
-  function flipButton(currentTarget, target) { // <--- maybe don't pass an entire event?
+  function flipButton(currentTarget, target) { 
     const side = event.currentTarget; 
 
     const isClickedOnOption = side.classList.contains("rear") && event.target !== side;
@@ -22,7 +22,6 @@ export const buttonFlipper = (function() {
     if (isClickedOutsideButtons) { 
       const openButtons = [...document.querySelectorAll(".clicked")];
       openButtons.forEach((openButton) => openButton.classList.remove("clicked"));
-      console.log("inside closeAllButtons()");
       updateFocusibleElements("settings menu");
     }
   }
@@ -35,7 +34,6 @@ export const buttonFlipper = (function() {
 
           if (currentTarget.classList.contains("front")) {
             setFocus(currentTarget.parentNode);
-            console.log("inside side.attachEventListener");
             updateFocusibleElements("settings button");
           }
         }));

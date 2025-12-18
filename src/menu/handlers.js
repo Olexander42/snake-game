@@ -3,7 +3,7 @@ import setTheme from "../common/theme.js";
 
 import { normalize as normalizeBoard }  from "../components/board.js";
 
-import { updateFocusibleElements } from "./keyboardNavigation.js";
+import { updateFocusibleElements, setFocus } from "./keyboardNavigation.js";
 import { buttonFlipper, Slider, Outline } from "./components.js";
 
 
@@ -50,7 +50,7 @@ function attachSettingsListeners() {
 
   attachOutlines();
 
-  attachBackBtnListener();
+  attachBackBtnHandler();
 }
 
 function attachOutlines() {
@@ -64,7 +64,9 @@ function attachOutlines() {
   themeThumbnailOutline.attachTo(themeOptions);
 }
 
-function attachBackBtnListener() { // TODO: should close all buttons too
+
+
+function attachBackBtnHandler() { // TODO: should close all buttons too
   document.getElementById("back-btn").addEventListener('click', () => {
     mainMenu.style.display = 'flex';
     settingsMenu.style.display = 'none';
