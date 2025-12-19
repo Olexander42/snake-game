@@ -32,7 +32,9 @@ export const buttonFlipper = (function() {
         .forEach((buttonSide) => buttonSide.addEventListener('click', ({ currentTarget, target }) => {
           flipButton(currentTarget, target);
 
+          // Update context correctly when opening the settings button.
           if (currentTarget.classList.contains("front")) {
+            console.log("inside flipButton even Listener");
             setFocus(currentTarget.parentNode);
             updateFocusibleElements("settings button");
           }

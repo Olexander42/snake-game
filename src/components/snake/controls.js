@@ -12,8 +12,8 @@ const TURN_CONFIGS = {
 }
 
 export function handleKeydown(button) {
-  const isArrowButton = button.slice(0, 5) !== "Arrow";
-  if (!isControlsOn || isArrowButton) return;
+  const isArrowButton = button.slice(0, 5) === "Arrow";
+  if (!isControlsOn || !isArrowButton) return;
 
   let turnKey;
   switch (button) {
