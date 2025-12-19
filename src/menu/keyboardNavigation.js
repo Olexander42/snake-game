@@ -1,17 +1,38 @@
 import { bodyEl, html } from "../common/elements.js";
-import { toggleMute, soundIcon } from "../common/sound.js";
+import { soundIcon } from "../common/sound.js";
 
 
-const context = { ctx: null, direction: null };
-let focusibleElements = [];
-let focusedEl;
+const contexts = { 
+  "main menu": {
+    get focusibleElements() { 
+      return (() => {
+        let cache;
+        return cache ??= [...document.querySelectorAll("#main-menu button")]
+      })();
+    },
+    focusedEl: null,
+    direction: "vertical",
+  },
 
-const DELAY = 200;
+  "settings menu": {
+    get focusibleElements() { 
+      return (() => {
+        let cache;
+        return cache ??= [...document.querySelectorAll("#settings-menu button")]
+      })();
+    },
+    focusedEl: null,
+    direction: "vertical",
+  },
+} 
 
-export function handleMenuNavigation(event, isGameActive) {
+//let focusibleElements = [];
+//let focusedEl;
+
+export function handleMenuNavigation(code, isGameActive) {
   if (isGameActive) return;
   
-  switch (event.code) {
+  switch (code) {
     case 'ArrowDown': 
       if (context.direction === "vertical") moveFocus("Down");
       break;
@@ -29,44 +50,32 @@ export function handleMenuNavigation(event, isGameActive) {
       break;
 
     case 'KeyM':
-      emulateActiveState(soundIcon);
-      toggleMute();
+      emulateMouseClick(soundIcon); 
       break;
 
     case 'Enter':
       event.preventDefault();
       if (!focusedEl) return;
 
-      // Listeners in settings menu attached to "sides" of the buttons. 
-      const child = focusedEl.firstElementChild; 
-      const isSettingsBtnSide = child && child.classList.contains("side");
+      // Listeners in settings menu attached to children of the settings buttons. 
+      if (context.ctx === "settings menu" && focusedEl.firstElementChild) {
+        focusedEl.firstElementChild.click();
+      } else emulateMouseClick(focusedEl); 
 
-      if (isSettingsBtnSide) {
-        child.click();
-      } 
-      else {
-        emulateActiveState(focusedEl);
-        setTimeout(() => focusedEl.click(), DELAY); 
-      }
       break;
 
     case 'Escape': 
       if (context.ctx === "settings button") bodyEl.click(); // close all buttons
-
-    default:
-      // something
+      break;
   }
 }
 
 export function updateFocusibleElements(ctx) { 
-  if (context.ctx === ctx) return;
-  context.ctx = ctx;
   focusibleElements = [document.querySelector("#sound-icon")];
  
   let selector; 
-  let checkedOption;
 
-  switch(context.ctx) {
+  switch(ctx) {
     case "main menu":
       selector = "#main-menu button";
       context.direction = "vertical";
@@ -91,6 +100,7 @@ export function updateFocusibleElements(ctx) {
   focusibleElements.unshift(...document.querySelectorAll(selector));  
   focusedEl = null;
 
+  context.ctx = ctx;
   rememberContextFocusedEl();
 
   console.log("Focusible  Elements:", focusibleElements); 
@@ -129,9 +139,20 @@ function rememberContextFocusedEl() {
   }
 }
 
-function emulateActiveState(el) {
-  el.classList.add("active"); 
-  setTimeout(() => el.classList.remove("active"), DELAY);
+function emulateMouseClick(el) {
+  el.classList.add("active");  // emulate active state
+  setTimeout(() => {
+    el.classList.remove("active");
+    el.click();
+  }, 200);
+}
+
+export class Context {
+  constructor(selector, direction) {
+    this.focusibleElements = [...document.querySelectorAll("#main-menu button")];
+    this.direction = direction;
+    this.focusedEl = null;
+  }
 }
 
 

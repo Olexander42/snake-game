@@ -11,7 +11,7 @@ root.style.setProperty("--size", `${sizeSlider.value}px`);
 setDefaultTheme();
 
 updateFocusibleElements("main menu");
-html.addEventListener('keydown', (event) => handleMenuNavigation(event, Game.isGameActive));
+html.addEventListener('keydown', ({ code }) => handleMenuNavigation(code, Game.isGameActive));
 
 initMenuElements();
 startBtn.addEventListener('click', () => handleStartBtn(Game));
