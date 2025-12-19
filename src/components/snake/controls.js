@@ -12,9 +12,30 @@ const TURN_CONFIGS = {
 }
 
 export function handleKeydown(button) {
-  if (!isControlsOn || button.slice(0, 5) !== "Arrow") return; // Work only with "Arrow" buttons.
+  const isArrowButton = button.slice(0, 5) !== "Arrow";
+  if (!isControlsOn || isArrowButton) return;
 
-  const turnKey = button.slice(5, button.length); 
+  let turnKey;
+  switch (button) {
+    case 'ArrowUp':
+      turnKey = "Up";
+      break;
+
+    case 'ArrowDown':
+      turnKey = "Down";
+      break;
+
+    case 'ArrowLeft':
+      turnKey = "Left";
+      break;
+
+    case 'ArrowRight':
+      turnKey = "Right";
+      break;
+
+    default: return;
+  }
+ 
   const { newDirection, axis, counterClockwise, border } = TURN_CONFIGS[turnKey];
  
   if (isAllowTurn(axis, border)) {
