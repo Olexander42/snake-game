@@ -38,10 +38,6 @@ button {
   &:focus {
     scale: var(--scale-up);
   }
-
-  &:focus-visible {
-    outline: none;
-  }
 }
 
 
@@ -180,7 +176,6 @@ option:focus {
 
   &:hover,
   &:focus-visible {
-    outline: none;
     scale: var(--scale-up);
   }
 }

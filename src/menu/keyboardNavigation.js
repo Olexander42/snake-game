@@ -64,6 +64,7 @@ export function updateFocusibleElements(ctx) {
   focusibleElements = [document.querySelector("#sound-icon")];
  
   let selector; 
+  let checkedOption;
 
   switch(context.ctx) {
     case "main menu":
@@ -89,6 +90,7 @@ export function updateFocusibleElements(ctx) {
 
   focusibleElements.unshift(...document.querySelectorAll(selector));  
   focusedEl = null;
+
   rememberContextFocusedEl();
 
   console.log("Focusible  Elements:", focusibleElements); 
