@@ -1,13 +1,13 @@
-import { menu, settingsMenu, sizeSlider } from "../common/elements.js";
+import { menu, settingsMenu, settingsMenuBtn, sizeSlider } from "../common/elements.js";
 import setTheme from "../common/theme.js";
 
 import { normalize as normalizeBoard }  from "../components/board.js";
 
-import { updateFocusibleElements, setFocus } from "./keyboardNavigation.js";
+import { addContext, Context, setContext } from "./context.js";
 import { buttonFlipper, Slider, Outline } from "./components.js";
 
 
-export let startBtn, settingsMenuBtn;
+export let startBtn;
 
 let firstStart = true;
 let settingsVisited = false;
@@ -24,22 +24,22 @@ export function handleStartBtn(game) {
   game.begin();
 }
 
-export function handlesettingsMenuBtn() {
+export function handleSettingsMenuBtn() {
   mainMenu.style.display = 'none';
   settingsMenu.style.display = 'flex';
 
-  updateFocusibleElements("settings menu");
-
   if (!settingsVisited) { 
+    addContext(new Context("settings menu", "#settings-menu button"));
     attachSettingsListeners();
     settingsVisited = true;
   }
+
+  setContext("settings menu");
 }
 
 export function initMenuElements() {
   mainMenu = document.getElementById("main-menu");
   startBtn = document.getElementById("start-btn");
-  settingsMenuBtn = document.getElementById("settings-btn");
 }
 
 function attachSettingsListeners() {
@@ -71,7 +71,7 @@ function attachBackBtnHandler() { // TODO: should close all buttons too
     mainMenu.style.display = 'flex';
     settingsMenu.style.display = 'none';
 
-    updateFocusibleElements("main menu");
+    setContext("main menu");
   })
 }
 

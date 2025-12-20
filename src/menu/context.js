@@ -1,0 +1,68 @@
+export const contexts = {};
+
+export let context;
+export const addContext = (ctxInst) => contexts[ctxInst.name] = ctxInst;
+export const setContext = (ctxName) => {
+  context = contexts[ctxName];
+  context.resetFocus();
+}
+
+export class Context {
+  static DELAY = 200;
+
+  constructor(name, selector, alignment) {
+    this.name = name;
+    this.focusibleElements = [...document.querySelectorAll(`${selector}, #sound-icon`)];
+    this.alignment = alignment;
+    this.focusedEl = null;
+  }
+
+  moveFocus(direction) {
+    const INDEX_MIN = 0;
+    const INDEX_MAX = this.focusibleElements.length - 1;
+
+    const increment = (direction === "Down" || direction === "Right") ? 1 : -1;
+    const focusedElIndex = this.focusibleElements.indexOf(this.focusedEl); 
+    const newIndex = focusedElIndex + increment;
+
+    const newIndexSafe = Math.max(Math.min(newIndex, INDEX_MAX), INDEX_MIN); 
+    console.log("inside moveFocus()");
+    this.setFocus(this.focusibleElements[newIndexSafe]);
+  }
+
+  setFocus(el) {
+    this.focusedEl = el;
+    this.focusedEl.focus();
+
+    console.log("FocusedEl:", this.focusedEl);
+  }
+
+  resetFocus() {
+    this.setFocus(this.focusibleElements[0]);
+  }
+
+  emulateClick() {
+    this.focusedEl.classList.add("active");  // emulate active state
+    setTimeout(() => {
+      this.focusedEl.classList.remove("active");
+      this.focusedEl.click();
+    }, Context.DELAY);
+  }
+}
+
+export class SubContext extends Context {
+  static initFocusibleElements(parent) {
+    const rearSide = parent.children[1];
+    const fieldsetId = rearSide.firstElementChild.id;
+
+    return [...document.querySelectorAll(`#${fieldsetId} [tabindex = '0']`)];
+  }
+
+  constructor(name, parent, alignment = "horizontal") {
+    super(name);
+    console.log(name, parent);
+    this.focusibleElements = SubContext.initFocusibleElements(parent);
+    this.alignment = alignment;
+    this.focusedEl = null;
+  }
+}

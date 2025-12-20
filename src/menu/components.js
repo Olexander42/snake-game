@@ -1,5 +1,5 @@
 import { settingsMenu, bodyEl, borderEl } from "../common/elements.js";
-import { updateFocusibleElements, setFocus } from "./keyboardNavigation.js";
+import { context, setContext } from "./context.js";
 
 
 export const buttonFlipper = (function() {
@@ -20,9 +20,12 @@ export const buttonFlipper = (function() {
     const isClickedOutsideButtons = isClickedBetweenButtons || isClickedOnBoard || isClickedOnBody;
 
     if (isClickedOutsideButtons) { 
+      if (context.name === "main menu") return;
+
       const openButtons = [...document.querySelectorAll(".clicked")];
       openButtons.forEach((openButton) => openButton.classList.remove("clicked"));
-      updateFocusibleElements("settings menu");
+      console.log("inside closeAllButtons()");
+      setContext("settings menu");
     }
   }
  
@@ -35,8 +38,8 @@ export const buttonFlipper = (function() {
           // Update context correctly when opening the settings button.
           if (currentTarget.classList.contains("front")) {
             console.log("inside flipButton even Listener");
-            setFocus(currentTarget.parentNode);
-            updateFocusibleElements("settings button");
+           // setFocus(currentTarget.parentNode);
+            setContext("settings button");
           }
         }));
 
