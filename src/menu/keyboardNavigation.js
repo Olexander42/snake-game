@@ -1,7 +1,7 @@
 import { bodyEl, html, settingsMenuBtn } from "../common/elements.js";
 import { soundIcon } from "../common/sound.js";
 
-import { context, addContext, SubContext } from "./context.js";
+import { contexts, context, addContext, SubContext } from "./context.js";
 
 
 export function handleMenuNavigation(event, isGameActive) {
@@ -28,16 +28,16 @@ function handleSettingsMenuContext() {
   try {
     // In settings menu listeners are inside buttons
     const child = context.focusedEl.firstElementChild;
-    const isBtnSide = child.classList.contains("side"); 
+    const isSettingsBtnSide = child.classList.contains("side"); 
 
-    if (isBtnSide) {
+    if (isSettingsBtnSide) {
       addContext(new SubContext(context.focusedEl.id, context.focusedEl));
-      console.log("contexts:", contexts);
       child.click();
     }
     else context.emulateClick();
-  } catch {
+  } catch(e) {
     context.emulateClick();
+    console.log(e);
   }
 }
 

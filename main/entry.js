@@ -12,13 +12,9 @@ root.style.setProperty("--size", `${sizeSlider.value}px`);
 
 setDefaultTheme();
 
-html.addEventListener('keydown', () => {
-  addContext(new Context("main menu", "#main-menu button"));
-  setContext("main menu");
-
-  html.addEventListener('keydown', (event) => handleMenuNavigation(event, Game.isGameActive));
-}, { once: true })
-
+addContext(new Context("main menu", "#main-menu button"));
+setContext("main menu");
+html.addEventListener('keydown', (event) => handleMenuNavigation(event, Game.isGameActive));
 
 initMenuElements();
 startBtn.addEventListener('click', () => handleStartBtn(Game));

@@ -1,15 +1,17 @@
 import { settingsMenu, bodyEl, borderEl } from "../common/elements.js";
-import { context, setContext } from "./context.js";
+import { context, getContext, addContext, SubContext, setContext,  } from "./context.js";
 
 
 export const buttonFlipper = (function() {
-  function flipButton(currentTarget, target) { 
-    const side = event.currentTarget; 
-
-    const isClickedOnOption = side.classList.contains("rear") && event.target !== side;
-    const isClickedOnFieldset = [...document.querySelectorAll('fieldset')].includes(event.target); 
+  function flipButton(side, target) { 
+    const isClickedOnOption = side.classList.contains("rear") && target !== side;
+    const isClickedOnFieldset = [...document.querySelectorAll('fieldset')].includes(target); 
     
-    if (!isClickedOnOption || isClickedOnFieldset) side.parentElement.classList.toggle("clicked"); 
+    if (!isClickedOnOption || isClickedOnFieldset) {
+      const button = side.parentElement;
+      button.classList.toggle("clicked"); 
+      _handleContextSwitch(side, button);
+    }
   }
 
   function closeAllButtons(target) {
@@ -22,26 +24,29 @@ export const buttonFlipper = (function() {
     if (isClickedOutsideButtons) { 
       if (context.name === "main menu") return;
 
-      const openButtons = [...document.querySelectorAll(".clicked")];
-      openButtons.forEach((openButton) => openButton.classList.remove("clicked"));
-      console.log("inside closeAllButtons()");
+      const openedBtns = [...document.querySelectorAll(".clicked")];
+      openedBtns.forEach((openedBtn) => openedBtn.classList.remove("clicked"));
       setContext("settings menu");
     }
+  }
+
+  function _handleContextSwitch(side, btn) {
+    if (side.classList.contains("front")) {
+      context.setFocus(btn);
+
+      if (!getContext(btn.id)) addContext(new SubContext(context.focusedEl.id, context.focusedEl));
+      setContext(btn.id);
+    }
+    else setContext("settings menu");
   }
  
   return {
     attach: () => {
-      [...document.querySelectorAll(".side")]
-        .forEach((buttonSide) => buttonSide.addEventListener('click', ({ currentTarget, target }) => {
+      const settingsBtnsSides = [...document.querySelectorAll(".side")];
+      settingsBtnsSides.forEach((btnSide) => btnSide.addEventListener('click', ({ currentTarget, target }) => {
           flipButton(currentTarget, target);
-
-          // Update context correctly when opening the settings button.
-          if (currentTarget.classList.contains("front")) {
-            console.log("inside flipButton even Listener");
-           // setFocus(currentTarget.parentNode);
-            setContext("settings button");
-          }
-        }));
+        })
+      )
 
       bodyEl.addEventListener('click', ({ target }) => closeAllButtons(target));
     }

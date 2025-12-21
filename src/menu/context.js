@@ -4,8 +4,10 @@ export let context;
 export const addContext = (ctxInst) => contexts[ctxInst.name] = ctxInst;
 export const setContext = (ctxName) => {
   context = contexts[ctxName];
-  context.resetFocus();
+  //context.resetFocus();
+  console.log("current context:", context.name);
 }
+export const getContext = (ctxName) => contexts[ctxName];
 
 export class Context {
   static DELAY = 200;
@@ -60,7 +62,7 @@ export class SubContext extends Context {
 
   constructor(name, parent, alignment = "horizontal") {
     super(name);
-    console.log(name, parent);
+    console.log("name:", name);
     this.focusibleElements = SubContext.initFocusibleElements(parent);
     this.alignment = alignment;
     this.focusedEl = null;
