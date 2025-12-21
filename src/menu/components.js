@@ -1,5 +1,5 @@
 import { settingsMenu, bodyEl, borderEl } from "../common/elements.js";
-import { context, getContext, addContext, SubContext, setContext,  } from "./context.js";
+import { context, getContext, addContext, OptionsButton, switchContext,  } from "./context.js";
 
 
 export const buttonFlipper = (function() {
@@ -10,7 +10,7 @@ export const buttonFlipper = (function() {
     if (!isClickedOnOption || isClickedOnFieldset) {
       const button = side.parentElement;
       button.classList.toggle("clicked"); 
-      _handleContextSwitch(side, button);
+      _handleContextSwitch(side, button)
     }
   }
 
@@ -24,9 +24,9 @@ export const buttonFlipper = (function() {
     if (isClickedOutsideButtons) { 
       if (context.name === "main menu") return;
 
-      const openedBtns = [...document.querySelectorAll(".clicked")];
-      openedBtns.forEach((openedBtn) => openedBtn.classList.remove("clicked"));
-      setContext("settings menu");
+      const openBtns = [...document.querySelectorAll(".clicked")];
+      openBtns.forEach((openBtn) => openBtn.classList.remove("clicked"));
+      switchContext("settings menu");
     }
   }
 
@@ -34,19 +34,23 @@ export const buttonFlipper = (function() {
     if (side.classList.contains("front")) {
       context.setFocus(btn);
 
-      if (!getContext(btn.id)) addContext(new SubContext(context.focusedEl.id, context.focusedEl));
-      setContext(btn.id);
+      if (!getContext(btn.id)) {
+        addContext(new OptionsButton(context.focusedEl.id, context.focusedEl));
+      }
+      switchContext(btn.id);
+    } else {
+      switchContext("settings menu");
     }
-    else setContext("settings menu");
   }
  
   return {
     attach: () => {
       const settingsBtnsSides = [...document.querySelectorAll(".side")];
-      settingsBtnsSides.forEach((btnSide) => btnSide.addEventListener('click', ({ currentTarget, target }) => {
+      settingsBtnsSides.forEach((btnSide) => {
+        btnSide.addEventListener('click', ({ currentTarget, target }) => {
           flipButton(currentTarget, target);
         })
-      )
+      })
 
       bodyEl.addEventListener('click', ({ target }) => closeAllButtons(target));
     }

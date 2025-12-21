@@ -2,12 +2,19 @@
 
 export let context;
 export const addContext = (ctxInst) => contexts[ctxInst.name] = ctxInst;
-export const setContext = (ctxName) => {
-  context = contexts[ctxName];
-  //context.resetFocus();
-  console.log("current context:", context.name);
-}
 export const getContext = (ctxName) => contexts[ctxName];
+
+export function switchContext(ctxName) {
+  const prevCtx = context;
+  context = contexts[ctxName];
+
+  if (isOptionsCtx(context)) context.focusChecked();
+  else if ((isOptionsCtx(prevCtx)) && context.name === "settings menu") {
+    context.focusedEl.focus();
+  } else {
+    context.focusedEl = null;
+  }
+}
 
 export class Context {
   static DIRECTIONS = {
@@ -41,34 +48,42 @@ export class Context {
     const focusedElIndex = this.focusibleElements.indexOf(this.focusedEl); 
     const newIndex = focusedElIndex + increment;
     const newIndexSafe = Math.max(Math.min(newIndex, INDEX_MAX), INDEX_MIN); 
-    
+
     this.setFocus(this.focusibleElements[newIndexSafe]);
   }
 
   setFocus(el) {
     this.focusedEl = el;
     this.focusedEl.focus();
-
-    console.log("FocusedEl:", this.focusedEl);
-  }
-
-  resetFocus() {
-    this.setFocus(this.focusibleElements[0]);
   }
 }
 
-export class SubContext extends Context {
-  static initFocusibleElements(parent) {
-    const rearSide = parent.children[1];
-    const fieldsetId = rearSide.firstElementChild.id;
-
-    return [...document.querySelectorAll(`#${fieldsetId} [tabindex = '0']`)];
-  }
-
+export class OptionsButton extends Context {
   constructor(name, parent, alignment = "horizontal") {
     super(name);
-    this.focusibleElements = SubContext.initFocusibleElements(parent);
+    this.fieldsetId = parent.children[1].firstElementChild.id;
+    this.focusibleElements = [...document.querySelectorAll(`#${this.fieldsetId} [tabindex = '0']`)];
     this.allowedDirs = Context.DIRECTIONS[alignment];
+    this.inputType = document.querySelector(`#${this.fieldsetId} input`).type;
     this.focusedEl = null;
   }
+
+  focusChecked() {
+    if (this.inputType === 'radio') {
+      const checked = document.querySelector(`#${this.fieldsetId} input:checked + span`);
+      this.setFocus(checked);
+    } else if (this.inputType === 'range') {
+        this.input = this.input ??= document.querySelector(`#${this.fieldsetId} input`);
+        this.options = this.options ??= [...document.querySelectorAll(`#${this.fieldsetId} input + datalist option`)];
+
+        for (const option of this.options) {
+          if (option.value === this.input.value) {
+            this.focusedEl = option;
+            break;
+          }
+        }
+    }
+  }
 }
+
+const isOptionsCtx = (ctx) => ctx instanceof OptionsButton;

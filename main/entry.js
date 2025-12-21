@@ -5,7 +5,7 @@ import setDefaultTheme from "../src/common/theme.js";
 import * as Game from "../src/game/game.js";
 import { initMenuElements, startBtn, handleStartBtn, handleSettingsMenuBtn } from "../src/menu/handlers.js";
 import { handleMenuNavigation } from "../src/menu/keyboardNavigation.js";
-import { Context, addContext, setContext } from "../src/menu/context.js";
+import { Context, addContext, switchContext } from "../src/menu/context.js";
 
 
 root.style.setProperty("--size", `${sizeSlider.value}px`);
@@ -13,7 +13,7 @@ root.style.setProperty("--size", `${sizeSlider.value}px`);
 setDefaultTheme();
 
 addContext(new Context("main menu", "#main-menu button"));
-setContext("main menu");
+switchContext("main menu");
 html.addEventListener('keydown', (event) => handleMenuNavigation(event, Game.isGameActive));
 
 initMenuElements();

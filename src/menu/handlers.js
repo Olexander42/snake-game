@@ -3,7 +3,7 @@ import setTheme from "../common/theme.js";
 
 import { normalize as normalizeBoard }  from "../components/board.js";
 
-import { addContext, Context, setContext } from "./context.js";
+import { addContext, Context, switchContext } from "./context.js";
 import { buttonFlipper, Slider, Outline } from "./components.js";
 
 
@@ -34,7 +34,7 @@ export function handleSettingsMenuBtn() {
     settingsVisited = true;
   }
 
-  setContext("settings menu");
+  switchContext("settings menu");
 }
 
 export function initMenuElements() {
@@ -71,7 +71,7 @@ function attachBackBtnHandler() { // TODO: should close all buttons too
     mainMenu.style.display = 'flex';
     settingsMenu.style.display = 'none';
 
-    setContext("main menu");
+    switchContext("main menu");
   })
 }
 

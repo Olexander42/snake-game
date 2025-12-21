@@ -1,7 +1,7 @@
 import { bodyEl, html, settingsMenuBtn, backBtn } from "../common/elements.js";
 import { soundIcon } from "../common/sound.js";
 
-import { context, addContext, SubContext } from "./context.js";
+import { context, addContext, Context, OptionsButton } from "./context.js";
 
 
 export function handleMenuNavigation(event, isGameActive) {
@@ -39,7 +39,7 @@ export function handleMenuNavigation(event, isGameActive) {
       break;
 
     case 'Escape':
-      if (context instanceof SubContext) bodyEl.click();
+      if (context instanceof OptionsButton) bodyEl.click();
       else if (context.name === "settings menu") backBtn.click();
 
       break;
@@ -56,8 +56,4 @@ function emulateClick(el) {
   }, DELAY);
 }
 
-
-export const setFocus = () => {}
-
-export function updateFocusibleElements() {}
 
