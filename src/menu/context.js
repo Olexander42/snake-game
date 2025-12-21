@@ -10,20 +10,34 @@ export const setContext = (ctxName) => {
 export const getContext = (ctxName) => contexts[ctxName];
 
 export class Context {
+  static DIRECTIONS = {
+    vertical: {
+      Up: -1,
+      Down: 1
+    },
+
+    horizontal: {
+      Left: -1,
+      Right: 1
+    }
+  }
+
   static DELAY = 200;
 
-  constructor(name, selector, alignment) {
+  constructor(name, selector, alignment = "vertical") {
     this.name = name;
     this.focusibleElements = [...document.querySelectorAll(`${selector}, #sound-icon`)];
-    this.alignment = alignment;
+    this.allowedDirs = Context.DIRECTIONS[alignment];
     this.focusedEl = null;
   }
 
   moveFocus(direction) {
+    const increment = this.allowedDirs[direction];
+    if (!increment) return;
+
     const INDEX_MIN = 0;
     const INDEX_MAX = this.focusibleElements.length - 1;
-
-    const increment = (direction === "Down" || direction === "Right") ? 1 : -1;
+    
     const focusedElIndex = this.focusibleElements.indexOf(this.focusedEl); 
     const newIndex = focusedElIndex + increment;
 
@@ -62,9 +76,8 @@ export class SubContext extends Context {
 
   constructor(name, parent, alignment = "horizontal") {
     super(name);
-    console.log("name:", name);
     this.focusibleElements = SubContext.initFocusibleElements(parent);
-    this.alignment = alignment;
+    this.allowedDirs = Context.DIRECTIONS[alignment];
     this.focusedEl = null;
   }
 }

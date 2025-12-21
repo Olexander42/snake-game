@@ -8,12 +8,20 @@ export function handleMenuNavigation(event, isGameActive) {
   if (isGameActive) return;
   
   switch(event.code) {
+    case 'ArrowUp': 
+      context.moveFocus("Up");
+      break;
+
     case 'ArrowDown': 
       context.moveFocus("Down");
       break;
 
-    case 'ArrowUp': 
-      context.moveFocus("Up");
+    case 'ArrowLeft': 
+      context.moveFocus("Left");
+      break;
+
+    case 'ArrowRight': 
+      context.moveFocus("Right");
       break;
 
     case 'Enter':
@@ -21,6 +29,12 @@ export function handleMenuNavigation(event, isGameActive) {
 
       if (context.name === "settings menu") handleSettingsMenuContext();
       else context.emulateClick();
+
+      break;
+
+    case 'Escape':
+      if (context.name !== "main menu") bodyEl.click();
+      break;
   }
 }
 
