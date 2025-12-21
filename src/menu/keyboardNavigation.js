@@ -27,31 +27,16 @@ export function handleMenuNavigation(event, isGameActive) {
     case 'Enter':
       event.preventDefault();
 
-      if (context.name === "settings menu") handleSettingsMenuContext();
-      else context.emulateClick();
+      const child = context.focusedEl.firstElementChild;
+
+      if (!child || !child.classList.contains("side")) context.emulateClick();
+      else child.click() // in settings menu listeners are inside buttons
 
       break;
 
     case 'Escape':
       if (context.name !== "main menu") bodyEl.click();
       break;
-  }
-}
-
-function handleSettingsMenuContext() {
-  try {
-    // In settings menu listeners are inside buttons
-    const child = context.focusedEl.firstElementChild;
-    const isSettingsBtnSide = child.classList.contains("side"); 
-
-    if (isSettingsBtnSide) {
-      addContext(new SubContext(context.focusedEl.id, context.focusedEl));
-      child.click();
-    }
-    else context.emulateClick();
-  } catch(e) {
-    context.emulateClick();
-    console.log(e);
   }
 }
 
