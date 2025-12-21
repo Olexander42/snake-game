@@ -1,4 +1,4 @@
-export const contexts = {};
+ const contexts = {};
 
 export let context;
 export const addContext = (ctxInst) => contexts[ctxInst.name] = ctxInst;
@@ -40,9 +40,8 @@ export class Context {
     
     const focusedElIndex = this.focusibleElements.indexOf(this.focusedEl); 
     const newIndex = focusedElIndex + increment;
-
     const newIndexSafe = Math.max(Math.min(newIndex, INDEX_MAX), INDEX_MIN); 
-    console.log("inside moveFocus()");
+    
     this.setFocus(this.focusibleElements[newIndexSafe]);
   }
 
@@ -55,14 +54,6 @@ export class Context {
 
   resetFocus() {
     this.setFocus(this.focusibleElements[0]);
-  }
-
-  emulateClick() {
-    this.focusedEl.classList.add("active");  // emulate active state
-    setTimeout(() => {
-      this.focusedEl.classList.remove("active");
-      this.focusedEl.click();
-    }, Context.DELAY);
   }
 }
 

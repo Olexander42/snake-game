@@ -1,7 +1,7 @@
-import { bodyEl, html, settingsMenuBtn } from "../common/elements.js";
+import { bodyEl, html, settingsMenuBtn, backBtn } from "../common/elements.js";
 import { soundIcon } from "../common/sound.js";
 
-import { contexts, context, addContext, SubContext } from "./context.js";
+import { context, addContext, SubContext } from "./context.js";
 
 
 export function handleMenuNavigation(event, isGameActive) {
@@ -29,15 +29,31 @@ export function handleMenuNavigation(event, isGameActive) {
 
       const child = context.focusedEl.firstElementChild;
 
-      if (!child || !child.classList.contains("side")) context.emulateClick();
+      if (!child || !child.classList.contains("side")) emulateClick(context.focusedEl);
       else child.click() // in settings menu listeners are inside buttons
 
       break;
 
+    case 'KeyM':
+      emulateClick(soundIcon);
+      break;
+
     case 'Escape':
-      if (context.name !== "main menu") bodyEl.click();
+      if (context instanceof SubContext) bodyEl.click();
+      else if (context.name === "settings menu") backBtn.click();
+
       break;
   }
+}
+
+function emulateClick(el) {
+  const DELAY = 200;
+
+  el.classList.add("active");  // emulate active state
+  setTimeout(() => {
+    el.classList.remove("active");
+    el.click();
+  }, DELAY);
 }
 
 

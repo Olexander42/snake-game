@@ -1,4 +1,4 @@
-import { menu, settingsMenu, settingsMenuBtn, sizeSlider } from "../common/elements.js";
+import { menu, settingsMenu, settingsMenuBtn, backBtn, sizeSlider } from "../common/elements.js";
 import setTheme from "../common/theme.js";
 
 import { normalize as normalizeBoard }  from "../components/board.js";
@@ -67,7 +67,7 @@ function attachOutlines() {
 
 
 function attachBackBtnHandler() { // TODO: should close all buttons too
-  document.getElementById("back-btn").addEventListener('click', () => {
+  backBtn.addEventListener('click', () => {
     mainMenu.style.display = 'flex';
     settingsMenu.style.display = 'none';
 
