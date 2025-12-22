@@ -68,6 +68,8 @@ export class Slider {
     this.STEP_DEFAULT = parseInt(this.slider.step);
     this.currentValue = parseInt(this.slider.value);
 
+    this.FULL_RANGE = this.slider.max - this.slider.min;
+
     this.options = [...document.querySelectorAll(`#${this.slider.id} + datalist option`)];
   }
 
@@ -112,7 +114,7 @@ export class Slider {
   _updateGradient() {
     const HUNDRED_PERCENT = 100;
 
-    const cutoffVal = (this.currentValue - this.slider.min) / (this.slider.max - this.slider.min) * HUNDRED_PERCENT;
+    const cutoffVal = ((this.currentValue - this.slider.min) / this.FULL_RANGE) * HUNDRED_PERCENT;
     const grad = `linear-gradient(to right, black, black ${cutoffVal}%, transparent ${cutoffVal}%, transparent)`;
     this.slider.style.setProperty("--responsive-gradient", grad);
   }
