@@ -40,10 +40,8 @@ export function attachControls() {
   
   html.addEventListener('keydown', (event) => {
     if (!whitelist.includes(event.code)) event.preventDefault();
-  
     if (event.code === 'Space') togglePause();
-    if (event.code === 'KeyM') toggleMute();
-    else if (isGameActive) Snake.handleKeydown(event.code); 
+    else if (isGameActive) Snake.handleKeydown(event.code);
   })
 }
 

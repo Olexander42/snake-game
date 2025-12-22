@@ -6,7 +6,7 @@ export const getContext = (ctxName) => contexts[ctxName];
 
 export function switchContext(ctxName) {
   const prevCtx = context;
-  context = contexts[ctxName];
+  context = contexts[ctxName]; 
 
   if (isOptionsCtx(context)) context.focusChecked();
   else if ((isOptionsCtx(prevCtx)) && context.name === "settings menu") {
@@ -14,7 +14,6 @@ export function switchContext(ctxName) {
   } else {
     context.focusedEl = null;
   }
-  console.log("current context:", context.name);
 }
 
 export class Context {
