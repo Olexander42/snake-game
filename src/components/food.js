@@ -69,7 +69,7 @@ export function fadeIn() {
   foodEl.offsetLeft; // force repaint
 
   foodEl.style.transition = `opacity ${TRANSITION_DURATION / MS_IN_SECOND}s linear`;
-  foodEl.addEventListener('transitionend', () => foodEl.style.transition = 'none');
+  foodEl.addEventListener('transitionend', () => foodEl.style.transition = "");
   requestAnimationFrame(() => foodEl.style.opacity = 1); 
 }
 
