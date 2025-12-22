@@ -19,14 +19,16 @@ export function begin() {
  
   Snake.setBorders(borders);
   const snakeCoords =  Snake.getBodyData();
-  
-  if (isFirstStart) {  
-    Food.spawn(borders, snakeCoords);
-    Food.transitionColors();
 
+  if (isFirstStart) {  
+    Food.init(borders, snakeCoords);
+    Food.transitionColors();
+    
     stats.initElements(); 
     isFirstStart = false;
-  } else Food.teleport(borders, snakeCoords);
+  }
+  
+  Food.teleport(borders, snakeCoords);
   Food.fadeIn();
 
   timer.updateGap(Snake.speed);

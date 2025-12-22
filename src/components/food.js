@@ -7,19 +7,15 @@ import Color from "../common/Color.js";
 let foodCoords;
 export const getCoords = () => ({...foodCoords});
 
-let foodEl, colorManager, minSizeUnit;
+let foodEl, colorManager;
 
 const TRANSITION_DURATION = 2000;
 const MS_IN_SECOND = 1000;
 
-export function spawn(borders, snakeCoords) {
+export function init(borders, snakeCoords) {
   foodEl = document.getElementById("food");
   colorManager = new Color(Color.getRandomColor({ rangeS: [50, 100], rangeL: [25, 75] }));
   foodEl.style.backgroundColor = colorManager.string; 
-
-  minSizeUnit = getMinSizeUnit();
-
-  teleport(borders, snakeCoords);
 }
 
 export function teleport(borders, snakeCoords) {
@@ -31,6 +27,7 @@ export function teleport(borders, snakeCoords) {
 
 function generateRandomCoords(borders, snakeCoords) {
   const { left, right, top, bottom } = borders;
+  const minSizeUnit = getMinSizeUnit();
   const randomCoords = {}
 
   while (true) {
