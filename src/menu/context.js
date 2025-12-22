@@ -14,6 +14,7 @@ export function switchContext(ctxName) {
   } else {
     context.focusedEl = null;
   }
+  console.log("current context:", context.name);
 }
 
 export class Context {

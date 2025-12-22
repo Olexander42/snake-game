@@ -1,37 +1,41 @@
 import { bodyEl, html, settingsMenuBtn, backBtn } from "../common/elements.js";
 import { soundIcon } from "../common/sound.js";
 
-import { context, addContext, Context, OptionsButton } from "./context.js";
+import { context, addContext, switchContext, Context, OptionsButton } from "./context.js";
 
 
 export function handleMenuNavigation(event, isGameActive) {
   if (isGameActive) return;
   
+  const direction = event.code.slice(5, event.code.length);
   switch(event.code) {
     case 'ArrowUp': 
-      context.moveFocus("Up");
-      break;
-
-    case 'ArrowDown': 
-      context.moveFocus("Down");
+    case 'ArrowDown':
+      if (context instanceof OptionsButton) switchContext("settings menu");
+      context.moveFocus(direction);
       break;
 
     case 'ArrowLeft': 
-      context.moveFocus("Left");
-      break;
+    case 'ArrowRight':
+      if (context.name === "settings menu" && context.focusedEl?.classList.contains("clicked")) {
+        switchContext(context.focusedEl.id);
+      } 
 
-    case 'ArrowRight': 
-      context.moveFocus("Right");
+      context.moveFocus(direction);
       break;
 
     case 'Enter':
+    case 'Space':
       event.preventDefault();
 
+      // in settings menu listeners are inside buttons
       const child = context.focusedEl.firstElementChild;
+      if (child?.classList.contains("side")) {
+        child.click(); 
+        return;
+      }
 
-      if (!child || !child.classList.contains("side")) emulateClick(context.focusedEl);
-      else child.click() // in settings menu listeners are inside buttons
-
+      emulateClick(context.focusedEl);
       break;
 
     case 'KeyM':
