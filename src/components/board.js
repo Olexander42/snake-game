@@ -36,7 +36,7 @@ export function shrink() {
   borderEl.style.height =`${bounds.height}px`;
 
   backgroundClip += minSizeUnit; 
-  root.style.setProperty("--clip", `${backgroundClip}px`);
+  root.style.setProperty("--clip", `${backgroundClip - 1}px`); // "- 1" compensate for sub pixel rounding error
 
   updateBorders();
 }
@@ -58,10 +58,10 @@ function updateBorders() {
 function updateSizeUnits() {
   minSizeUnit = getMinSizeUnit();
   sizeUnit = minSizeUnit * 2; // board should shrink minSizeUnit from EACH side
-  backgroundClip = sizeUnit - 1; // compensate for sub pixel rounding error
+  backgroundClip = sizeUnit; 
 
   root.style.setProperty("--size", `${sizeUnit}px`);
-  root.style.setProperty("--clip", `${backgroundClip}px`);
+  root.style.setProperty("--clip", `${backgroundClip - 1}px`); // "- 1" compensate for sub pixel rounding error
 }
 
 
