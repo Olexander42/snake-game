@@ -58,7 +58,7 @@ export const buttonFlipper = (function() {
 })();
 
 
-export class Slider {
+export class Slider { 
   static SPEED = 0.2;
 
   constructor(slider, recipient) {
@@ -74,18 +74,18 @@ export class Slider {
   }
 
   _moveThumb(value = this.slider.value) {
-    // Intercept input before the slider reacts to it.
-    this.targetValue = parseInt(value); 
-    this.slider.value = this.currentValue; 
+    value = parseInt(value);
+    const totalDistance = value - this.currentValue;
+    if (Math.abs(totalDistance) < this.STEP_DEFAULT) return; // guard against internal 'input' events
 
-    const totalDistance = this.targetValue - this.currentValue;
+    this.slider.value = this.currentValue; // intercept input before the slider reacts to it
+    this.targetValue = value; 
+    
     const ONE_PERCENT = 0.01;
     this.minStep = Math.abs(totalDistance * ONE_PERCENT);
     this.direction = 1 * Math.sign(totalDistance);
-
     this.slider.step = this.minStep;
     
-    this._updateGradient();
     this._makeStep();
   }
 
@@ -113,14 +113,14 @@ export class Slider {
 
   _updateGradient() {
     const HUNDRED_PERCENT = 100;
-
+   
     const cutoffVal = ((this.currentValue - this.slider.min) / this.FULL_RANGE) * HUNDRED_PERCENT;
     const grad = `linear-gradient(to right, black, black ${cutoffVal}%, transparent ${cutoffVal}%, transparent)`;
     this.slider.style.setProperty("--responsive-gradient", grad);
   }
 
   attach() {
-    this.slider.addEventListener('input', () => this._moveThumb()); 
+    this.slider.addEventListener('input', () => this._moveThumb()); // 'change' wouldn't work here because it fires too late
     this.options.forEach((option) => {
       option.addEventListener('click', ({ currentTarget: { value } }) => this._moveThumb(value));
     });
