@@ -1,5 +1,5 @@
 import { vi, test, expect } from 'vitest';
-import { spawn, getCoords } from "./food.js";
+import { init, getCoords } from "./food.js";
 
 document.body.innerHTML = `<span id="food"></span>`;
 vi.mock("../common/config.js", () => ( { getMinSizeUnit: () => 30 }));
@@ -25,7 +25,7 @@ const snakeCoords = [
 ]
 
 test("Food random coords get generated correctly", { repeats: 10000 }, () => {
-  spawn(borders, snakeCoords);
+  init(borders, snakeCoords);
 
   expect(getCoords()).toSatisfy(({ x, y }) => 
     (left <= x <= right)
