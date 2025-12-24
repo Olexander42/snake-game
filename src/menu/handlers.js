@@ -3,7 +3,7 @@ import setTheme from "../common/theme.js";
 
 import { normalize as normalizeBoard }  from "../components/board.js";
 
-import { addContext, Context, switchContext } from "./context.js";
+import { addContext, context, Context, switchContext } from "./context.js";
 import { buttonFlipper, Slider, Outline } from "./components.js";
 
 
@@ -15,12 +15,14 @@ let mainMenu;
 
 export function handleStartBtn(game) {  
   if (game.isFirstStart) {
-    startBtn.innerText = "Start Again";
+    startBtn.textContent = "Start Again";
 
     game.attachControls();
   } else game.reset();
 
   menu.style.display = 'none';
+  context.focusedEl = null;
+
   game.begin();
 }
 
@@ -66,7 +68,7 @@ function attachOutlines() {
 
 
 
-function attachBackBtnHandler() { // TODO: should close all buttons too
+function attachBackBtnHandler() {
   backBtn.addEventListener('click', () => {
     mainMenu.style.display = 'flex';
     settingsMenu.style.display = 'none';
