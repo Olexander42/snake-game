@@ -9,9 +9,9 @@ export function initSoundLibrary(theme) {
   if (soundLibrary) soundLibrary.bgMusic.pause(); // allow bgMusic to change
 
   soundLibrary = {
-    bgMusic: new Audio(`../assets/${theme}/sounds/background.mp3`),
-    bite: new Audio(`../assets/${theme}/sounds/bite.mp3`),
-    gameOver: new Audio(`../assets/${theme}/sounds/game-over.mp3`),
+    bgMusic: new Audio(`./assets/${theme}/sounds/background.mp3`),
+    bite: new Audio(`./assets/${theme}/sounds/bite.mp3`),
+    gameOver: new Audio(`./assets/${theme}/sounds/game-over.mp3`),
   };
 
   applyMutedState();

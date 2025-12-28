@@ -1,7 +1,7 @@
-@import url("../styles/menu.css");
-@import url("../styles/board.css");
-@import url("../styles/snake.css");
-@import url("../styles/food.css");
+@import url("./styles/menu.css");
+@import url("./styles/board.css");
+@import url("./styles/snake.css");
+@import url("./styles/food.css");
 
 :root {
   --time-gap: 0.5s;
